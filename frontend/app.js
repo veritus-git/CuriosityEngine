@@ -300,7 +300,9 @@
             saveOnb.addEventListener('click', async () => {
                 const interestsVal = $('#input-onboarding-interests').value.trim();
                 const currentVal = $('#input-onboarding-current').value.trim();
-                const goalVal = $('#input-onboarding-goal').value;
+                const goalSelect = $('#input-onboarding-goal').value;
+                const goalCustom = $('#input-onboarding-goal-custom').value.trim();
+                const levelVal = $('#input-onboarding-level').value.trim();
 
                 let subjects = [];
                 if (interestsVal) {
@@ -309,10 +311,22 @@
 
                 let currentInterests = [];
                 if (currentVal) currentInterests.push(`Chcę się dowiedzieć: ${currentVal}`);
-                if (goalVal === 'general') currentInterests.push('Cel: Rozwój ogólnej wiedzy o świecie');
-                if (goalVal === 'cs') currentInterests.push('Cel: Informatyka i nowa technologia');
-                if (goalVal === 'math') currentInterests.push('Cel: Lepsze logiczne zrozumienie matematyki');
-                if (goalVal === 'humanities') currentInterests.push('Cel: Nauki humanistyczne i kultura');
+                
+                let finalGoal = goalSelect;
+                if (goalSelect === 'custom' && goalCustom) {
+                    finalGoal = goalCustom;
+                } else if (goalSelect === 'general') finalGoal = 'Rozwój ogólnej wiedzy o świecie';
+                else if (goalSelect === 'cs') finalGoal = 'Informatyka i nowa technologia';
+                else if (goalSelect === 'math') finalGoal = 'Lepsze logiczne zrozumienie matematyki';
+                else if (goalSelect === 'humanities') finalGoal = 'Nauki humanistyczne i kultura';
+                
+                if (finalGoal !== 'custom' && finalGoal) {
+                    currentInterests.push(`Cel: ${finalGoal}`);
+                }
+
+                if (levelVal) {
+                    currentInterests.push(`Obecny poziom wiedzy: ${levelVal}`);
+                }
 
                 setLoading(saveOnb, true);
                 try {
@@ -335,7 +349,22 @@
                 if (e.key === 'Enter') $('#input-onboarding-current').focus();
             });
             $('#input-onboarding-current').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') $('#input-onboarding-goal').focus();
+            });
+            $('#input-onboarding-level').addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') saveOnb.click();
+            });
+            $('#input-onboarding-goal-custom').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') $('#input-onboarding-level').focus();
+            });
+            $('#input-onboarding-goal').addEventListener('change', (e) => {
+                const customInput = $('#input-onboarding-goal-custom');
+                if (e.target.value === 'custom') {
+                    customInput.style.display = 'block';
+                    customInput.focus();
+                } else {
+                    customInput.style.display = 'none';
+                }
             });
         }
 

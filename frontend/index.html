@@ -120,12 +120,21 @@
 
                         <div class="field" style="margin-top: 1rem;">
                             <label class="field__label">3. Jaki jest Twój główny cel?</label>
-                            <select class="input" id="input-onboarding-goal">
-                                <option value="general">Rozwój ogólnej wiedzy o świecie (wszystkiego po trochu)</option>
-                                <option value="cs">Informatyka i nowa technologia</option>
-                                <option value="math">Lepsze logiczne zrozumienie matematyki</option>
-                                <option value="humanities">Nauki humanistyczne i kultura</option>
-                            </select>
+                            <div style="display: flex; gap: 0.5rem; flex-direction: column;">
+                                <select class="input" id="input-onboarding-goal">
+                                    <option value="general">Rozwój ogólnej wiedzy o świecie (wszystkiego po trochu)</option>
+                                    <option value="cs">Informatyka i nowa technologia</option>
+                                    <option value="math">Lepsze logiczne zrozumienie matematyki</option>
+                                    <option value="humanities">Nauki humanistyczne i kultura</option>
+                                    <option value="custom">Inny (wpisz poniżej)</option>
+                                </select>
+                                <input type="text" class="input" id="input-onboarding-goal-custom" placeholder="Wpisz swój cel..." style="display: none;">
+                            </div>
+                        </div>
+
+                        <div class="field" style="margin-top: 1rem;">
+                            <label class="field__label">4. Jaki jest Twój poziom edukacji / co już wiesz?</label>
+                            <input type="text" class="input" id="input-onboarding-level" placeholder="np. student informatyki, uczeń liceum, samouk...">
                         </div>
                     </div>
 
