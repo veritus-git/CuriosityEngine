@@ -86,6 +86,10 @@
     padding: 0;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 html {
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
@@ -728,6 +732,10 @@ body {
 }
 
 /* --- Modals & Drawers --- */
+.modal-backdrop[hidden] {
+    display: none !important;
+}
+
 .modal-backdrop {
     position: fixed;
     inset: 0;
