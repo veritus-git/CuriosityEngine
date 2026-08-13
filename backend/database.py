@@ -64,12 +64,20 @@ def init_db_schema(conn: sqlite3.Connection):
             grounding_level TEXT DEFAULT 'builder',
             active_domains TEXT DEFAULT '["math", "computer_science"]',
             custom_instructions TEXT DEFAULT '',
-            language TEXT DEFAULT 'en',
+            language TEXT DEFAULT 'pl',
+            onboarded INTEGER DEFAULT 0,
             updated_at TEXT NOT NULL DEFAULT (datetime('now'))
         );
 
         INSERT OR IGNORE INTO user_cognitive_profile (id) VALUES (1);
     """)
+
+    # Ensure onboarded column exists for existing dbs
+    cursor = conn.cursor()
+    cursor.execute("PRAGMA table_info(user_cognitive_profile)")
+    columns = [row[1] for row in cursor.fetchall()]
+    if "onboarded" not in columns:
+        cursor.execute("ALTER TABLE user_cognitive_profile ADD COLUMN onboarded INTEGER DEFAULT 0")
 
     # Auto-migration from legacy tables if present
     _migrate_legacy_data(conn)
@@ -462,14 +470,16 @@ def get_profile() -> Dict[str, Any]:
         try:
             d["active_domains"] = json.loads(d.get("active_domains") or "[]")
         except Exception:
-            d["active_domains"] = ["math", "computer_science"]
+            d["active_domains"] = []
+        d["onboarded"] = bool(d.get("onboarded", 0))
         return d
     return {
         "learning_style": "top-down_analogical",
         "grounding_level": "builder",
-        "active_domains": ["math", "computer_science"],
+        "active_domains": [],
         "custom_instructions": "",
-        "language": "en"
+        "language": "pl",
+        "onboarded": False
     }
 
 
@@ -478,16 +488,18 @@ def update_profile(
     grounding_level: Optional[str] = None,
     active_domains: Optional[List[str]] = None,
     custom_instructions: Optional[str] = None,
-    language: Optional[str] = None
+    language: Optional[str] = None,
+    onboarded: Optional[bool] = None
 ) -> Dict[str, Any]:
     conn = get_connection()
     current = get_profile()
 
     style = learning_style if learning_style is not None else current["learning_style"]
     grounding = grounding_level if grounding_level is not None else current.get("grounding_level", "builder")
-    domains = json.dumps(active_domains if active_domains is not None else current["active_domains"])
+    domains = json.dumps(active_domains if active_domains is not None else current.get("active_domains", []))
     instructions = custom_instructions if custom_instructions is not None else current.get("custom_instructions", "")
-    lang = language if language is not None else current.get("language", "en")
+    lang = language if language is not None else current.get("language", "pl")
+    is_onboarded = int(onboarded) if onboarded is not None else int(current.get("onboarded", False))
 
     conn.execute("""
         UPDATE user_cognitive_profile
@@ -496,9 +508,11 @@ def update_profile(
             active_domains = ?,
             custom_instructions = ?,
             language = ?,
+            onboarded = ?,
             updated_at = datetime('now')
         WHERE id = 1
-    """, (style, grounding, domains, instructions, lang))
+    """, (style, grounding, domains, instructions, lang, is_onboarded))
     conn.commit()
     conn.close()
     return get_profile()
+

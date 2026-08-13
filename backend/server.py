@@ -73,6 +73,7 @@ class OnboardingRequest(BaseModel):
     interests: List[str] = Field(default_factory=list)
     level: str = "builder"
     recent_thought: Optional[str] = None
+    language: Optional[str] = None
 
 class ProfileUpdateRequest(BaseModel):
     learning_style: Optional[str] = None
@@ -278,25 +279,30 @@ async def update_user_profile(req: ProfileUpdateRequest, username: str = Depends
 # ─── Cold Start Spark Cards ───
 
 @app.get("/api/cold-start-cards")
-async def get_starter_cards(username: str = Depends(get_current_user_token)):
+async def get_starter_cards(lang: Optional[str] = None, username: str = Depends(get_current_user_token)):
     profile = get_profile()
-    lang = profile.get("language", "en")
-    prompts = load_prompts(lang)
+    target_lang = lang or profile.get("language", "pl")
+    prompts = load_prompts(target_lang)
     cards = prompts.get("cold_start_cards", [])
     return {"cards": cards}
 
 
 @app.post("/api/onboarding")
 async def complete_onboarding_route(req: OnboardingRequest, username: str = Depends(get_current_user_token)):
+    profile = get_profile()
+    target_lang = req.language or profile.get("language", "pl")
     update_profile(
         active_domains=req.interests,
         grounding_level=req.level,
-        custom_instructions=req.recent_thought
+        custom_instructions=req.recent_thought,
+        language=target_lang,
+        onboarded=True
     )
     cards = await generate_dynamic_starter_cards(
         interests=req.interests,
         level=req.level,
-        recent_thought=req.recent_thought
+        recent_thought=req.recent_thought,
+        language=target_lang
     )
     return {"cards": cards, "profile": get_profile()}
 

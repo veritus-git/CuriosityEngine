@@ -191,14 +191,15 @@ def get_learning_prompt(concept_id: int) -> str:
 async def generate_dynamic_starter_cards(
     interests: List[str],
     level: str,
-    recent_thought: Optional[str] = None
+    recent_thought: Optional[str] = None,
+    language: Optional[str] = None
 ) -> List[Dict[str, Any]]:
     """
     Generate 4 custom, captivating starter cards using AI based on the user's onboarding choices.
     Falls back gracefully to localized default cards if AI fails.
     """
     profile = get_profile()
-    lang = profile.get("language", "en")
+    lang = language or profile.get("language", "pl")
 
     try:
         sys_prompt, user_prompt = build_cold_start_generation_prompts(

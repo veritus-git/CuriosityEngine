@@ -102,11 +102,12 @@
 
     async function switchLanguage(code) {
         await loadLanguage(code);
+        localStorage.setItem('curiosity_lang', code);
         if (localStorage.getItem('curiosity_token')) {
             await api('POST', '/api/profile', { language: code }).catch(() => {});
         }
         updateGreetingAndDates();
-        if (state.coldStartActive) {
+        if (state.coldStartActive && state.profile && state.profile.onboarded) {
             await loadColdStartCards();
         }
     }
@@ -236,7 +237,7 @@
     // ─── Cold Start & Dynamic Starter Cards ───
     async function loadColdStartCards() {
         try {
-            const data = await api('GET', '/api/cold-start-cards');
+            const data = await api('GET', `/api/cold-start-cards?lang=${langCode}`);
             state.coldStartCards = data.cards || [];
             renderColdStartCards();
         } catch (err) {
@@ -542,8 +543,7 @@
             }
 
             if (state.coldStartActive) {
-                const domains = state.profile.active_domains || [];
-                if (!domains || domains.length === 0) {
+                if (!state.profile || !state.profile.onboarded) {
                     showView('ONBOARDING');
                 } else {
                     await loadColdStartCards();
@@ -594,6 +594,7 @@
                     }
                 }
                 localStorage.setItem('curiosity_token', data.token);
+                await api('POST', '/api/profile', { language: langCode }).catch(() => {});
                 eventsBound = false;
                 init();
             } catch (error) {
@@ -623,7 +624,8 @@
                 const res = await api('POST', '/api/onboarding', {
                     interests: activeChips,
                     level: level,
-                    recent_thought: recentThought
+                    recent_thought: recentThought,
+                    language: langCode
                 });
 
                 state.coldStartCards = res.cards || [];
