@@ -174,10 +174,10 @@ def get_recent_topics(limit=10):
 
 
 def get_all_topic_titles():
-    """Get all topic titles for context."""
+    """Get all topic titles for context (including rejected ones to avoid repeats)."""
     conn = get_connection()
     rows = conn.execute(
-        "SELECT title, status FROM topics WHERE status IN ('completed', 'active') ORDER BY created_at DESC"
+        "SELECT title, status FROM topics WHERE status IN ('completed', 'active', 'rejected') ORDER BY created_at DESC"
     ).fetchall()
     conn.close()
     return [dict(r) for r in rows]

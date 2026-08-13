@@ -6,7 +6,6 @@ A personal, self-hosted learning companion that uses AI to suggest specific, foc
 
 Not a course platform. Not a productivity tracker. Just a calm, beautiful engine for your daily curiosity.
 
----
 
 ## Why?
 
@@ -18,7 +17,6 @@ CuriosityEngine removes that friction. Open the page, get a topic, explore it. N
 
 **Structured spontaneity.**
 
----
 
 ## Features
 
@@ -31,14 +29,11 @@ CuriosityEngine removes that friction. Open the page, get a topic, explore it. N
 - 🌙 **Beautiful dark UI** — minimal, atmospheric, mobile-first
 - 🔒 **Privacy-first** — all data local, API key never touches the browser
 
----
-
 ## Requirements
 
+- Git
 - Python 3.9+
 - An AI API key (OpenAI, Anthropic, or Google Gemini)
-
----
 
 ## Installation
 
@@ -68,7 +63,6 @@ HOST=0.0.0.0
 PORT=8080
 ```
 
----
 
 ## Running
 
@@ -85,7 +79,6 @@ Since the server binds to `0.0.0.0`, you can access it from any device on your l
 1. Find your machine's local IP: `hostname -I`
 2. Open `http://<your-ip>:8080` on your phone/tablet
 
----
 
 ## Server Deployment
 
@@ -148,9 +141,7 @@ sudo journalctl -u curiosity-engine -f
 
 Once running, open `http://<server-ip>:8080` from any device on the same network.
 
-> **Tip for Raspberry Pi users:** The Pi's IP can change after reboot. Consider setting a static IP or using `hostname.local` (e.g. `http://raspberrypi.local:8080`) if mDNS is enabled.
 
----
 
 ## AI Integration
 
@@ -173,7 +164,7 @@ AI_API_KEY=ollama
 
 The AI generates structured JSON with a topic suggestion. The backend validates the response before saving.
 
----
+
 
 ## Database
 
@@ -186,7 +177,6 @@ Tables:
 
 The database is created automatically on first run.
 
----
 
 ## Security Notes
 
@@ -196,7 +186,6 @@ The database is created automatically on first run.
 - User input is sanitized in the frontend
 - No authentication (single-user, local-only design)
 
----
 
 ## Project Structure
 
@@ -218,7 +207,6 @@ CuriosityEngine/
 └── README.md
 ```
 
----
 
 ## License
 

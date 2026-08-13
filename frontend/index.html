@@ -75,6 +75,25 @@
                 </div>
             </section>
 
+            <!-- ONBOARDING state -->
+            <section class="view view--onboarding" id="view-onboarding" hidden aria-label="Welcome">
+                <div class="view__content">
+                    <h2 class="history-title" data-i18n="onboarding.title"></h2>
+                    <p class="subtitle" data-i18n="onboarding.subtitle"></p>
+
+                    <div class="field" style="margin-top: 2rem; margin-bottom: 2rem;">
+                        <input type="text" class="input" id="input-onboarding-interests" data-i18n-placeholder="onboarding.placeholder">
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn--primary" id="btn-onboarding-save">
+                            <span class="btn__text" data-i18n="onboarding.save_btn"></span>
+                            <span class="btn__loader" aria-hidden="true"></span>
+                        </button>
+                        <button class="btn btn--ghost" id="btn-onboarding-skip" data-i18n="onboarding.skip_btn"></button>
+                    </div>
+                </div>
+            </section>
+
             <!-- TOPIC_SUGGESTED state -->
             <section class="view view--suggested" id="view-suggested" hidden aria-label="Topic suggestion">
                 <div class="view__content">
@@ -222,6 +241,12 @@
                     </div>
 
                     <div class="settings-section">
+                        <h3 class="settings-heading" data-i18n="settings.language_heading"></h3>
+                        <p class="settings-hint" data-i18n="settings.language_hint"></p>
+                        <select class="input" id="select-language" aria-label="Language"></select>
+                    </div>
+
+                    <div class="settings-section">
                         <h3 class="settings-heading" data-i18n="settings.preferred_heading"></h3>
                         <p class="settings-hint" data-i18n="settings.preferred_hint"></p>
                         <div class="tag-input" id="preferred-tags"></div>
@@ -248,12 +273,6 @@
                             <option value="bottom-up" data-i18n="settings.style_bottomup"></option>
                             <option value="mixed" data-i18n="settings.style_mixed"></option>
                         </select>
-                    </div>
-
-                    <div class="settings-section">
-                        <h3 class="settings-heading" data-i18n="settings.language_heading"></h3>
-                        <p class="settings-hint" data-i18n="settings.language_hint"></p>
-                        <select class="input" id="select-language" aria-label="Language"></select>
                     </div>
 
                     <div class="settings-section">

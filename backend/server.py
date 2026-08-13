@@ -102,6 +102,7 @@ async def get_state():
         "session": session,
         "ai": ai_status,
         "history_count": history_count,
+        "preferences": get_preferences()
     }
 
 

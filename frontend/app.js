@@ -92,6 +92,7 @@
         HISTORY: $('#view-history'),
         DETAIL: $('#view-detail'),
         SETTINGS: $('#view-settings'),
+        ONBOARDING: $('#view-onboarding'),
     };
 
     // ─── API helpers ───
@@ -193,7 +194,11 @@
                 renderSuggested();
                 showView('TOPIC_SUGGESTED');
             } else {
-                showView('NO_TOPIC');
+                if (data.history_count === 0 && (!data.preferences || !data.preferences.preferred_subjects || data.preferences.preferred_subjects.length === 0)) {
+                    showView('ONBOARDING');
+                } else {
+                    showView('NO_TOPIC');
+                }
             }
         } catch (err) {
             showView('NO_TOPIC');
@@ -240,6 +245,35 @@
         $('#btn-history-back').addEventListener('click', goBack);
         $('#btn-settings-back').addEventListener('click', goBack);
         $('#btn-detail-back').addEventListener('click', () => loadHistory());
+
+        // ONBOARDING
+        const saveOnb = $('#btn-onboarding-save');
+        if (saveOnb) {
+            saveOnb.addEventListener('click', async () => {
+                const val = $('#input-onboarding-interests').value.trim();
+                if (val) {
+                    const subjects = val.split(',').map(s => s.trim()).filter(s => s);
+                    if (subjects.length > 0) {
+                        setLoading(saveOnb, true);
+                        try {
+                            const prefs = await api('GET', '/api/preferences');
+                            prefs.preferred_subjects = subjects;
+                            await api('POST', '/api/preferences', prefs);
+                        } catch (err) {
+                            showError(err.message);
+                        }
+                        setLoading(saveOnb, false);
+                    }
+                }
+                showView('NO_TOPIC');
+            });
+            $('#btn-onboarding-skip').addEventListener('click', () => {
+                showView('NO_TOPIC');
+            });
+            $('#input-onboarding-interests').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') saveOnb.click();
+            });
+        }
 
         // TOAST
         $('#toast-close').addEventListener('click', hideError);

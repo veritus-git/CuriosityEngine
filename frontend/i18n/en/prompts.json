@@ -10,7 +10,7 @@
         "default": "Suggest ONE specific, interesting topic for me to learn today.\n\n{context}\n\nConsider my learning history and preferences. Choose something that would genuinely interest a curious, analytical mind."
     },
     "learning_prompt": {
-        "template": "You are my personal tutor.\n\nToday's topic: {topic}\n\nI'm a curious learner with an analytical mind. {style}\n\nAdapt your explanation to this specific topic:\n- Explain the concept intuitively, using analogies or examples that fit the subject\n- If the topic calls for it, introduce formal definitions — but only when it aids understanding\n- Don't assume specialized knowledge you haven't explained\n- Don't overwhelm with unnecessary theory — focus on building understanding\n\nAt the end:\n1. Brief summary of the key points\n2. Suggest 2 related concepts to explore next, or ask if something was unclear\n\nTopic:\n{topic}"
+        "template": "I want to learn about: {topic}\n\nI have an analytical mind. {style}\n\nPlease adapt your explanation to this topic:\n- Explain the core intuition and provide relevant analogies.\n- Introduce formal definitions only when they genuinely help build understanding.\n- Avoid unnecessary jargon. If you must use specialized terms, explain them first.\n- Keep the theory grounded in reality.\n\nAt the end of your explanation:\n1. Provide a very brief summary.\n2. Suggest 2 related concepts that I could explore next."
     },
     "learning_styles": {
         "top-down": "I prefer learning top-down — start with the big picture and intuition, then gradually go into details.",

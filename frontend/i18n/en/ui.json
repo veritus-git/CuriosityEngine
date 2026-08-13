@@ -15,6 +15,13 @@
         "evening": "Good evening.",
         "night_owl": "Night owl mode."
     },
+    "onboarding": {
+        "title": "Welcome to CuriosityEngine",
+        "subtitle": "To give you the best suggestions, what are you generally interested in?",
+        "placeholder": "e.g. physics, art history, coding\u2026",
+        "save_btn": "Start Exploring",
+        "skip_btn": "Skip for now"
+    },
     "no_topic": {
         "subtitle": "What shall we explore?",
         "suggest_btn": "Suggest a topic",

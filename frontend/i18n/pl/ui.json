@@ -15,6 +15,13 @@
         "evening": "Dobry wiecz\u00f3r.",
         "night_owl": "Tryb nocnego marka."
     },
+    "onboarding": {
+        "title": "Witaj w CuriosityEngine",
+        "subtitle": "Jakie s\u0105 Twoje g\u0142\u00f3wne zainteresowania, aby\u015bmy mogli lepjej dobiera\u0107 tematy?",
+        "placeholder": "np. fizyka, historia sztuki, programowanie\u2026",
+        "save_btn": "Rozpocznij eksploracj\u0119",
+        "skip_btn": "Pomi\u0144 na razie"
+    },
     "no_topic": {
         "subtitle": "Czego dzi\u015b b\u0119dziemy szuka\u0107?",
         "suggest_btn": "Zasugeruj temat",
