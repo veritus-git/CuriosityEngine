@@ -507,8 +507,26 @@
     async function copyPrompt() {
         if (!state.topic) return;
         try {
-            const promptText = $('#active-prompt-text').value;
-            await navigator.clipboard.writeText(promptText);
+            const promptText = $('#active-prompt-text').textContent;
+            
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(promptText);
+            } else {
+                const textArea = document.createElement("textarea");
+                textArea.value = promptText;
+                textArea.style.top = "0";
+                textArea.style.left = "0";
+                textArea.style.position = "fixed";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                } catch (err) {
+                    throw new Error('Fallback copy failed');
+                }
+                document.body.removeChild(textArea);
+            }
             
             const btn = $('#btn-copy-prompt');
             btn.innerHTML = '<span class="icon">✓</span>';
@@ -603,17 +621,17 @@
         $('#active-meta').textContent = started ? t('active.started', { date: started }) : '';
         if ($('#active-prompt-text')) {
             if (state.topic.prompt) {
-                $('#active-prompt-text').value = state.topic.prompt;
+                $('#active-prompt-text').textContent = state.topic.prompt;
             } else {
-                $('#active-prompt-text').value = 'Loading prompt...';
+                $('#active-prompt-text').textContent = 'Loading prompt...';
                 try {
                     const data = await api('POST', '/api/learning-prompt', {
                         topic_title: state.topic.title,
                     });
                     state.topic.prompt = data.prompt;
-                    $('#active-prompt-text').value = data.prompt;
+                    $('#active-prompt-text').textContent = data.prompt;
                 } catch (err) {
-                    $('#active-prompt-text').value = 'Failed to load prompt.';
+                    $('#active-prompt-text').textContent = 'Failed to load prompt.';
                 }
             }
         }

@@ -171,13 +171,17 @@
                     <p class="topic-reason" id="suggested-reason"></p>
                     <p class="topic-connection" id="suggested-connection"></p>
 
-                    <div class="actions">
-                        <button class="btn btn--primary" id="btn-accept" data-i18n="suggested.accept_btn"></button>
+                    <div class="actions actions--row">
                         <button class="btn btn--secondary" id="btn-skip">
                             <span class="btn__text" data-i18n="suggested.skip_btn"></span>
                             <span class="btn__loader" aria-hidden="true"></span>
                         </button>
-                        <button class="btn btn--ghost" id="btn-reject">
+                        <button class="btn btn--primary" id="btn-accept">
+                            <span class="btn__text" data-i18n="suggested.accept_btn"></span>
+                            <span class="icon" style="margin-left: 0.25rem;">➔</span>
+                            <span class="btn__loader" aria-hidden="true"></span>
+                        </button>
+                        <button class="btn btn--ghost" id="btn-reject" style="width: 100%; margin-top: 1rem; flex: 1 1 100%;">
                             <span class="btn__text" data-i18n="suggested.reject_btn"></span>
                             <span class="btn__loader" aria-hidden="true"></span>
                         </button>
@@ -193,15 +197,17 @@
                     <p class="topic-reason" id="active-reason"></p>
                     <p class="topic-meta" id="active-meta"></p>
 
-                    <div class="actions">
-                        <button class="btn btn--secondary" id="btn-copy-prompt">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-                            </svg>
-                            <span data-i18n="active.copy_prompt_btn"></span>
+                    <div class="prompt-container" style="position: relative; background: var(--bg-elevated); padding: var(--space-lg); border-radius: var(--radius-md); border: 1px solid var(--border); width: 100%; text-align: left; margin-top: 1rem;">
+                        <button id="btn-copy-prompt" class="btn btn--ghost btn--small" style="position: absolute; top: var(--space-sm); right: var(--space-sm);" title="Copy">
+                            <span class="icon">📋</span>
                         </button>
-                        <button class="btn btn--primary" id="btn-finish" data-i18n="active.finish_btn"></button>
+                        <div id="active-prompt-text" contenteditable="plaintext-only" style="width: 100%; background: transparent; border: none; color: var(--text-secondary); font-family: var(--font-mono); font-size: var(--fs-sm); outline: none; white-space: pre-wrap; word-break: break-word;"></div>
+                    </div>
+
+                    <div class="actions actions--row" style="margin-top: 2rem;">
+                        <button class="btn btn--primary" id="btn-finish">
+                            <span class="icon">✓</span> <span class="btn__text" data-i18n="active.finish_btn"></span>
+                        </button>
                     </div>
 
                     <div class="prompt-copied" id="prompt-copied" hidden>
@@ -212,26 +218,29 @@
 
             <!-- REFLECTION state -->
             <section class="view view--reflection" id="view-reflection" hidden aria-label="Reflection">
-                <div class="view__content">
-                    <p class="label label--subtle" data-i18n="reflection.label"></p>
-                    <h2 class="reflection-title" data-i18n="reflection.title"></h2>
-                    <p class="reflection-topic" id="reflection-topic"></p>
-
-                    <form class="reflection-form" id="reflection-form">
-                        <div class="field">
-                            <label class="field__label" for="field-notes" data-i18n="reflection.notes_label"></label>
-                            <textarea class="textarea" id="field-notes" rows="3" data-i18n-placeholder="reflection.notes_placeholder"></textarea>
+                <div class="view__content view__content--wide">
+                    <div class="reflection-layout" style="display: grid; grid-template-columns: 1fr; gap: 2rem; width: 100%; text-align: left; align-items: start;">
+                        <div class="reflection-header">
+                            <p class="label label--subtle" data-i18n="reflection.label"></p>
+                            <h1 style="font-size: var(--fs-xl); margin-bottom: 1rem; margin-top: 0.5rem; color: var(--text-secondary);" data-i18n="reflection.title"></h1>
+                            <h2 class="topic-title" id="reflection-topic" style="font-size: var(--fs-2xl); text-align: left; margin: 0; max-width: 100%;"></h2>
                         </div>
 
-                        <div class="field">
-                            <label class="field__label" for="field-discoveries" data-i18n="reflection.discoveries_label"></label>
-                            <textarea class="textarea" id="field-discoveries" rows="3" data-i18n-placeholder="reflection.discoveries_placeholder"></textarea>
-                        </div>
+                        <form class="reflection-form" id="reflection-form" style="width: 100%; max-width: 100%; display: flex; flex-direction: column; gap: 2rem;">
+                            <div class="field">
+                                <label class="field__label" for="field-notes" data-i18n="reflection.notes_label"></label>
+                                <textarea class="textarea" id="field-notes" rows="3" data-i18n-placeholder="reflection.notes_placeholder"></textarea>
+                            </div>
 
-                        <div class="field">
-                            <label class="field__label" for="field-sidepaths" data-i18n="reflection.sidepaths_label"></label>
-                            <textarea class="textarea" id="field-sidepaths" rows="3" data-i18n-placeholder="reflection.sidepaths_placeholder"></textarea>
-                        </div>
+                            <div class="field">
+                                <label class="field__label" for="field-discoveries" data-i18n="reflection.discoveries_label"></label>
+                                <textarea class="textarea" id="field-discoveries" rows="3" data-i18n-placeholder="reflection.discoveries_placeholder"></textarea>
+                            </div>
+
+                            <div class="field">
+                                <label class="field__label" for="field-sidepaths" data-i18n="reflection.sidepaths_label"></label>
+                                <textarea class="textarea" id="field-sidepaths" rows="3" data-i18n-placeholder="reflection.sidepaths_placeholder"></textarea>
+                            </div>
 
                         <div class="ratings">
                             <div class="rating-group">
