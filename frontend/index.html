@@ -86,18 +86,29 @@
                 </div>
             </section>
 
-            <!-- 2. ONBOARDING VIEW (FLEXIBLE & GENERAL PROFILE) -->
-            <section class="view view--onboarding" id="view-onboarding" hidden aria-label="Onboarding">
-                <div class="view__content view__content--wide onboarding-container">
-                    <div class="onboarding-header">
-                        <span class="badge" data-i18n="onboarding.badge"></span>
-                        <h1 class="page-title" data-i18n="onboarding.title"></h1>
-                        <p class="page-subtitle" data-i18n="onboarding.subtitle"></p>
+            <!-- 2. ONBOARDING VIEW (3-STEP INTERACTIVE SLIDE WIZARD) -->
+            <section class="view view--onboarding" id="view-onboarding" hidden aria-label="Onboarding Wizard">
+                <div class="view__content onboarding-container">
+                    
+                    <!-- Wizard Header & Progress Bar -->
+                    <div class="wizard-header">
+                        <div class="wizard-meta">
+                            <span class="badge" data-i18n="onboarding.badge"></span>
+                            <span class="wizard-step-indicator" id="wizard-step-text"></span>
+                        </div>
+                        <div class="wizard-progress-bar">
+                            <div class="wizard-progress-fill" id="wizard-progress-fill"></div>
+                        </div>
                     </div>
 
-                    <form id="onboarding-form" class="onboarding-form">
-                        <div class="onboarding-section">
-                            <label class="field__label" data-i18n="onboarding.domains_label"></label>
+                    <!-- Slide Card Container -->
+                    <div class="wizard-card">
+                        
+                        <!-- SLIDE 1: DOMAINS & PASSIONS -->
+                        <div class="wizard-slide" id="wizard-slide-1">
+                            <h2 class="slide-title" data-i18n="onboarding.step1_title"></h2>
+                            <p class="slide-subtitle" data-i18n="onboarding.step1_subtitle"></p>
+
                             <div class="chips-grid" id="onboarding-domains-chips">
                                 <button type="button" class="chip active" data-domain="math" data-i18n="onboarding.domains.math"></button>
                                 <button type="button" class="chip active" data-domain="cs" data-i18n="onboarding.domains.cs"></button>
@@ -108,29 +119,64 @@
                                 <button type="button" class="chip" data-domain="linguistics" data-i18n="onboarding.domains.linguistics"></button>
                                 <button type="button" class="chip" data-domain="philosophy" data-i18n="onboarding.domains.philosophy"></button>
                             </div>
+
+                            <!-- Custom Tag Input -->
+                            <div class="custom-chip-builder">
+                                <input type="text" class="input" id="input-custom-chip" data-i18n-placeholder="onboarding.custom_chip_placeholder">
+                                <button type="button" class="btn btn--secondary" id="btn-add-custom-chip" data-i18n="onboarding.add_chip_btn"></button>
+                            </div>
+
+                            <div class="wizard-actions">
+                                <div></div>
+                                <button type="button" class="btn btn--primary" id="btn-wizard-step1-next" data-i18n="onboarding.btn_next"></button>
+                            </div>
                         </div>
 
-                        <div class="onboarding-section">
-                            <label class="field__label" for="onboarding-level-select" data-i18n="onboarding.level_label"></label>
-                            <select class="input select-input" id="onboarding-level-select">
-                                <option value="ground_zero" data-i18n="onboarding.level_ground_zero"></option>
-                                <option value="builder" selected data-i18n="onboarding.level_builder"></option>
-                                <option value="deep" data-i18n="onboarding.level_deep"></option>
-                            </select>
+                        <!-- SLIDE 2: GROUNDING LEVEL CARDS -->
+                        <div class="wizard-slide" id="wizard-slide-2" hidden>
+                            <h2 class="slide-title" data-i18n="onboarding.step2_title"></h2>
+                            <p class="slide-subtitle" data-i18n="onboarding.step2_subtitle"></p>
+
+                            <div class="level-cards-grid">
+                                <div class="level-tile" data-level="ground_zero">
+                                    <h3 class="level-tile__title" data-i18n="onboarding.level_ground_zero_title"></h3>
+                                    <p class="level-tile__desc" data-i18n="onboarding.level_ground_zero_desc"></p>
+                                </div>
+                                <div class="level-tile active" data-level="builder">
+                                    <h3 class="level-tile__title" data-i18n="onboarding.level_builder_title"></h3>
+                                    <p class="level-tile__desc" data-i18n="onboarding.level_builder_desc"></p>
+                                </div>
+                                <div class="level-tile" data-level="deep">
+                                    <h3 class="level-tile__title" data-i18n="onboarding.level_deep_title"></h3>
+                                    <p class="level-tile__desc" data-i18n="onboarding.level_deep_desc"></p>
+                                </div>
+                            </div>
+
+                            <div class="wizard-actions">
+                                <button type="button" class="btn btn--ghost" id="btn-wizard-step2-prev" data-i18n="onboarding.btn_prev"></button>
+                                <button type="button" class="btn btn--primary" id="btn-wizard-step2-next" data-i18n="onboarding.btn_next"></button>
+                            </div>
                         </div>
 
-                        <div class="onboarding-section">
-                            <label class="field__label" for="onboarding-recent-input" data-i18n="onboarding.recent_label"></label>
-                            <textarea class="textarea" id="onboarding-recent-input" rows="2" data-i18n-placeholder="onboarding.recent_placeholder"></textarea>
+                        <!-- SLIDE 3: RECENT INTRIGUES & SUBMIT -->
+                        <div class="wizard-slide" id="wizard-slide-3" hidden>
+                            <h2 class="slide-title" data-i18n="onboarding.step3_title"></h2>
+                            <p class="slide-subtitle" data-i18n="onboarding.step3_subtitle"></p>
+
+                            <div class="field">
+                                <textarea class="textarea" id="onboarding-recent-input" rows="4" data-i18n-placeholder="onboarding.recent_placeholder"></textarea>
+                            </div>
+
+                            <div class="wizard-actions">
+                                <button type="button" class="btn btn--ghost" id="btn-wizard-step3-prev" data-i18n="onboarding.btn_prev"></button>
+                                <button type="button" class="btn btn--primary btn--lg" id="btn-onboarding-submit">
+                                    <span class="btn__text" data-i18n="onboarding.btn_submit"></span>
+                                    <span class="btn__loader" aria-hidden="true"></span>
+                                </button>
+                            </div>
                         </div>
 
-                        <div class="onboarding-actions">
-                            <button type="submit" class="btn btn--primary btn--lg btn--full" id="btn-onboarding-submit">
-                                <span class="btn__text" data-i18n="onboarding.submit_btn"></span>
-                                <span class="btn__loader" aria-hidden="true"></span>
-                            </button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </section>
 

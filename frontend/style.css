@@ -971,75 +971,171 @@ body {
     margin-top: var(--space-xs);
 }
 
-/* --- Onboarding Layout & Chips --- */
+/* --- Onboarding Slide Wizard Layout --- */
 .onboarding-container {
-    max-width: 720px;
-    margin: 0 auto;
+    max-width: 680px;
+    width: 100%;
+    margin: 1rem auto;
 }
 
-.onboarding-header {
-    text-align: center;
-    margin-bottom: var(--space-xl);
-}
-
-.onboarding-form {
+.wizard-header {
     display: flex;
     flex-direction: column;
-    gap: var(--space-xl);
+    gap: var(--space-xs);
+    margin-bottom: var(--space-lg);
+}
+
+.wizard-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.wizard-step-indicator {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: #38bdf8;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.wizard-progress-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--bg-hover);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.wizard-progress-fill {
+    height: 100%;
+    width: 33.33%;
+    background: linear-gradient(90deg, #6366f1, #38bdf8);
+    transition: width var(--duration-normal) var(--ease-out);
+}
+
+.wizard-card {
     background: var(--bg-surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-xl);
-    padding: var(--space-xl);
+    padding: 2.5rem;
     box-shadow: var(--card-shadow);
 }
 
-.onboarding-section {
+.wizard-slide {
     display: flex;
     flex-direction: column;
-    gap: var(--space-sm);
+    gap: 1.4rem;
+    animation: fadeIn var(--duration-fast) var(--ease-out);
+}
+
+.wizard-slide[hidden] {
+    display: none !important;
+}
+
+.slide-title {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.01em;
+}
+
+.slide-subtitle {
+    font-size: 0.95rem;
+    color: #cbd5e1;
+    line-height: 1.45;
 }
 
 .chips-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-xs);
+    gap: 0.5rem;
 }
 
 .chip {
     display: inline-flex;
     align-items: center;
-    padding: 0.6rem 1rem;
+    padding: 0.65rem 1.1rem;
     font-family: var(--font-sans);
-    font-size: var(--fs-sm);
+    font-size: 0.9rem;
     font-weight: 500;
-    color: var(--text-secondary);
-    background: var(--bg-elevated);
-    border: 1px solid var(--border);
+    color: #cbd5e1;
+    background: #11111f;
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 999px;
     cursor: pointer;
+    user-select: none;
     transition: all var(--duration-fast) var(--ease-out);
 }
 
 .chip:hover {
-    color: var(--text-primary);
-    border-color: var(--border-focus);
-    background: var(--bg-hover);
+    color: #ffffff;
+    border-color: #818cf8;
+    background: #18182e;
 }
 
 .chip.active {
     color: #ffffff;
     background: var(--accent);
     border-color: var(--accent);
-    box-shadow: 0 4px 15px var(--accent-glow-strong);
+    box-shadow: 0 4px 16px var(--accent-glow-strong);
 }
 
-.select-input {
+.custom-chip-builder {
+    display: flex;
+    gap: var(--space-xs);
+    width: 100%;
+    margin-top: 0.25rem;
+}
+
+.level-cards-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.level-tile {
+    padding: 1.2rem 1.4rem;
+    background: #11111e;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
     cursor: pointer;
-    font-weight: 500;
+    transition: all var(--duration-fast) var(--ease-out);
 }
 
-.onboarding-actions {
+.level-tile:hover {
+    background: #16162c;
+    border-color: #818cf8;
+}
+
+.level-tile.active {
+    background: #15152a;
+    border-color: #6366f1;
+    box-shadow: 0 0 24px rgba(99, 102, 241, 0.22);
+}
+
+.level-tile__title {
+    font-size: 1.12rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.3rem;
+}
+
+.level-tile__desc {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    line-height: 1.4;
+}
+
+.wizard-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
     margin-top: var(--space-sm);
+    padding-top: var(--space-sm);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 /* --- Zen Loading Overlay --- */

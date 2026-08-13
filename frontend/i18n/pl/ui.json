@@ -29,9 +29,11 @@
     },
     "onboarding": {
         "badge": "Personalizacja",
-        "title": "Witaj w CuriosityEngine",
-        "subtitle": "Wybierz kilka ogólnych dziedzin i orientacyjny poziom — wygenerujemy dla Ciebie 4 unikalne, porywające tematy startowe:",
-        "domains_label": "1. Co Cię najbardziej pociąga? (Zaznacz kilka)",
+        "step_progress": "Krok {current} z {total}",
+        "step1_title": "Co Cię najbardziej pociąga?",
+        "step1_subtitle": "Zaznacz dziedziny lub dodaj własne hasła. Silnik użyje ich do wygenerowania nieoczywistych tematów:",
+        "custom_chip_placeholder": "Wpisz własną pasję (np. teoria gier, kryptografia)...",
+        "add_chip_btn": "+ Dodaj",
         "domains": {
             "math": "📐 Matematyka",
             "cs": "💻 Computer Science",
@@ -42,13 +44,20 @@
             "linguistics": "🗣️ Lingwistyka",
             "philosophy": "🏛️ Filozofia i Logika"
         },
-        "level_label": "2. Twój orientacyjny punkt wyjścia:",
-        "level_ground_zero": "🟢 Zupełny Laik (Tłumacz od zera i intuicyjnych analogii)",
-        "level_builder": "🟡 Średniozaawansowany / Samouk (Znam podstawy)",
-        "level_deep": "🔴 Głęboka woda (Nietrywialne, zaawansowane powiązania)",
-        "recent_label": "3. O czym ostatnio myślałeś lub co Cię ciekawi? (Opcjonalne)",
-        "recent_placeholder": "np. jak działają GPU, algorytmy kompresji, teoria liczb...",
-        "submit_btn": "Wygeneruj moje tematy startowe ✨"
+        "step2_title": "Twój orientacyjny punkt wyjścia",
+        "step2_subtitle": "Wybierz styl, w jakim silnik ma przygotowywać pierwsze modele mentalne:",
+        "level_ground_zero_title": "🟢 Zupełny Laik",
+        "level_ground_zero_desc": "Tłumacz od zupełnego zera i intuicyjnych analogii jak z klocków LEGO.",
+        "level_builder_title": "🟡 Średniozaawansowany / Samouk",
+        "level_builder_desc": "Znam podstawy, chcę łączyć kropki i budować wyżej.",
+        "level_deep_title": "🔴 Głęboka woda",
+        "level_deep_desc": "Nietrywialne powiązania i zaawansowane mechanizmy pod maską.",
+        "step3_title": "O czym ostatnio myślałeś?",
+        "step3_subtitle": "Wpisz cokolwiek, co mignęło Ci w głowie w ostatnich dniach (lub zostaw puste):",
+        "recent_placeholder": "np. jak działają GPU, dlaczego kompresja wideo gubi jakość, jak silnik szachowy ocenia pozycję...",
+        "btn_next": "Dalej ➔",
+        "btn_prev": "← Wstecz",
+        "btn_submit": "Wygeneruj moje tematy startowe ✨"
     },
     "cold_start": {
         "badge": "Zimny Start",

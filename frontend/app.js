@@ -1,6 +1,6 @@
 /**
  * CuriosityEngine — Zen Dashboard Frontend Application
- * Fully associative, vector-backed knowledge interface with Dynamic Starter Sparks & Onboarding.
+ * Fully associative, vector-backed knowledge interface with Slide Wizard Onboarding & Dynamic Starter Sparks.
  * Adheres strictly to i18n — zero hardcoded UI strings.
  */
 
@@ -20,9 +20,13 @@
         coldStartCards: []
     };
 
+    // ─── Wizard State ───
+    let wizardCurrentStep = 1;
+    let selectedLevel = 'builder';
+
     // ─── i18n Engine ───
     let lang = {};
-    let langCode = 'en';
+    let langCode = 'pl';
     let languages = [];
 
     function t(key, vars) {
@@ -50,6 +54,7 @@
             el.innerHTML = t(el.dataset.i18nHtml);
         });
         document.documentElement.lang = langCode;
+        updateWizardProgress();
     }
 
     async function loadLanguage(code) {
@@ -70,7 +75,7 @@
             const data = await api('GET', '/api/languages');
             languages = data.languages || [];
         } catch (err) {
-            languages = [{ code: 'en', name: 'English', native_name: 'English' }];
+            languages = [{ code: 'pl', name: 'Polish', native_name: 'Polski' }];
         }
 
         const sel = $('#topbar-lang-select');
@@ -196,6 +201,10 @@
             if (navLinks) navLinks.hidden = false;
             if (floatingBtn) floatingBtn.hidden = false;
         }
+
+        if (viewName === 'ONBOARDING') {
+            setWizardStep(1);
+        }
     }
 
     function showToast(message) {
@@ -212,7 +221,7 @@
     function updateGreetingAndDates() {
         const dateEl = $('#topbar-date');
         const greetingEl = $('#greeting-title');
-        const locale = t('dates.locale') || 'en-US';
+        const locale = t('dates.locale') || 'pl-PL';
 
         if (dateEl) {
             dateEl.textContent = new Date().toLocaleDateString(locale, {
@@ -231,6 +240,31 @@
             else if (h < 21) greetingKey = 'greeting.evening';
             else greetingKey = 'greeting.night_owl';
             greetingEl.textContent = t(greetingKey);
+        }
+    }
+
+    // ─── Onboarding Slide Wizard Controller ───
+    function setWizardStep(step) {
+        wizardCurrentStep = step;
+        const slide1 = $('#wizard-slide-1');
+        const slide2 = $('#wizard-slide-2');
+        const slide3 = $('#wizard-slide-3');
+
+        if (slide1) slide1.hidden = (step !== 1);
+        if (slide2) slide2.hidden = (step !== 2);
+        if (slide3) slide3.hidden = (step !== 3);
+
+        updateWizardProgress();
+    }
+
+    function updateWizardProgress() {
+        const stepText = $('#wizard-step-text');
+        const progressFill = $('#wizard-progress-fill');
+        if (stepText) {
+            stepText.textContent = t('onboarding.step_progress', { current: wizardCurrentStep, total: 3 });
+        }
+        if (progressFill) {
+            progressFill.style.width = `${(wizardCurrentStep / 3) * 100}%`;
         }
     }
 
@@ -514,18 +548,15 @@
         const token = localStorage.getItem('curiosity_token');
         const savedLang = localStorage.getItem('curiosity_lang') || 'pl';
 
-        if (!token) {
-            await loadLanguage(savedLang);
-            await loadLanguageList();
-            bindEvents();
-            showView('AUTH');
-            return;
-        }
-
         await loadLanguage(savedLang);
         await loadLanguageList();
         updateGreetingAndDates();
-        bindEvents();
+        bindGlobalEvents();
+
+        if (!token) {
+            showView('AUTH');
+            return;
+        }
 
         try {
             const data = await api('GET', '/api/state');
@@ -567,7 +598,7 @@
 
     // ─── Event Bindings ───
     let eventsBound = false;
-    function bindEvents() {
+    function bindGlobalEvents() {
         if (eventsBound) return;
         eventsBound = true;
 
@@ -605,44 +636,114 @@
             }
         });
 
-        // Onboarding Chips Toggle
-        $$('#onboarding-domains-chips .chip').forEach(chip => {
-            chip.addEventListener('click', () => {
-                chip.classList.toggle('active');
+        // Dynamic Event Delegation for Chips Grid (Clicking predefined or custom chips)
+        const chipsContainer = $('#onboarding-domains-chips');
+        if (chipsContainer) {
+            chipsContainer.addEventListener('click', (e) => {
+                const chip = e.target.closest('.chip');
+                if (chip) {
+                    chip.classList.toggle('active');
+                }
             });
-        });
+        }
 
-        // Onboarding Form Submission
-        $('#onboarding-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const activeChips = Array.from($$('#onboarding-domains-chips .chip.active')).map(c => c.dataset.domain);
-            const level = $('#onboarding-level-select').value;
-            const recentThought = $('#onboarding-recent-input').value.trim();
+        // Adding Custom Interest Chip
+        function addCustomChip() {
+            const input = $('#input-custom-chip');
+            if (!input) return;
+            const text = input.value.trim();
+            if (!text) return;
 
-            setGlobalLoading(true, 'loading.onboarding');
-            try {
-                const res = await api('POST', '/api/onboarding', {
-                    interests: activeChips,
-                    level: level,
-                    recent_thought: recentThought,
-                    language: langCode
-                });
+            const newChip = document.createElement('button');
+            newChip.type = 'button';
+            newChip.className = 'chip active';
+            newChip.dataset.domain = text.toLowerCase().replace(/\s+/g, '_');
+            newChip.textContent = `✨ ${text}`;
+            
+            chipsContainer.appendChild(newChip);
+            input.value = '';
+            input.focus();
+        }
 
-                state.coldStartCards = res.cards || [];
-                state.profile = res.profile || {};
-                renderColdStartCards();
-                showView('COLD_START');
-            } catch (err) {
-                showToast(err.message || t('errors.server_down'));
-            } finally {
-                setGlobalLoading(false);
-            }
-        });
+        const btnAddCustomChip = $('#btn-add-custom-chip');
+        if (btnAddCustomChip) {
+            btnAddCustomChip.addEventListener('click', addCustomChip);
+        }
+        const inputCustomChip = $('#input-custom-chip');
+        if (inputCustomChip) {
+            inputCustomChip.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addCustomChip();
+                }
+            });
+        }
+
+        // Level Tiles Selection
+        const levelGrid = $('.level-cards-grid');
+        if (levelGrid) {
+            levelGrid.addEventListener('click', (e) => {
+                const tile = e.target.closest('.level-tile');
+                if (!tile) return;
+                $$('.level-tile').forEach(t => t.classList.remove('active'));
+                tile.classList.add('active');
+                selectedLevel = tile.dataset.level || 'builder';
+            });
+        }
+
+        // Wizard Step Navigation
+        const btnStep1Next = $('#btn-wizard-step1-next');
+        if (btnStep1Next) {
+            btnStep1Next.addEventListener('click', () => setWizardStep(2));
+        }
+
+        const btnStep2Prev = $('#btn-wizard-step2-prev');
+        if (btnStep2Prev) {
+            btnStep2Prev.addEventListener('click', () => setWizardStep(1));
+        }
+        const btnStep2Next = $('#btn-wizard-step2-next');
+        if (btnStep2Next) {
+            btnStep2Next.addEventListener('click', () => setWizardStep(3));
+        }
+
+        const btnStep3Prev = $('#btn-wizard-step3-prev');
+        if (btnStep3Prev) {
+            btnStep3Prev.addEventListener('click', () => setWizardStep(2));
+        }
+
+        // Wizard Submit Button (Final Step)
+        const btnOnboardingSubmit = $('#btn-onboarding-submit');
+        if (btnOnboardingSubmit) {
+            btnOnboardingSubmit.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const activeChips = Array.from($$('#onboarding-domains-chips .chip.active')).map(c => c.textContent.trim().replace(/^✨\s*/, ''));
+                const recentThought = ($('#onboarding-recent-input')?.value || '').trim();
+
+                setGlobalLoading(true, 'loading.onboarding');
+                try {
+                    const res = await api('POST', '/api/onboarding', {
+                        interests: activeChips.length > 0 ? activeChips : ['Matematyka', 'Computer Science'],
+                        level: selectedLevel,
+                        recent_thought: recentThought,
+                        language: langCode
+                    });
+
+                    state.coldStartCards = res.cards || [];
+                    state.profile = res.profile || {};
+                    renderColdStartCards();
+                    showView('COLD_START');
+                } catch (err) {
+                    showToast(err.message || t('errors.server_down'));
+                } finally {
+                    setGlobalLoading(false);
+                }
+            });
+        }
 
         // Navigation
         $('#nav-brand').addEventListener('click', (e) => {
             e.preventDefault();
-            showView(state.coldStartActive ? 'COLD_START' : 'DASHBOARD');
+            showView(state.coldStartActive ? (state.profile.onboarded ? 'COLD_START' : 'ONBOARDING') : 'DASHBOARD');
         });
         $('#btn-nav-sparks').addEventListener('click', () => {
             loadSparksList();

@@ -29,9 +29,11 @@
     },
     "onboarding": {
         "badge": "Personalization",
-        "title": "Welcome to CuriosityEngine",
-        "subtitle": "Select a few broad areas and your rough background — we'll generate 4 unique starter sparks for you:",
-        "domains_label": "1. What pulls your curiosity most? (Select a few)",
+        "step_progress": "Step {current} of {total}",
+        "step1_title": "What pulls your curiosity?",
+        "step1_subtitle": "Select broad domains or add custom passions for AI associative connections:",
+        "custom_chip_placeholder": "Type custom interest (e.g. game theory, cryptography)...",
+        "add_chip_btn": "+ Add",
         "domains": {
             "math": "📐 Mathematics",
             "cs": "💻 Computer Science",
@@ -42,13 +44,20 @@
             "linguistics": "🗣️ Linguistics",
             "philosophy": "🏛️ Philosophy & Logic"
         },
-        "level_label": "2. Your rough baseline:",
-        "level_ground_zero": "🟢 Complete Beginner (Explain from scratch & intuitive analogies)",
-        "level_builder": "🟡 Intermediate / Self-taught (I know the basics)",
-        "level_deep": "🔴 Deep Explorer (Jump straight into advanced connections)",
-        "recent_label": "3. Any specific questions or thoughts on your mind recently? (Optional)",
-        "recent_placeholder": "e.g. how GPUs render scenes, data compression algorithms, number theory...",
-        "submit_btn": "Generate My Starter Sparks ✨"
+        "step2_title": "Your rough baseline",
+        "step2_subtitle": "Choose the intuition style for your starter mental models:",
+        "level_ground_zero_title": "🟢 Complete Beginner",
+        "level_ground_zero_desc": "Explain from absolute scratch with mechanical LEGO-like analogies.",
+        "level_builder_title": "🟡 Intermediate / Builder",
+        "level_builder_desc": "I understand fundamentals, let's connect dots higher up.",
+        "level_deep_title": "🔴 Deep Explorer",
+        "level_deep_desc": "Non-trivial deep dives and architectural mechanisms under the hood.",
+        "step3_title": "Any recent curious thoughts?",
+        "step3_subtitle": "Type anything you recently wondered about (or leave blank):",
+        "recent_placeholder": "e.g. how GPUs render scenes, how video codecs drop data, chess engine search...",
+        "btn_next": "Next ➔",
+        "btn_prev": "← Back",
+        "btn_submit": "Generate My Starter Sparks ✨"
     },
     "cold_start": {
         "badge": "Starter Sparks",
