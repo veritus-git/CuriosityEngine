@@ -33,7 +33,8 @@
     "suggested": {
         "label": "Dzisiejsza sugestia",
         "accept_btn": "Zbadaj ten temat",
-        "reject_btn": "Zasugeruj inny"
+        "skip_btn": "Nie dzisiaj",
+        "reject_btn": "Nigdy tego nie sugeruj"
     },
     "active": {
         "label": "Dzisiejsza eksploracja",

@@ -219,7 +219,8 @@
 
         // SUGGESTED
         $('#btn-accept').addEventListener('click', acceptTopic);
-        $('#btn-reject').addEventListener('click', rejectTopic);
+        $('#btn-skip').addEventListener('click', () => rejectTopic('skip'));
+        $('#btn-reject').addEventListener('click', () => rejectTopic('reject'));
 
         // ACTIVE
         $('#btn-copy-prompt').addEventListener('click', copyPrompt);
@@ -313,15 +314,15 @@
     }
 
     // ─── Generate Topic ───
-    async function generateTopic(mode, userRequest = null) {
+    async function generateTopic(mode, userRequest = null, action = 'skip') {
         const btn = mode === 'random' ? $('#btn-random-topic') :
                     mode === 'connected' && state.view === 'SAVED' ? $('#btn-next-topic') :
-                    state.view === 'TOPIC_SUGGESTED' ? $('#btn-reject') : $('#btn-get-topic');
+                    state.view === 'TOPIC_SUGGESTED' ? (action === 'reject' ? $('#btn-reject') : $('#btn-skip')) : $('#btn-get-topic');
 
         setLoading(btn, true);
 
         try {
-            const body = { mode };
+            const body = { mode, current_topic_action: action };
             if (userRequest) body.user_request = userRequest;
             const data = await api('POST', '/api/topics/generate', body);
 
@@ -354,9 +355,9 @@
         }
     }
 
-    async function rejectTopic() {
+    async function rejectTopic(action) {
         if (!state.topic) return;
-        generateTopic('connected');
+        generateTopic('connected', null, action);
     }
 
     // ─── Copy Prompt ───

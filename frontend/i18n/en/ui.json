@@ -33,7 +33,8 @@
     "suggested": {
         "label": "Today's suggestion",
         "accept_btn": "Explore this topic",
-        "reject_btn": "Suggest another"
+        "skip_btn": "Not today",
+        "reject_btn": "Never suggest this"
     },
     "active": {
         "label": "Today's exploration",

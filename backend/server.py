@@ -54,6 +54,7 @@ app = FastAPI(title="CuriosityEngine", lifespan=lifespan)
 class TopicGenerateRequest(BaseModel):
     mode: str = Field(default="connected", pattern="^(connected|random|user_interest|expand)$")
     user_request: Optional[str] = None
+    current_topic_action: str = "skip"  # skip, reject
 
 class TopicCompleteRequest(BaseModel):
     notes: Optional[str] = None
@@ -116,8 +117,8 @@ async def generate_topic_endpoint(req: TopicGenerateRequest):
             detail="AI is not configured. Please set AI_API_KEY in your .env file and restart the server."
         )
 
-    # Reject any existing suggestions
-    reject_all_suggested()
+    # Handle any existing suggestions based on the action parameter
+    reject_all_suggested(new_status=req.current_topic_action)
 
     # Gather context
     recent = get_recent_topics(limit=10)

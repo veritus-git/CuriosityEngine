@@ -132,10 +132,10 @@ def update_topic_status(topic_id, status):
     conn.close()
 
 
-def reject_all_suggested():
-    """Reject all currently suggested topics."""
+def reject_all_suggested(new_status="skipped"):
+    """Update all currently suggested topics to a new status (skipped or rejected)."""
     conn = get_connection()
-    conn.execute("UPDATE topics SET status = 'rejected' WHERE status = 'suggested'")
+    conn.execute("UPDATE topics SET status = ? WHERE status = 'suggested'", (new_status,))
     conn.commit()
     conn.close()
 
@@ -174,10 +174,13 @@ def get_recent_topics(limit=10):
 
 
 def get_all_topic_titles():
-    """Get all topic titles for context (including rejected ones to avoid repeats)."""
+    """Get all topic titles for context (including rejected ones and recently skipped ones)."""
     conn = get_connection()
     rows = conn.execute(
-        "SELECT title, status FROM topics WHERE status IN ('completed', 'active', 'rejected') ORDER BY created_at DESC"
+        """SELECT title, status FROM topics 
+           WHERE status IN ('completed', 'active', 'rejected') 
+              OR (status = 'skipped' AND created_at >= datetime('now', '-1 day'))
+           ORDER BY created_at DESC"""
     ).fetchall()
     conn.close()
     return [dict(r) for r in rows]
