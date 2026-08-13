@@ -79,33 +79,38 @@
 
             <!-- AUTH state -->
             <section class="view view--auth" id="view-auth" aria-label="Authentication">
-                <div class="view__content">
-                    <h2 class="history-title">CuriosityEngine</h2>
-                    <p class="subtitle" data-i18n="auth.subtitle"></p>
-
-                    <form id="auth-form" class="reflection-form" style="margin-top: 1rem; width: 100%;">
-                        <div class="field">
-                            <label class="field__label" for="auth-username" data-i18n="auth.username"></label>
-                            <input type="text" class="input" id="auth-username" required>
+                <div class="view__content" style="padding: 0; overflow: hidden; max-width: 800px; width: 100%;">
+                    <div class="landing-layout" style="display: grid; grid-template-columns: 1fr; width: 100%;">
+                        <div class="landing-hero" style="padding: var(--space-2xl); display: flex; flex-direction: column; justify-content: center; align-items: flex-start; text-align: left; background: var(--accent-glow); border-radius: var(--radius-xl) var(--radius-xl) 0 0;">
+                            <h2 class="history-title" style="font-size: var(--fs-3xl); margin-bottom: 0.5rem; color: var(--text-primary); text-shadow: 0 0 20px var(--accent-glow);">CuriosityEngine</h2>
+                            <p class="subtitle" data-i18n="auth.subtitle" style="font-size: var(--fs-lg); margin-top: 0; max-width: 400px; line-height: 1.4; color: var(--text-secondary);"></p>
                         </div>
-                        <div class="field">
-                            <label class="field__label" for="auth-password" data-i18n="auth.password"></label>
-                            <input type="password" class="input" id="auth-password" required>
+                        <div class="landing-form-container" style="padding: var(--space-2xl); background: var(--bg-surface); border-radius: 0 0 var(--radius-xl) var(--radius-xl);">
+                            <form id="auth-form" class="reflection-form" style="width: 100%; display: flex; flex-direction: column; gap: 1.5rem;">
+                                <div class="field">
+                                    <label class="field__label" for="auth-username" data-i18n="auth.username"></label>
+                                    <input type="text" class="input" id="auth-username" required>
+                                </div>
+                                <div class="field">
+                                    <label class="field__label" for="auth-password" data-i18n="auth.password"></label>
+                                    <input type="password" class="input" id="auth-password" required>
+                                </div>
+                                <p id="auth-error" style="color: var(--error); font-size: var(--fs-sm); display: none;"></p>
+                                <div class="actions" style="margin-top: 0.5rem; max-width: 100%;">
+                                    <button type="submit" class="btn btn--primary" id="btn-login" style="width: 100%;">
+                                        <span class="btn__text" data-i18n="auth.submit"></span>
+                                        <span class="btn__loader" aria-hidden="true"></span>
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                        <p id="auth-error" style="color: var(--error); font-size: var(--fs-sm); display: none;"></p>
-                        <div class="actions" style="margin-top: 1rem;">
-                            <button type="submit" class="btn btn--primary" id="btn-login">
-                                <span class="btn__text" data-i18n="auth.submit"></span>
-                                <span class="btn__loader" aria-hidden="true"></span>
-                            </button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </section>
 
             <!-- ONBOARDING state -->
             <section class="view view--onboarding" id="view-onboarding" hidden aria-label="Welcome">
-                <div class="progress-bar-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 4px; background: rgba(255, 255, 255, 0.05); z-index: 9999;">
+                <div class="progress-bar-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 4px; background: var(--border); z-index: 9999;">
                     <div class="progress-bar" id="onboarding-progress" style="height: 100%; width: 25%; background: var(--accent); box-shadow: 0 0 10px var(--accent); transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);"></div>
                 </div>
                 
@@ -320,6 +325,24 @@
                         <h3 class="settings-heading" data-i18n="settings.ai_heading"></h3>
                         <div class="settings-info" id="settings-ai-info"></div>
                         <p class="settings-hint" data-i18n-html="settings.ai_hint"></p>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3 class="settings-heading" data-i18n="settings.theme_heading">Wygląd</h3>
+                        <p class="settings-hint">Wybierz tryb i kolor przewodni.</p>
+                        
+                        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                            <button type="button" class="btn btn--secondary" id="btn-theme-light" style="flex: 1;">Jasny</button>
+                            <button type="button" class="btn btn--secondary" id="btn-theme-dark" style="flex: 1;">Ciemny</button>
+                        </div>
+                        
+                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;" id="color-picker">
+                            <button type="button" class="color-swatch" data-hue="220" style="width: 32px; height: 32px; border-radius: 50%; border: none; background: hsl(220, 70%, 50%); cursor: pointer;"></button>
+                            <button type="button" class="color-swatch" data-hue="280" style="width: 32px; height: 32px; border-radius: 50%; border: none; background: hsl(280, 70%, 50%); cursor: pointer;"></button>
+                            <button type="button" class="color-swatch" data-hue="340" style="width: 32px; height: 32px; border-radius: 50%; border: none; background: hsl(340, 70%, 50%); cursor: pointer;"></button>
+                            <button type="button" class="color-swatch" data-hue="160" style="width: 32px; height: 32px; border-radius: 50%; border: none; background: hsl(160, 70%, 50%); cursor: pointer;"></button>
+                            <button type="button" class="color-swatch" data-hue="30" style="width: 32px; height: 32px; border-radius: 50%; border: none; background: hsl(30, 70%, 50%); cursor: pointer;"></button>
+                        </div>
                     </div>
 
                     <div class="settings-section">

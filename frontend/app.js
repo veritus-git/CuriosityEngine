@@ -23,6 +23,27 @@
     let langCode = 'en'; // current language code
     let languages = [];  // available languages
 
+    // ─── Theme & Color ───
+    const root = document.documentElement;
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            root.setAttribute('data-theme', 'dark');
+        } else {
+            root.removeAttribute('data-theme');
+        }
+        localStorage.setItem('curiosity_theme', theme);
+    }
+
+    function applyColor(hue) {
+        root.style.setProperty('--hue-primary', hue);
+        localStorage.setItem('curiosity_hue', hue);
+    }
+
+    const savedTheme = localStorage.getItem('curiosity_theme') || 'light';
+    const savedHue = localStorage.getItem('curiosity_hue') || '220';
+    applyTheme(savedTheme);
+    applyColor(savedHue);
+
     /** Resolve a dotted key like "nav.history" from the lang object */
     function t(key, vars) {
         const parts = key.split('.');
@@ -844,6 +865,19 @@
         btn.classList.toggle('is-loading', loading);
         btn.disabled = loading;
     }
+
+    // Theme bindings
+    if ($('#btn-theme-light')) {
+        $('#btn-theme-light').addEventListener('click', () => applyTheme('light'));
+    }
+    if ($('#btn-theme-dark')) {
+        $('#btn-theme-dark').addEventListener('click', () => applyTheme('dark'));
+    }
+    document.querySelectorAll('.color-swatch').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            applyColor(e.target.dataset.hue);
+        });
+    });
 
     function esc(str) {
         if (!str) return '';
