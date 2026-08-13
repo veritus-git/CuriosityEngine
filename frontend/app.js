@@ -507,10 +507,12 @@
     async function copyPrompt() {
         if (!state.topic) return;
         try {
-            const data = await api('POST', '/api/learning-prompt', {
-                topic_title: state.topic.title,
-            });
-            await navigator.clipboard.writeText(data.prompt);
+            const promptText = $('#active-prompt-text').value;
+            await navigator.clipboard.writeText(promptText);
+            
+            const btn = $('#btn-copy-prompt');
+            btn.innerHTML = '<span class="icon">✓</span>';
+            setTimeout(() => { btn.innerHTML = '<span class="icon">📋</span>'; }, 2000);
 
             const el = $('#prompt-copied');
             el.hidden = false;
@@ -593,12 +595,28 @@
         }
     }
 
-    function renderActive() {
+    async function renderActive() {
         if (!state.topic) return;
         $('#active-title').textContent = state.topic.title;
         $('#active-reason').textContent = state.topic.short_reason || t('active.fallback_reason');
         const started = relativeDate(state.topic.created_at);
         $('#active-meta').textContent = started ? t('active.started', { date: started }) : '';
+        if ($('#active-prompt-text')) {
+            if (state.topic.prompt) {
+                $('#active-prompt-text').value = state.topic.prompt;
+            } else {
+                $('#active-prompt-text').value = 'Loading prompt...';
+                try {
+                    const data = await api('POST', '/api/learning-prompt', {
+                        topic_title: state.topic.title,
+                    });
+                    state.topic.prompt = data.prompt;
+                    $('#active-prompt-text').value = data.prompt;
+                } catch (err) {
+                    $('#active-prompt-text').value = 'Failed to load prompt.';
+                }
+            }
+        }
     }
 
     function renderReflection() {
