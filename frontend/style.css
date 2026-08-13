@@ -307,6 +307,7 @@ body {
     gap: var(--space-sm);
     width: 100%;
     max-width: 380px;
+    margin: 0 auto;
 }
 
 .btn {
@@ -404,6 +405,16 @@ body {
 
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+
+/* --- Onboarding Slides --- */
+@keyframes slideInUp {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.onboarding-slide {
+    animation: slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* --- Interest Input --- */

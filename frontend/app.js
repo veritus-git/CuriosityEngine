@@ -301,12 +301,42 @@
         // ONBOARDING
         const saveOnb = $('#btn-onboarding-save');
         if (saveOnb) {
+            let currentOnbSlide = 1;
+            const totalOnbSlides = 4;
+            
+            function updateOnbProgress() {
+                const progress = $('#onboarding-progress');
+                if (progress) {
+                    progress.style.width = ((currentOnbSlide) / totalOnbSlides * 100) + '%';
+                }
+            }
+
+            function showOnbSlide(slide) {
+                document.querySelectorAll('.onboarding-slide').forEach(el => el.style.display = 'none');
+                const target = $(`#onb-slide-${slide}`);
+                if (target) {
+                    target.style.display = 'block';
+                    const input = target.querySelector('input');
+                    if (input) input.focus();
+                }
+                updateOnbProgress();
+            }
+
+            document.querySelectorAll('.btn-onb-next').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (currentOnbSlide < totalOnbSlides) {
+                        currentOnbSlide++;
+                        showOnbSlide(currentOnbSlide);
+                    }
+                });
+            });
+
             saveOnb.addEventListener('click', async () => {
                 const interestsVal = $('#input-onboarding-interests').value.trim();
                 const currentVal = $('#input-onboarding-current').value.trim();
-                const goalSelect = $('#input-onboarding-goal').value;
                 const goalCustom = $('#input-onboarding-goal-custom').value.trim();
-                const levelVal = $('#input-onboarding-level').value.trim();
+                const levelVal = $('#input-onboarding-level').value;
+                const levelDetails = $('#input-onboarding-level-details').value.trim();
 
                 let subjects = [];
                 if (interestsVal) {
@@ -315,21 +345,13 @@
 
                 let currentInterests = [];
                 if (currentVal) currentInterests.push(`Chcę się dowiedzieć: ${currentVal}`);
-                
-                let finalGoal = goalSelect;
-                if (goalSelect === 'custom' && goalCustom) {
-                    finalGoal = goalCustom;
-                } else if (goalSelect === 'general') finalGoal = 'Rozwój ogólnej wiedzy o świecie';
-                else if (goalSelect === 'cs') finalGoal = 'Informatyka i nowa technologia';
-                else if (goalSelect === 'math') finalGoal = 'Lepsze logiczne zrozumienie matematyki';
-                else if (goalSelect === 'humanities') finalGoal = 'Nauki humanistyczne i kultura';
-                
-                if (finalGoal !== 'custom' && finalGoal) {
-                    currentInterests.push(`Cel: ${finalGoal}`);
-                }
+                if (goalCustom) currentInterests.push(`Cel: ${goalCustom}`);
 
                 if (levelVal) {
-                    currentInterests.push(`Obecny poziom wiedzy: ${levelVal}`);
+                    let levelStr = levelVal;
+                    if (levelVal === 'custom' && levelDetails) levelStr = levelDetails;
+                    else if (levelDetails) levelStr += ` (${levelDetails})`;
+                    currentInterests.push(`Obecny poziom wiedzy: ${levelStr}`);
                 }
 
                 setLoading(saveOnb, true);
@@ -350,25 +372,28 @@
             });
             
             $('#input-onboarding-interests').addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') $('#input-onboarding-current').focus();
+                if (e.key === 'Enter') document.querySelectorAll('.btn-onb-next')[0].click();
             });
             $('#input-onboarding-current').addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') $('#input-onboarding-goal').focus();
-            });
-            $('#input-onboarding-level').addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') saveOnb.click();
+                if (e.key === 'Enter') document.querySelectorAll('.btn-onb-next')[1].click();
             });
             $('#input-onboarding-goal-custom').addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') $('#input-onboarding-level').focus();
+                if (e.key === 'Enter') document.querySelectorAll('.btn-onb-next')[2].click();
             });
-            $('#input-onboarding-goal').addEventListener('change', (e) => {
-                const customInput = $('#input-onboarding-goal-custom');
-                if (e.target.value === 'custom') {
-                    customInput.style.display = 'block';
-                    customInput.focus();
+            $('#input-onboarding-level').addEventListener('change', (e) => {
+                const detailsInput = $('#input-onboarding-level-details');
+                if (e.target.value === 'szkola_srednia' || e.target.value === 'studia' || e.target.value === 'custom') {
+                    detailsInput.style.display = 'block';
+                    detailsInput.focus();
                 } else {
-                    customInput.style.display = 'none';
+                    detailsInput.style.display = 'none';
                 }
+            });
+            $('#input-onboarding-level').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && $('#input-onboarding-level-details').style.display === 'none') saveOnb.click();
+            });
+            $('#input-onboarding-level-details').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') saveOnb.click();
             });
         }
 

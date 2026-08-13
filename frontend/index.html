@@ -79,21 +79,21 @@
             <section class="view view--auth" id="view-auth" aria-label="Authentication">
                 <div class="view__content">
                     <h2 class="history-title">CuriosityEngine</h2>
-                    <p class="subtitle">Zaloguj się lub utwórz konto</p>
+                    <p class="subtitle" data-i18n="auth.subtitle"></p>
 
                     <form id="auth-form" class="reflection-form" style="margin-top: 1rem;">
                         <div class="field">
-                            <label class="field__label" for="auth-username">Nazwa użytkownika</label>
+                            <label class="field__label" for="auth-username" data-i18n="auth.username"></label>
                             <input type="text" class="input" id="auth-username" required>
                         </div>
                         <div class="field">
-                            <label class="field__label" for="auth-password">Hasło</label>
+                            <label class="field__label" for="auth-password" data-i18n="auth.password"></label>
                             <input type="password" class="input" id="auth-password" required>
                         </div>
                         <p id="auth-error" style="color: var(--error); font-size: var(--fs-sm); display: none;"></p>
                         <div class="actions" style="margin-top: 1rem;">
                             <button type="submit" class="btn btn--primary" id="btn-login">
-                                <span class="btn__text">Zaloguj / Zarejestruj</span>
+                                <span class="btn__text" data-i18n="auth.submit"></span>
                                 <span class="btn__loader" aria-hidden="true"></span>
                             </button>
                         </div>
@@ -103,46 +103,60 @@
 
             <!-- ONBOARDING state -->
             <section class="view view--onboarding" id="view-onboarding" hidden aria-label="Welcome">
-                <div class="view__content">
-                    <h2 class="history-title" data-i18n="onboarding.title">Witaj w CuriosityEngine</h2>
-                    <p class="subtitle" data-i18n="onboarding.subtitle">Skonfigurujmy Twój profil nauki.</p>
+                <div class="progress-bar-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255, 255, 255, 0.05);">
+                    <div class="progress-bar" id="onboarding-progress" style="height: 100%; width: 25%; background: var(--accent); box-shadow: 0 0 10px var(--accent); transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+                </div>
+                
+                <div class="view__content" id="onboarding-slides" style="width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh;">
+                    <h2 class="history-title" data-i18n="onboarding.title" style="margin-bottom: 0.5rem; text-align: center;"></h2>
+                    <p class="subtitle" data-i18n="onboarding.subtitle" style="margin-bottom: 3rem; text-align: center;"></p>
 
-                    <div class="reflection-form" style="margin-top: 2rem; width: 100%;">
-                        <div class="field">
-                            <label class="field__label">1. Co Cię interesuje ogólnie?</label>
-                            <input type="text" class="input" id="input-onboarding-interests" placeholder="np. historia sztuki, programowanie, biologia...">
-                        </div>
+                    <div class="reflection-form" style="width: 100%; max-width: 500px;">
                         
-                        <div class="field" style="margin-top: 1rem;">
-                            <label class="field__label">2. Od czego chcesz zacząć dzisiaj?</label>
-                            <input type="text" class="input" id="input-onboarding-current" placeholder="np. sztuczna inteligencja">
-                        </div>
-
-                        <div class="field" style="margin-top: 1rem;">
-                            <label class="field__label">3. Jaki jest Twój główny cel?</label>
-                            <div style="display: flex; gap: 0.5rem; flex-direction: column;">
-                                <select class="input" id="input-onboarding-goal">
-                                    <option value="general">Rozwój ogólnej wiedzy o świecie (wszystkiego po trochu)</option>
-                                    <option value="cs">Informatyka i nowa technologia</option>
-                                    <option value="math">Lepsze logiczne zrozumienie matematyki</option>
-                                    <option value="humanities">Nauki humanistyczne i kultura</option>
-                                    <option value="custom">Inny (wpisz poniżej)</option>
-                                </select>
-                                <input type="text" class="input" id="input-onboarding-goal-custom" placeholder="Wpisz swój cel..." style="display: none;">
+                        <div class="onboarding-slide active" id="onb-slide-1">
+                            <label class="field__label" data-i18n="onboarding.q1_label" style="font-size: var(--fs-md); margin-bottom: 1rem; display: block; text-align: center; color: var(--text-primary);"></label>
+                            <input type="text" class="input" id="input-onboarding-interests" data-i18n-placeholder="onboarding.q1_placeholder" style="padding: 1rem; font-size: var(--fs-base);">
+                            <div class="actions" style="margin-top: 2rem;">
+                                <button type="button" class="btn btn--primary btn-onb-next" data-i18n="onboarding.next_btn"></button>
                             </div>
                         </div>
 
-                        <div class="field" style="margin-top: 1rem;">
-                            <label class="field__label">4. Jaki jest Twój poziom edukacji / co już wiesz?</label>
-                            <input type="text" class="input" id="input-onboarding-level" placeholder="np. student informatyki, uczeń liceum, samouk...">
+                        <div class="onboarding-slide" id="onb-slide-2" style="display: none;">
+                            <label class="field__label" data-i18n="onboarding.q2_label" style="font-size: var(--fs-md); margin-bottom: 1rem; display: block; text-align: center; color: var(--text-primary);"></label>
+                            <input type="text" class="input" id="input-onboarding-current" data-i18n-placeholder="onboarding.q2_placeholder" style="padding: 1rem; font-size: var(--fs-base);">
+                            <div class="actions" style="margin-top: 2rem;">
+                                <button type="button" class="btn btn--primary btn-onb-next" data-i18n="onboarding.next_btn"></button>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="actions" style="margin-top: 2rem;">
-                        <button class="btn btn--primary" id="btn-onboarding-save">
-                            <span class="btn__text" data-i18n="onboarding.save_btn">Zapisz i rozpocznij</span>
-                            <span class="btn__loader" aria-hidden="true"></span>
-                        </button>
+                        <div class="onboarding-slide" id="onb-slide-3" style="display: none;">
+                            <label class="field__label" data-i18n="onboarding.q3_label" style="font-size: var(--fs-md); margin-bottom: 1rem; display: block; text-align: center; color: var(--text-primary);"></label>
+                            <input type="text" class="input" id="input-onboarding-goal-custom" data-i18n-placeholder="onboarding.q3_placeholder" style="padding: 1rem; font-size: var(--fs-base);">
+                            <div class="actions" style="margin-top: 2rem;">
+                                <button type="button" class="btn btn--primary btn-onb-next" data-i18n="onboarding.next_btn"></button>
+                            </div>
+                        </div>
+
+                        <div class="onboarding-slide" id="onb-slide-4" style="display: none;">
+                            <label class="field__label" data-i18n="onboarding.q4_label" style="font-size: var(--fs-md); margin-bottom: 1rem; display: block; text-align: center; color: var(--text-primary);"></label>
+                            <div style="display: flex; gap: 0.5rem; flex-direction: column;">
+                                <select class="input" id="input-onboarding-level" style="padding: 1rem; font-size: var(--fs-base);">
+                                    <option value="szkola_podstawowa" data-i18n="onboarding.level_primary"></option>
+                                    <option value="szkola_srednia" data-i18n="onboarding.level_secondary"></option>
+                                    <option value="studia" data-i18n="onboarding.level_university"></option>
+                                    <option value="samouk" data-i18n="onboarding.level_selftaught"></option>
+                                    <option value="custom" data-i18n="onboarding.level_custom"></option>
+                                </select>
+                                <input type="text" class="input" id="input-onboarding-level-details" data-i18n-placeholder="onboarding.level_custom_placeholder" style="display: none; padding: 1rem; font-size: var(--fs-base);">
+                            </div>
+                            <div class="actions" style="margin-top: 2rem;">
+                                <button type="button" class="btn btn--primary" id="btn-onboarding-save">
+                                    <span class="btn__text" data-i18n="onboarding.save_btn"></span>
+                                    <span class="btn__loader" aria-hidden="true"></span>
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </section>

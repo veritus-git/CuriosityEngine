@@ -15,12 +15,32 @@
         "evening": "Dobry wiecz\u00f3r.",
         "night_owl": "Tryb nocnej sowy."
     },
+    "auth": {
+        "subtitle": "Zaloguj się lub utwórz konto",
+        "username": "Nazwa użytkownika",
+        "password": "Hasło",
+        "submit": "Zaloguj / Zarejestruj"
+    },
     "onboarding": {
         "title": "Witaj w CuriosityEngine",
-        "subtitle": "Jakie s\u0105 Twoje g\u0142\u00f3wne zainteresowania, aby\u015bmy mogli lepjej dobiera\u0107 tematy?",
+        "subtitle": "Skonfigurujmy Twój profil nauki.",
         "placeholder": "np. fizyka, historia sztuki, programowanie\u2026",
-        "save_btn": "Rozpocznij eksploracj\u0119",
-        "skip_btn": "Pomi\u0144 na razie"
+        "q1_label": "1. Co Cię interesuje ogólnie?",
+        "q1_placeholder": "np. historia sztuki, programowanie, biologia...",
+        "q2_label": "2. Od czego chcesz zacząć dzisiaj?",
+        "q2_placeholder": "np. sztuczna inteligencja",
+        "q3_label": "3. Jaki jest Twój główny cel?",
+        "q3_placeholder": "Wpisz swój cel...",
+        "q4_label": "4. Jaki jest Twój poziom edukacji / co już wiesz?",
+        "level_primary": "Szkoła podstawowa",
+        "level_secondary": "Szkoła średnia",
+        "level_university": "Studia wyższe",
+        "level_selftaught": "Samouk / Poza systemem edukacji",
+        "level_custom": "Inny poziom (wpisz poniżej)",
+        "level_custom_placeholder": "Wpisz profil, kierunek, lub szczegóły...",
+        "next_btn": "Dalej",
+        "save_btn": "Rozpocznij przygodę",
+        "skip_btn": "Pomiń na razie"
     },
     "no_topic": {
         "subtitle": "Czego dzi\u015b b\u0119dziemy szuka\u0107?",

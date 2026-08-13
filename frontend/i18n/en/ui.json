@@ -15,11 +15,31 @@
         "evening": "Good evening.",
         "night_owl": "Night owl mode."
     },
+    "auth": {
+        "subtitle": "Login or create an account",
+        "username": "Username",
+        "password": "Password",
+        "submit": "Login / Register"
+    },
     "onboarding": {
         "title": "Welcome to CuriosityEngine",
-        "subtitle": "To give you the best suggestions, what are you generally interested in?",
-        "placeholder": "e.g. physics, art history, coding\u2026",
-        "save_btn": "Start Exploring",
+        "subtitle": "Let's configure your learning profile.",
+        "placeholder": "e.g., physics, art history, coding...",
+        "q1_label": "1. What are your general interests?",
+        "q1_placeholder": "e.g., art history, programming, biology...",
+        "q2_label": "2. Where do you want to start today?",
+        "q2_placeholder": "e.g., artificial intelligence",
+        "q3_label": "3. What is your main goal?",
+        "q3_placeholder": "Enter your goal...",
+        "q4_label": "4. What is your education level / what do you know?",
+        "level_primary": "Primary school",
+        "level_secondary": "High school",
+        "level_university": "University",
+        "level_selftaught": "Self-taught / Outside formal education",
+        "level_custom": "Other level (type below)",
+        "level_custom_placeholder": "Enter major, profile, or details...",
+        "next_btn": "Next",
+        "save_btn": "Start exploring",
         "skip_btn": "Skip for now"
     },
     "no_topic": {
