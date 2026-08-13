@@ -177,14 +177,17 @@
 
     // ─── Initialize ───
     async function init() {
-        let savedLang = 'en';
+        let savedLang = navigator.language.startsWith('pl') ? 'pl' : 'en';
         try {
             if (localStorage.getItem('curiosity_token')) {
                 const prefs = await api('GET', '/api/preferences');
                 savedLang = prefs.language || 'en';
             }
         } catch (e) { 
-            if (e.message === 'Unauthorized') return;
+            if (e.message === 'Unauthorized') {
+                await loadLanguage(savedLang);
+                return;
+            }
         }
 
         await loadLanguage(savedLang);
