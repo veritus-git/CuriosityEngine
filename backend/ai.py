@@ -1,6 +1,6 @@
 """
 AI integration layer.
-Supports OpenAI and Anthropic APIs via httpx.
+Supports OpenAI, Anthropic, and Google Gemini APIs via httpx.
 """
 
 import os
@@ -37,8 +37,10 @@ async def generate_topic(system_prompt: str, user_prompt: str) -> dict:
             return await _call_openai(system_prompt, user_prompt)
         elif provider == "anthropic":
             return await _call_anthropic(system_prompt, user_prompt)
+        elif provider == "gemini" or provider == "google":
+            return await _call_gemini(system_prompt, user_prompt)
         else:
-            raise AIError(f"Unsupported AI provider: {provider}. Use 'openai' or 'anthropic'.")
+            raise AIError(f"Unsupported AI provider: {provider}. Use 'openai', 'anthropic', or 'gemini'.")
     except AIError:
         raise
     except httpx.TimeoutException:
@@ -117,6 +119,53 @@ async def _call_anthropic(system_prompt: str, user_prompt: str) -> dict:
 
         data = response.json()
         content = data["content"][0]["text"].strip()
+        return _parse_json_response(content)
+
+
+async def _call_gemini(system_prompt: str, user_prompt: str) -> dict:
+    """Call Google Gemini API."""
+    base_url = os.getenv("AI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta")
+    model = MODEL or "gemini-2.0-flash"
+
+    async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+        response = await client.post(
+            f"{base_url}/models/{model}:generateContent",
+            params={"key": API_KEY},
+            headers={"Content-Type": "application/json"},
+            json={
+                "contents": [
+                    {
+                        "role": "user",
+                        "parts": [{"text": f"{system_prompt}\n\n{user_prompt}"}],
+                    }
+                ],
+                "generationConfig": {
+                    "temperature": 0.8,
+                    "maxOutputTokens": 500,
+                    "responseMimeType": "application/json",
+                },
+            },
+        )
+
+        if response.status_code == 400:
+            error_msg = response.text
+            logger.error(f"Gemini API error 400: {error_msg}")
+            if "API_KEY_INVALID" in error_msg:
+                raise AIError("Invalid API key. Please check your AI_API_KEY.")
+            raise AIError(f"Gemini request error. Check model name '{model}'.")
+        if response.status_code == 429:
+            raise AIError("Rate limited by Google. Please wait a moment and try again.")
+        if response.status_code != 200:
+            logger.error(f"Gemini API error {response.status_code}: {response.text}")
+            raise AIError(f"AI provider returned error {response.status_code}.")
+
+        data = response.json()
+        try:
+            content = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+        except (KeyError, IndexError):
+            logger.error(f"Unexpected Gemini response structure: {json.dumps(data)[:500]}")
+            raise AIError("AI returned an unexpected response format. Please try again.")
+
         return _parse_json_response(content)
 
 
