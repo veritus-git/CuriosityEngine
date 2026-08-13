@@ -1,10 +1,10 @@
-# 🧭 Learning Compass
+# ⚡ CuriosityEngine
 
 **One interesting thing at a time.**
 
 A personal, self-hosted learning companion that uses AI to suggest specific, focused topics to explore — based on your curiosity, learning history, and interests.
 
-Not a course platform. Not a productivity tracker. Just a calm, beautiful compass for your daily curiosity.
+Not a course platform. Not a productivity tracker. Just a calm, beautiful engine for your daily curiosity.
 
 ---
 
@@ -14,7 +14,7 @@ You're curious. You want to learn something new. But you often get stuck:
 
 > "Where do I start? What's the right order? Am I missing prerequisites?"
 
-Learning Compass removes that friction. Open the page, get a topic, explore it. No pressure, no streaks, no gamification.
+CuriosityEngine removes that friction. Open the page, get a topic, explore it. No pressure, no streaks, no gamification.
 
 **Structured spontaneity.**
 
@@ -36,7 +36,7 @@ Learning Compass removes that friction. Open the page, get a topic, explore it. 
 ## Requirements
 
 - Python 3.9+
-- An AI API key (OpenAI or Anthropic)
+- An AI API key (OpenAI, Anthropic, or Google Gemini)
 
 ---
 
@@ -44,8 +44,8 @@ Learning Compass removes that friction. Open the page, get a topic, explore it. 
 
 ```bash
 # Clone the repository
-git clone <your-repo-url> learning-compass
-cd learning-compass
+git clone https://github.com/veritus-git/CuriosityEngine CuriosityEngine
+cd CuriosityEngine
 
 # Create virtual environment (recommended)
 python3 -m venv venv
@@ -61,9 +61,9 @@ cp .env.example .env
 Edit `.env` with your API key:
 
 ```env
-AI_PROVIDER=openai
-AI_MODEL=gpt-4o-mini
-AI_API_KEY=sk-your-key-here
+AI_PROVIDER=gemini
+AI_MODEL=gemini-2.0-flash
+AI_API_KEY=your-key-here
 HOST=0.0.0.0
 PORT=8080
 ```
@@ -87,61 +87,78 @@ Since the server binds to `0.0.0.0`, you can access it from any device on your l
 
 ---
 
-## Raspberry Pi Setup
+## Server Deployment
+
+If you want CuriosityEngine to run permanently on a home server (Raspberry Pi, any Linux box, old laptop, VPS, etc.):
+
+### 1. Install on the server
 
 ```bash
-# Install Python if needed
+# Make sure Python is available
 sudo apt update && sudo apt install python3 python3-pip python3-venv
 
-# Clone and install
-git clone <your-repo-url> ~/learning-compass
-cd ~/learning-compass
+# Clone and set up
+git clone https://github.com/veritus-git/CuriosityEngine ~/CuriosityEngine
+cd ~/CuriosityEngine
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
-# Edit .env with your API key
-
-# Run
-python -m backend.server
+# Edit .env with your API key: nano .env
 ```
 
-### Run as a service (optional)
+### 2. Run as a systemd service (auto-start on boot)
 
-Create `/etc/systemd/system/learning-compass.service`:
+Create `/etc/systemd/system/curiosity-engine.service`:
 
 ```ini
 [Unit]
-Description=Learning Compass
+Description=CuriosityEngine
 After=network.target
 
 [Service]
 Type=simple
-User=pi
-WorkingDirectory=/home/pi/learning-compass
-Environment=PATH=/home/pi/learning-compass/venv/bin
-ExecStart=/home/pi/learning-compass/venv/bin/python -m backend.server
+User=YOUR_USERNAME
+WorkingDirectory=/home/YOUR_USERNAME/CuriosityEngine
+Environment=PATH=/home/YOUR_USERNAME/CuriosityEngine/venv/bin
+ExecStart=/home/YOUR_USERNAME/CuriosityEngine/venv/bin/python -m backend.server
 Restart=always
+RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
 ```
 
-Then:
+> Replace `YOUR_USERNAME` with your actual user (e.g. `pi`, `linux`, `ubuntu`).
+
+Then enable and start:
 
 ```bash
-sudo systemctl enable learning-compass
-sudo systemctl start learning-compass
+sudo systemctl enable curiosity-engine
+sudo systemctl start curiosity-engine
+
+# Check if it's running
+sudo systemctl status curiosity-engine
+
+# View logs
+sudo journalctl -u curiosity-engine -f
 ```
+
+### 3. Access from any device
+
+Once running, open `http://<server-ip>:8080` from any device on the same network.
+
+> **Tip for Raspberry Pi users:** The Pi's IP can change after reboot. Consider setting a static IP or using `hostname.local` (e.g. `http://raspberrypi.local:8080`) if mDNS is enabled.
 
 ---
 
 ## AI Integration
 
-The app supports two providers:
+The app supports three providers:
 
 | Provider | `AI_PROVIDER` | Example `AI_MODEL` |
 |----------|---------------|---------------------|
+| Google Gemini | `gemini` | `gemini-2.0-flash`, `gemini-3.1-flash-lite` |
 | OpenAI | `openai` | `gpt-4o-mini`, `gpt-4o` |
 | Anthropic | `anthropic` | `claude-sonnet-4-20250514` |
 
@@ -160,7 +177,7 @@ The AI generates structured JSON with a topic suggestion. The backend validates 
 
 ## Database
 
-SQLite database stored at `data/compass.db`.
+SQLite database stored at `data/curiosity.db`.
 
 Tables:
 - `topics` — suggested, active, completed, rejected topics
@@ -184,7 +201,7 @@ The database is created automatically on first run.
 ## Project Structure
 
 ```
-learning-compass/
+CuriosityEngine/
 ├── backend/
 │   ├── server.py      # FastAPI server + API routes
 │   ├── database.py    # SQLite operations

@@ -1,5 +1,5 @@
 /**
- * Learning Compass — Frontend Application
+ * CuriosityEngine — Frontend Application
  * State machine: NO_TOPIC → TOPIC_SUGGESTED → TOPIC_ACTIVE → REFLECTION → SAVED
  */
 

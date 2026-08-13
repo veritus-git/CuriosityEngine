@@ -1,5 +1,5 @@
 """
-Database layer for Learning Compass.
+Database layer for CuriosityEngine.
 SQLite with simple schema — topics, sessions, preferences.
 """
 
@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-DB_PATH = Path(__file__).parent.parent / "data" / "compass.db"
+DB_PATH = Path(__file__).parent.parent / "data" / "curiosity.db"
 
 
 def get_connection():

@@ -1,5 +1,5 @@
 """
-Learning Compass — FastAPI server.
+CuriosityEngine — FastAPI server.
 Serves the frontend and provides API endpoints.
 """
 
@@ -34,7 +34,7 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
 )
-logger = logging.getLogger("compass")
+logger = logging.getLogger("curiosity")
 
 # --- App ---
 
@@ -45,7 +45,7 @@ async def lifespan(app: FastAPI):
     logger.info("Database initialized.")
     yield
 
-app = FastAPI(title="Learning Compass", lifespan=lifespan)
+app = FastAPI(title="CuriosityEngine", lifespan=lifespan)
 
 
 # --- Request Models ---
@@ -293,5 +293,5 @@ if __name__ == "__main__":
     import uvicorn
     host = os.getenv("HOST", "0.0.0.0")
     port = int(os.getenv("PORT", "8080"))
-    logger.info(f"Starting Learning Compass on {host}:{port}")
+    logger.info(f"Starting CuriosityEngine on {host}:{port}")
     uvicorn.run("backend.server:app", host=host, port=port, reload=True)

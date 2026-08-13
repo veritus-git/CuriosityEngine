@@ -8,7 +8,7 @@ import json
 import logging
 import httpx
 
-logger = logging.getLogger("compass.ai")
+logger = logging.getLogger("curiosity.ai")
 
 PROVIDER = os.getenv("AI_PROVIDER", "openai")
 MODEL = os.getenv("AI_MODEL", "gpt-4o-mini")

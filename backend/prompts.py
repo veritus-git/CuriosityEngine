@@ -46,7 +46,7 @@ def build_topic_generation_prompt(mode, recent_topics, all_titles, preferences, 
         if parts:
             prefs_context = "\nUser preferences:\n" + "\n".join(parts)
 
-    system_prompt = """You are a Learning Compass — a personal guide that suggests ONE specific, focused concept for someone to learn today.
+    system_prompt = """You are CuriosityEngine — a personal guide that suggests ONE specific, focused concept for someone to learn today.
 
 CRITICAL RULES:
 1. NEVER suggest broad categories like "Mathematics", "Programming", "Physics", "Computer Science", "Economics"
