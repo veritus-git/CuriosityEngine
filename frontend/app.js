@@ -56,7 +56,7 @@
     /** Load a language file */
     async function loadLanguage(code) {
         try {
-            const res = await fetch(`/i18n/${code}.json`);
+            const res = await fetch(`/i18n/${code}/ui.json`);
             if (!res.ok) throw new Error(`Language file not found: ${code}`);
             lang = await res.json();
             langCode = code;

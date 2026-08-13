@@ -1,41 +1,62 @@
 """
 Prompt templates for AI topic generation and learning prompt creation.
-All prompts are language-aware — the AI responds in the user's chosen UI language.
+All text is loaded from i18n/{lang}/prompts.json — nothing is hardcoded here.
 """
 
-# Map language codes to language names for AI instructions
-LANG_NAMES = {
-    "en": "English",
-    "pl": "Polish",
-    "de": "German",
-    "es": "Spanish",
-    "fr": "French",
-    "uk": "Ukrainian",
-    "ja": "Japanese",
-    "zh": "Chinese",
-}
+import json
+import logging
+from pathlib import Path
+
+logger = logging.getLogger("curiosity.prompts")
+
+I18N_DIR = Path(__file__).parent.parent / "frontend" / "i18n"
+
+# Cache loaded prompt files
+_prompts_cache = {}
 
 
-def _get_lang_name(code):
-    """Get the human-readable language name for a code."""
-    return LANG_NAMES.get(code, code)
+def _load_prompts(language: str) -> dict:
+    """Load prompts.json for the given language. Falls back to 'en'."""
+    if language in _prompts_cache:
+        return _prompts_cache[language]
+
+    prompts_file = I18N_DIR / language / "prompts.json"
+    if not prompts_file.exists():
+        logger.warning(f"Prompts file not found for '{language}', falling back to 'en'")
+        prompts_file = I18N_DIR / "en" / "prompts.json"
+        language = "en"
+
+    try:
+        data = json.loads(prompts_file.read_text(encoding="utf-8"))
+        _prompts_cache[language] = data
+        return data
+    except (json.JSONDecodeError, OSError) as e:
+        logger.error(f"Failed to load prompts for '{language}': {e}")
+        return {}
+
+
+def _get(prompts: dict, *keys, default=""):
+    """Safely traverse nested dict keys."""
+    val = prompts
+    for k in keys:
+        if isinstance(val, dict):
+            val = val.get(k, default)
+        else:
+            return default
+    return val if val is not None else default
 
 
 def build_topic_generation_prompt(mode, recent_topics, all_titles, preferences, user_request=None):
     """
     Build the system + user prompt for topic generation.
-
-    Modes:
-    - connected: suggest something related to recent learning
-    - random: suggest something unrelated
-    - user_interest: user gives a direction
-    - expand: go deeper on a specific topic
+    All text comes from i18n/{lang}/prompts.json.
     """
-
     language = "en"
     if preferences and preferences.get("language"):
         language = preferences["language"]
-    lang_name = _get_lang_name(language)
+
+    prompts = _load_prompts(language)
+    labels = _get(prompts, "context_labels", default={})
 
     # Build context about what user has learned
     history_context = ""
@@ -48,98 +69,50 @@ def build_topic_generation_prompt(mode, recent_topics, all_titles, preferences, 
             if t.get("interest_rating"):
                 line += f" [interest: {t['interest_rating']}/5]"
             history_lines.append(line)
-        history_context = "Recent learning history:\n" + "\n".join(history_lines)
+        history_context = _get(labels, "recent_history", default="Recent learning history:") + "\n" + "\n".join(history_lines)
 
     all_titles_context = ""
     if all_titles:
         titles_list = [t["title"] for t in all_titles]
-        all_titles_context = f"\nAll topics explored so far: {', '.join(titles_list)}"
+        label = _get(labels, "all_topics", default="All topics explored so far:")
+        all_titles_context = f"\n{label} {', '.join(titles_list)}"
 
     prefs_context = ""
     if preferences:
         parts = []
         if preferences.get("preferred_subjects"):
-            parts.append(f"Preferred areas: {', '.join(preferences['preferred_subjects'])}")
+            label = _get(labels, "preferred_areas", default="Preferred areas:")
+            parts.append(f"{label} {', '.join(preferences['preferred_subjects'])}")
         if preferences.get("disliked_subjects"):
-            parts.append(f"Areas to avoid: {', '.join(preferences['disliked_subjects'])}")
+            label = _get(labels, "areas_to_avoid", default="Areas to avoid:")
+            parts.append(f"{label} {', '.join(preferences['disliked_subjects'])}")
         if preferences.get("learning_style"):
-            parts.append(f"Learning style: {preferences['learning_style']}")
+            label = _get(labels, "learning_style", default="Learning style:")
+            parts.append(f"{label} {preferences['learning_style']}")
         if preferences.get("current_interests"):
-            parts.append(f"Current interests: {', '.join(preferences['current_interests'])}")
+            label = _get(labels, "current_interests", default="Current interests:")
+            parts.append(f"{label} {', '.join(preferences['current_interests'])}")
         if parts:
-            prefs_context = "\nUser preferences:\n" + "\n".join(parts)
+            header = _get(labels, "user_preferences", default="User preferences:")
+            prefs_context = f"\n{header}\n" + "\n".join(parts)
 
-    # Language instruction for AI output
-    lang_instruction = ""
-    if language != "en":
-        lang_instruction = f"""
-LANGUAGE: You MUST respond entirely in {lang_name}.
-The topic name, short_reason, and connection MUST ALL be written in {lang_name}.
-Do NOT use English for any field values."""
+    # Combine context
+    context = f"{history_context}{all_titles_context}{prefs_context}".strip()
 
-    system_prompt = f"""You are CuriosityEngine — a personal guide that suggests ONE specific, focused concept for someone to learn today.
-
-CRITICAL RULES:
-1. NEVER suggest broad categories like "Mathematics", "Programming", "Physics", "Computer Science", "Economics"
-2. ALWAYS suggest a SPECIFIC concept at a reasonable level of detail
-3. Good examples: "Eigenvalues", "Gradient descent", "TCP three-way handshake", "Euler's number", "Hash tables", "Fourier Transform", "Memory allocation", "Bayesian inference", "RSA key generation", "Markov chains"
-4. The topic should be small enough to explore meaningfully in one session
-5. NEVER repeat a topic the user has already explored
-6. Respond ONLY with valid JSON in the exact format specified
-{lang_instruction}
-Your response must be valid JSON with this exact structure:
-{{
-  "topic": "Topic Name",
-  "short_reason": "One sentence explaining why this topic is suggested now",
-  "connection": "Previous Topic → This Topic (or null if random)",
-  "difficulty": "beginner|intermediate|advanced"
-}}"""
-
-    # Build user message based on mode
-    if mode == "connected":
-        user_msg = f"""Suggest ONE specific topic that naturally connects to my recent learning.
-
-{history_context}
-{all_titles_context}
-{prefs_context}
-
-Find a concept that builds on, extends, or is closely related to what I've been exploring. The connection should feel natural and intellectually satisfying."""
-
-    elif mode == "random":
-        user_msg = f"""Suggest ONE specific topic from a completely different domain than my recent learning.
-
-{history_context}
-{all_titles_context}
-{prefs_context}
-
-Choose something surprising and stimulating from a field I haven't explored. It should spark genuine curiosity. Be creative — go beyond typical STEM topics if appropriate."""
-
-    elif mode == "user_interest":
-        user_msg = f"""The user expressed this interest: "{user_request}"
-
-{history_context}
-{all_titles_context}
-{prefs_context}
-
-Based on this interest, suggest ONE specific, focused concept they could explore. Don't just restate their interest — find a concrete concept within that area."""
-
-    elif mode == "expand":
-        user_msg = f"""The user wants to go deeper on: "{user_request}"
-
-{history_context}
-{all_titles_context}
-{prefs_context}
-
-Suggest ONE specific concept that goes deeper into this topic area. It should build understanding and reveal new layers."""
-
+    # Get system prompt, inject language instruction if present
+    system_prompt = _get(prompts, "topic_generation", "system", default="")
+    lang_instruction = _get(prompts, "language_instruction", default="")
+    if lang_instruction:
+        system_prompt = system_prompt.replace("{language_instruction}", lang_instruction)
     else:
-        user_msg = f"""Suggest ONE specific, interesting topic for me to learn today.
+        system_prompt = system_prompt.replace("{language_instruction}", "")
 
-{history_context}
-{all_titles_context}
-{prefs_context}
-
-Consider my learning history and preferences. Choose something that would genuinely interest a curious, analytical mind."""
+    # Get mode-specific user message template
+    tg = _get(prompts, "topic_generation", default={})
+    user_template = _get(tg, mode, default="") or _get(tg, "default", default="")
+    user_msg = user_template.replace("{context}", context)
+    if user_request:
+        user_msg = user_msg.replace("{user_request}", user_request)
 
     return system_prompt, user_msg
 
@@ -147,78 +120,29 @@ Consider my learning history and preferences. Choose something that would genuin
 def build_learning_prompt(topic_title, preferences=None):
     """
     Build a learning prompt that the user can copy to another LLM.
-
-    This is NOT a rigid script — it's a flexible template that tells the LLM
-    to adapt its explanation to the specific topic. The LLM decides what's
-    relevant (examples, math, analogies, etc.) based on the topic itself.
+    Template and style text come from i18n/{lang}/prompts.json.
     """
-
     language = "en"
     if preferences and preferences.get("language"):
         language = preferences["language"]
-    lang_name = _get_lang_name(language)
 
-    style = "top-down"
+    prompts = _load_prompts(language)
+
+    style_key = "top-down"
     if preferences and preferences.get("learning_style"):
-        style = preferences["learning_style"]
+        style_key = preferences["learning_style"]
 
-    style_instructions = {
-        "top-down": {
-            "en": "I prefer learning top-down — start with the big picture and intuition, then gradually go into details.",
-            "pl": "Preferuję naukę od ogółu do szczegółu — zacznij od ogólnego obrazu i intuicji, potem stopniowo przechodź do detali.",
-        },
-        "bottom-up": {
-            "en": "I prefer learning bottom-up — start with concrete examples and build up to the general concept.",
-            "pl": "Preferuję naukę od szczegółu do ogółu — zacznij od konkretnych przykładów i buduj ku ogólnej koncepcji.",
-        },
-        "mixed": {
-            "en": "Use a mix of intuitive explanations and concrete examples as you see fit.",
-            "pl": "Używaj mieszanki intuicyjnych wyjaśnień i konkretnych przykładów, jak uznasz za stosowne.",
-        },
-    }
-
-    style_text = style_instructions.get(style, style_instructions["top-down"]).get(language)
+    # Get style text from prompts.json
+    styles = _get(prompts, "learning_styles", default={})
+    style_text = _get(styles, style_key, default="")
     if not style_text:
-        style_text = style_instructions.get(style, style_instructions["top-down"])["en"]
+        # Fallback: use the key as-is
+        style_text = style_key
 
-    if language == "pl":
-        prompt = f"""Jesteś moim osobistym nauczycielem.
+    # Get prompt template
+    template = _get(prompts, "learning_prompt", "template", default="")
+    if not template:
+        # Absolute fallback if prompts.json is broken
+        return f"Teach me about: {topic_title}"
 
-Dzisiejszy temat: {topic_title}
-
-Jestem ciekawskim uczniem z analitycznym umysłem. {style_text}
-
-Dostosuj swoje wyjaśnienie do tego konkretnego tematu:
-- Wyjaśnij koncepcję intuicyjnie, używając analogii lub przykładów które pasują do tematu
-- Jeśli temat tego wymaga, wprowadź formalną definicję — ale tylko gdy to pomaga zrozumieniu
-- Nie zakładaj wiedzy specjalistycznej, której nie wyjaśniłeś
-- Nie przytłaczaj niepotrzebną teorią — skup się na zrozumieniu
-
-Na koniec:
-1. Krótkie podsumowanie najważniejszych punktów
-2. Zaproponuj 2 powiązane koncepcje do dalszej eksploracji, lub zapytaj czy coś było niejasne
-
-Temat:
-{topic_title}"""
-
-    else:
-        prompt = f"""You are my personal tutor.
-
-Today's topic: {topic_title}
-
-I'm a curious learner with an analytical mind. {style_text}
-
-Adapt your explanation to this specific topic:
-- Explain the concept intuitively, using analogies or examples that fit the subject
-- If the topic calls for it, introduce formal definitions — but only when it aids understanding
-- Don't assume specialized knowledge you haven't explained
-- Don't overwhelm with unnecessary theory — focus on building understanding
-
-At the end:
-1. Brief summary of the key points
-2. Suggest 2 related concepts to explore next, or ask if something was unclear
-
-Topic:
-{topic_title}"""
-
-    return prompt
+    return template.replace("{topic}", topic_title).replace("{style}", style_text)

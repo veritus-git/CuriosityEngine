@@ -261,21 +261,26 @@ async def generate_learning_prompt(req: LearningPromptRequest):
 
 @app.get("/api/languages")
 async def get_languages():
-    """List available languages by scanning i18n directory."""
+    """List available languages by scanning i18n subdirectories."""
     i18n_dir = FRONTEND_DIR / "i18n"
     languages = []
     if i18n_dir.exists():
-        for f in sorted(i18n_dir.glob("*.json")):
+        for lang_dir in sorted(i18n_dir.iterdir()):
+            if not lang_dir.is_dir():
+                continue
+            ui_file = lang_dir / "ui.json"
+            if not ui_file.exists():
+                continue
             try:
-                data = json.loads(f.read_text(encoding="utf-8"))
+                data = json.loads(ui_file.read_text(encoding="utf-8"))
                 meta = data.get("meta", {})
                 languages.append({
-                    "code": meta.get("code", f.stem),
-                    "name": meta.get("name", f.stem),
-                    "native_name": meta.get("native_name", f.stem),
+                    "code": meta.get("code", lang_dir.name),
+                    "name": meta.get("name", lang_dir.name),
+                    "native_name": meta.get("native_name", lang_dir.name),
                 })
             except (json.JSONDecodeError, Exception) as e:
-                logger.warning(f"Skipping invalid i18n file {f.name}: {e}")
+                logger.warning(f"Skipping invalid i18n dir {lang_dir.name}: {e}")
     return {"languages": languages}
 
 
