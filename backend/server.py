@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 # Load .env before any other imports that use env vars
 load_dotenv()
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
@@ -28,6 +28,7 @@ from backend.database import (
     get_preferences, update_preferences, get_history, get_history_count,
 )
 from backend.ai import generate_topic, get_ai_status, AIError
+from backend.auth import register_user, login_user, get_current_user_token
 from backend.prompts import build_topic_generation_prompt, build_learning_prompt
 
 # --- Logging ---
@@ -50,6 +51,10 @@ app = FastAPI(title="CuriosityEngine", lifespan=lifespan)
 
 
 # --- Request Models ---
+
+class AuthRequest(BaseModel):
+    username: str
+    password: str
 
 class TopicGenerateRequest(BaseModel):
     mode: str = Field(default="connected", pattern="^(connected|random|user_interest|expand)$")
@@ -74,10 +79,28 @@ class LearningPromptRequest(BaseModel):
     topic_title: str
 
 
+# --- Auth Routes ---
+
+@app.post("/api/auth/register")
+async def register(req: AuthRequest):
+    try:
+        register_user(req.username, req.password)
+        token = login_user(req.username, req.password)
+        return {"token": token}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/api/auth/login")
+async def login(req: AuthRequest):
+    token = login_user(req.username, req.password)
+    if not token:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    return {"token": token}
+
 # --- API Routes ---
 
 @app.get("/api/state")
-async def get_state():
+async def get_state_route(username: str = Depends(get_current_user_token)):
     """Get the current application state."""
     active = get_active_topic()
     suggested = get_suggested_topic()
@@ -108,7 +131,7 @@ async def get_state():
 
 
 @app.post("/api/topics/generate")
-async def generate_topic_endpoint(req: TopicGenerateRequest):
+async def generate_topic_endpoint(req: TopicGenerateRequest, username: str = Depends(get_current_user_token)):
     """Generate a new topic suggestion using AI."""
     ai_status = get_ai_status()
     if not ai_status["configured"]:
@@ -155,7 +178,7 @@ async def generate_topic_endpoint(req: TopicGenerateRequest):
 
 
 @app.post("/api/topics/{topic_id}/accept")
-async def accept_topic(topic_id: int):
+async def accept_topic(topic_id: int, username: str = Depends(get_current_user_token)):
     """Accept a suggested topic and start a learning session."""
     topic = get_topic(topic_id)
     if not topic:
@@ -175,7 +198,7 @@ async def accept_topic(topic_id: int):
 
 
 @app.post("/api/topics/{topic_id}/reject")
-async def reject_topic(topic_id: int):
+async def reject_topic(topic_id: int, username: str = Depends(get_current_user_token)):
     """Reject a suggested topic."""
     topic = get_topic(topic_id)
     if not topic:
@@ -189,7 +212,7 @@ async def reject_topic(topic_id: int):
 
 
 @app.post("/api/topics/{topic_id}/complete")
-async def complete_topic(topic_id: int, req: TopicCompleteRequest):
+async def complete_topic(topic_id: int, req: TopicCompleteRequest, username: str = Depends(get_current_user_token)):
     """Complete a topic and save session notes."""
     topic = get_topic(topic_id)
     if not topic:
@@ -215,7 +238,7 @@ async def complete_topic(topic_id: int, req: TopicCompleteRequest):
 
 
 @app.get("/api/history")
-async def get_history_endpoint(limit: int = 50, offset: int = 0):
+async def get_history_endpoint(limit: int = 50, offset: int = 0, username: str = Depends(get_current_user_token)):
     """Get learning history."""
     limit = min(limit, 100)
     items = get_history(limit=limit, offset=offset)
@@ -224,7 +247,7 @@ async def get_history_endpoint(limit: int = 50, offset: int = 0):
 
 
 @app.get("/api/topics/{topic_id}")
-async def get_topic_endpoint(topic_id: int):
+async def get_topic_endpoint(topic_id: int, username: str = Depends(get_current_user_token)):
     """Get a single topic with its session data."""
     topic = get_topic(topic_id)
     if not topic:
@@ -234,13 +257,13 @@ async def get_topic_endpoint(topic_id: int):
 
 
 @app.get("/api/preferences")
-async def get_preferences_endpoint():
+async def get_preferences_endpoint(username: str = Depends(get_current_user_token)):
     """Get user preferences."""
     return get_preferences()
 
 
 @app.post("/api/preferences")
-async def update_preferences_endpoint(req: PreferencesRequest):
+async def update_preferences_endpoint(req: PreferencesRequest, username: str = Depends(get_current_user_token)):
     """Update user preferences."""
     result = update_preferences(
         preferred_subjects=req.preferred_subjects,
@@ -254,7 +277,7 @@ async def update_preferences_endpoint(req: PreferencesRequest):
 
 
 @app.post("/api/learning-prompt")
-async def generate_learning_prompt(req: LearningPromptRequest):
+async def generate_learning_prompt(req: LearningPromptRequest, username: str = Depends(get_current_user_token)):
     """Generate a learning prompt for external LLM use."""
     prefs = get_preferences()
     prompt = build_learning_prompt(req.topic_title, prefs)

@@ -8,25 +8,13 @@ import os
 import json
 from datetime import datetime
 from pathlib import Path
+from .context import current_user
 
-DB_PATH = Path(__file__).parent.parent / "data" / "curiosity.db"
+DATA_DIR = Path(__file__).parent.parent / "data"
 
-
-def get_connection():
-    """Get a database connection with row factory."""
-    conn = sqlite3.connect(str(DB_PATH))
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA foreign_keys=ON")
-    return conn
-
-
-def init_db():
+def init_db_schema(conn):
     """Initialize the database schema."""
-    os.makedirs(DB_PATH.parent, exist_ok=True)
-    conn = get_connection()
     cursor = conn.cursor()
-
     cursor.executescript("""
         CREATE TABLE IF NOT EXISTS topics (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -66,14 +54,35 @@ def init_db():
         INSERT OR IGNORE INTO user_preferences (id) VALUES (1);
     """)
 
-    # Migration: add language column if missing (existing DBs)
     try:
         cursor.execute("ALTER TABLE user_preferences ADD COLUMN language TEXT DEFAULT 'en'")
     except sqlite3.OperationalError:
         pass  # column already exists
 
     conn.commit()
-    conn.close()
+
+
+def get_connection():
+    """Get a database connection with row factory, per user."""
+    username = current_user.get()
+    safe_username = "".join(c for c in username if c.isalnum()) or "default"
+    db_path = DATA_DIR / f"curiosity_{safe_username}.db"
+    
+    needs_init = not db_path.exists()
+    
+    conn = sqlite3.connect(str(db_path))
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA foreign_keys=ON")
+    
+    if needs_init:
+        init_db_schema(conn)
+        
+    return conn
+
+def init_db():
+    pass
+
 
 
 # --- Topic Operations ---

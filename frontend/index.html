@@ -75,21 +75,65 @@
                 </div>
             </section>
 
+            <!-- AUTH state -->
+            <section class="view view--auth" id="view-auth" aria-label="Authentication">
+                <div class="view__content">
+                    <h2 class="history-title">CuriosityEngine</h2>
+                    <p class="subtitle">Zaloguj się lub utwórz konto</p>
+
+                    <form id="auth-form" class="reflection-form" style="margin-top: 1rem;">
+                        <div class="field">
+                            <label class="field__label" for="auth-username">Nazwa użytkownika</label>
+                            <input type="text" class="input" id="auth-username" required>
+                        </div>
+                        <div class="field">
+                            <label class="field__label" for="auth-password">Hasło</label>
+                            <input type="password" class="input" id="auth-password" required>
+                        </div>
+                        <p id="auth-error" style="color: var(--error); font-size: var(--fs-sm); display: none;"></p>
+                        <div class="actions" style="margin-top: 1rem;">
+                            <button type="submit" class="btn btn--primary" id="btn-login">
+                                <span class="btn__text">Zaloguj / Zarejestruj</span>
+                                <span class="btn__loader" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
             <!-- ONBOARDING state -->
             <section class="view view--onboarding" id="view-onboarding" hidden aria-label="Welcome">
                 <div class="view__content">
-                    <h2 class="history-title" data-i18n="onboarding.title"></h2>
-                    <p class="subtitle" data-i18n="onboarding.subtitle"></p>
+                    <h2 class="history-title" data-i18n="onboarding.title">Witaj w CuriosityEngine</h2>
+                    <p class="subtitle" data-i18n="onboarding.subtitle">Skonfigurujmy Twój profil nauki.</p>
 
-                    <div class="field" style="margin-top: 2rem; margin-bottom: 2rem;">
-                        <input type="text" class="input" id="input-onboarding-interests" data-i18n-placeholder="onboarding.placeholder">
+                    <div class="reflection-form" style="margin-top: 2rem; width: 100%;">
+                        <div class="field">
+                            <label class="field__label">1. Co Cię interesuje ogólnie?</label>
+                            <input type="text" class="input" id="input-onboarding-interests" placeholder="np. historia sztuki, programowanie, biologia...">
+                        </div>
+                        
+                        <div class="field" style="margin-top: 1rem;">
+                            <label class="field__label">2. Od czego chcesz zacząć dzisiaj?</label>
+                            <input type="text" class="input" id="input-onboarding-current" placeholder="np. sztuczna inteligencja">
+                        </div>
+
+                        <div class="field" style="margin-top: 1rem;">
+                            <label class="field__label">3. Jaki jest Twój główny cel?</label>
+                            <select class="input" id="input-onboarding-goal">
+                                <option value="general">Rozwój ogólnej wiedzy o świecie (wszystkiego po trochu)</option>
+                                <option value="cs">Informatyka i nowa technologia</option>
+                                <option value="math">Lepsze logiczne zrozumienie matematyki</option>
+                                <option value="humanities">Nauki humanistyczne i kultura</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="actions">
+
+                    <div class="actions" style="margin-top: 2rem;">
                         <button class="btn btn--primary" id="btn-onboarding-save">
-                            <span class="btn__text" data-i18n="onboarding.save_btn"></span>
+                            <span class="btn__text" data-i18n="onboarding.save_btn">Zapisz i rozpocznij</span>
                             <span class="btn__loader" aria-hidden="true"></span>
                         </button>
-                        <button class="btn btn--ghost" id="btn-onboarding-skip" data-i18n="onboarding.skip_btn"></button>
                     </div>
                 </div>
             </section>
@@ -156,12 +200,12 @@
 
                         <div class="field">
                             <label class="field__label" for="field-discoveries" data-i18n="reflection.discoveries_label"></label>
-                            <textarea class="textarea" id="field-discoveries" rows="2" data-i18n-placeholder="reflection.discoveries_placeholder"></textarea>
+                            <textarea class="textarea" id="field-discoveries" rows="3" data-i18n-placeholder="reflection.discoveries_placeholder"></textarea>
                         </div>
 
                         <div class="field">
                             <label class="field__label" for="field-sidepaths" data-i18n="reflection.sidepaths_label"></label>
-                            <input type="text" class="input" id="field-sidepaths" data-i18n-placeholder="reflection.sidepaths_placeholder">
+                            <textarea class="textarea" id="field-sidepaths" rows="3" data-i18n-placeholder="reflection.sidepaths_placeholder"></textarea>
                         </div>
 
                         <div class="ratings">

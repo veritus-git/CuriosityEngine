@@ -11,9 +11,9 @@
     "greeting": {
         "late_night": "Nocne przemy\u015blenia.",
         "morning": "Dzie\u0144 dobry.",
-        "afternoon": "Dobre po\u0142udnie.",
+        "afternoon": "Dzie\u0144 dobry.",
         "evening": "Dobry wiecz\u00f3r.",
-        "night_owl": "Tryb nocnego marka."
+        "night_owl": "Tryb nocnej sowy."
     },
     "onboarding": {
         "title": "Witaj w CuriosityEngine",

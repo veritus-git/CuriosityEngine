@@ -93,6 +93,7 @@
         DETAIL: $('#view-detail'),
         SETTINGS: $('#view-settings'),
         ONBOARDING: $('#view-onboarding'),
+        AUTH: $('#view-auth'),
     };
 
     // ─── API helpers ───
@@ -101,10 +102,21 @@
             method,
             headers: { 'Content-Type': 'application/json' },
         };
+        const token = localStorage.getItem('curiosity_token');
+        if (token) {
+            opts.headers['Authorization'] = `Bearer ${token}`;
+        }
+
         if (body) opts.body = JSON.stringify(body);
 
         const res = await fetch(url, opts);
         const data = await res.json();
+
+        if (res.status === 401) {
+            localStorage.removeItem('curiosity_token');
+            showView('AUTH');
+            throw new Error('Unauthorized');
+        }
 
         if (!res.ok) {
             throw new Error(data.error || `Request failed (${res.status})`);
@@ -217,6 +229,41 @@
             if (e.key === 'Enter') submitInterest();
         });
 
+        // AUTH
+        $('#auth-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = $('#auth-username').value.trim();
+            const password = $('#auth-password').value.trim();
+            const btn = $('#btn-login');
+            const err = $('#auth-error');
+            
+            setLoading(btn, true);
+            err.style.display = 'none';
+
+            try {
+                // Try login first
+                let data;
+                try {
+                    data = await api('POST', '/api/auth/login', { username, password });
+                } catch (loginErr) {
+                    if (loginErr.message.includes('Invalid') || loginErr.message.includes('Unauthorized')) {
+                        // If login fails, try register
+                        data = await api('POST', '/api/auth/register', { username, password });
+                    } else {
+                        throw loginErr;
+                    }
+                }
+                
+                localStorage.setItem('curiosity_token', data.token);
+                initState();
+            } catch (error) {
+                err.textContent = error.message;
+                err.style.display = 'block';
+            } finally {
+                setLoading(btn, false);
+            }
+        });
+
         // SUGGESTED
         $('#btn-accept').addEventListener('click', acceptTopic);
         $('#btn-skip').addEventListener('click', () => rejectTopic('skip'));
@@ -251,27 +298,43 @@
         const saveOnb = $('#btn-onboarding-save');
         if (saveOnb) {
             saveOnb.addEventListener('click', async () => {
-                const val = $('#input-onboarding-interests').value.trim();
-                if (val) {
-                    const subjects = val.split(',').map(s => s.trim()).filter(s => s);
-                    if (subjects.length > 0) {
-                        setLoading(saveOnb, true);
-                        try {
-                            const prefs = await api('GET', '/api/preferences');
-                            prefs.preferred_subjects = subjects;
-                            await api('POST', '/api/preferences', prefs);
-                        } catch (err) {
-                            showError(err.message);
-                        }
-                        setLoading(saveOnb, false);
-                    }
+                const interestsVal = $('#input-onboarding-interests').value.trim();
+                const currentVal = $('#input-onboarding-current').value.trim();
+                const goalVal = $('#input-onboarding-goal').value;
+
+                let subjects = [];
+                if (interestsVal) {
+                    subjects = interestsVal.split(',').map(s => s.trim()).filter(s => s);
                 }
-                showView('NO_TOPIC');
+
+                let currentInterests = [];
+                if (currentVal) currentInterests.push(`Chcę się dowiedzieć: ${currentVal}`);
+                if (goalVal === 'general') currentInterests.push('Cel: Rozwój ogólnej wiedzy o świecie');
+                if (goalVal === 'cs') currentInterests.push('Cel: Informatyka i nowa technologia');
+                if (goalVal === 'math') currentInterests.push('Cel: Lepsze logiczne zrozumienie matematyki');
+                if (goalVal === 'humanities') currentInterests.push('Cel: Nauki humanistyczne i kultura');
+
+                setLoading(saveOnb, true);
+                try {
+                    const prefs = await api('GET', '/api/preferences');
+                    prefs.preferred_subjects = subjects;
+                    prefs.current_interests = currentInterests;
+                    await api('POST', '/api/preferences', prefs);
+                    
+                    showView('NO_TOPIC');
+                    if (currentVal) {
+                        generateTopic('user_interest', currentVal);
+                    }
+                } catch (err) {
+                    showError(err.message);
+                }
+                setLoading(saveOnb, false);
             });
-            $('#btn-onboarding-skip').addEventListener('click', () => {
-                showView('NO_TOPIC');
-            });
+            
             $('#input-onboarding-interests').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') $('#input-onboarding-current').focus();
+            });
+            $('#input-onboarding-current').addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') saveOnb.click();
             });
         }
@@ -442,7 +505,7 @@
         $('#suggested-title').textContent = state.topic.title;
         $('#suggested-reason').textContent = state.topic.short_reason || '';
         const connEl = $('#suggested-connection');
-        if (state.topic.connection) {
+        if (state.topic.connection && state.historyCount > 0) {
             connEl.textContent = state.topic.connection;
             connEl.hidden = false;
         } else {

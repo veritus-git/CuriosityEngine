@@ -317,7 +317,7 @@ body {
     font-family: var(--font-mono);
     font-size: var(--fs-sm);
     font-weight: 500;
-    padding: var(--space-md) var(--space-lg);
+    padding: 0.75rem 1.25rem;
     border-radius: var(--radius-md);
     border: 1px solid transparent;
     cursor: pointer;
@@ -465,7 +465,7 @@ body {
 
 .textarea {
     resize: vertical;
-    min-height: 60px;
+    min-height: 80px;
     line-height: 1.5;
 }
 
