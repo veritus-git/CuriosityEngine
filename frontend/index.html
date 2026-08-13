@@ -32,22 +32,24 @@
             </div>
 
             <nav class="topbar__nav">
-                <button class="topbar__btn" id="btn-nav-sparks" aria-label="Spark Inbox" title="Spark Inbox">
-                    <span class="icon">⚡</span>
-                    <span class="topbar__label" id="nav-sparks-label" data-i18n="nav.sparks"></span>
-                </button>
-                <button class="topbar__btn" id="btn-nav-constellation" aria-label="Constellation" title="Knowledge Constellation">
-                    <span class="icon">🌌</span>
-                    <span class="topbar__label" data-i18n="nav.constellation"></span>
-                </button>
-                <button class="topbar__btn" id="btn-nav-history" aria-label="History" title="History">
-                    <span class="icon">📚</span>
-                    <span class="topbar__label" data-i18n="nav.history"></span>
-                </button>
-                <button class="topbar__btn" id="btn-nav-settings" aria-label="Settings" title="Settings">
-                    <span class="icon">⚙️</span>
-                    <span class="topbar__label" data-i18n="nav.settings"></span>
-                </button>
+                <div class="topbar__nav-links" id="topbar-nav-links" hidden>
+                    <button class="topbar__btn" id="btn-nav-sparks" aria-label="Spark Inbox" title="Spark Inbox">
+                        <span class="icon">⚡</span>
+                        <span class="topbar__label" id="nav-sparks-label" data-i18n="nav.sparks"></span>
+                    </button>
+                    <button class="topbar__btn" id="btn-nav-constellation" aria-label="Constellation" title="Knowledge Constellation">
+                        <span class="icon">🌌</span>
+                        <span class="topbar__label" data-i18n="nav.constellation"></span>
+                    </button>
+                    <button class="topbar__btn" id="btn-nav-history" aria-label="History" title="History">
+                        <span class="icon">📚</span>
+                        <span class="topbar__label" data-i18n="nav.history"></span>
+                    </button>
+                    <button class="topbar__btn" id="btn-nav-settings" aria-label="Settings" title="Settings">
+                        <span class="icon">⚙️</span>
+                        <span class="topbar__label" data-i18n="nav.settings"></span>
+                    </button>
+                </div>
                 <select id="topbar-lang-select" class="lang-select" aria-label="Language">
                 </select>
             </nav>
@@ -56,7 +58,7 @@
         <!-- Main Workspace -->
         <main class="main" id="main">
             
-            <!-- 1. AUTH VIEW -->
+            <!-- 1. AUTH VIEW (LOGIN / REGISTER) -->
             <section class="view view--auth" id="view-auth" hidden aria-label="Authentication">
                 <div class="auth-card">
                     <div class="auth-hero">
@@ -74,15 +76,65 @@
                             <input type="password" class="input" id="auth-password" required autocomplete="current-password">
                         </div>
                         <p id="auth-error" class="form-error" style="display: none;"></p>
-                        <button type="submit" class="btn btn--primary btn--full" id="btn-login-submit">
-                            <span class="btn__text" data-i18n="auth.submit"></span>
-                            <span class="btn__loader" aria-hidden="true"></span>
-                        </button>
+                        <div class="auth-actions">
+                            <button type="submit" class="btn btn--primary btn--full" id="btn-login-submit">
+                                <span class="btn__text" data-i18n="auth.submit"></span>
+                                <span class="btn__loader" aria-hidden="true"></span>
+                            </button>
+                        </div>
                     </form>
                 </div>
             </section>
 
-            <!-- 2. COLD START (ZERO-INTERROGATION SPARK CARDS) -->
+            <!-- 2. ONBOARDING VIEW (FLEXIBLE & GENERAL PROFILE) -->
+            <section class="view view--onboarding" id="view-onboarding" hidden aria-label="Onboarding">
+                <div class="view__content view__content--wide onboarding-container">
+                    <div class="onboarding-header">
+                        <span class="badge" data-i18n="onboarding.badge"></span>
+                        <h1 class="page-title" data-i18n="onboarding.title"></h1>
+                        <p class="page-subtitle" data-i18n="onboarding.subtitle"></p>
+                    </div>
+
+                    <form id="onboarding-form" class="onboarding-form">
+                        <div class="onboarding-section">
+                            <label class="field__label" data-i18n="onboarding.domains_label"></label>
+                            <div class="chips-grid" id="onboarding-domains-chips">
+                                <button type="button" class="chip active" data-domain="math" data-i18n="onboarding.domains.math"></button>
+                                <button type="button" class="chip active" data-domain="cs" data-i18n="onboarding.domains.cs"></button>
+                                <button type="button" class="chip" data-domain="gamedev" data-i18n="onboarding.domains.gamedev"></button>
+                                <button type="button" class="chip" data-domain="ai" data-i18n="onboarding.domains.ai"></button>
+                                <button type="button" class="chip" data-domain="hardware" data-i18n="onboarding.domains.hardware"></button>
+                                <button type="button" class="chip" data-domain="physics" data-i18n="onboarding.domains.physics"></button>
+                                <button type="button" class="chip" data-domain="linguistics" data-i18n="onboarding.domains.linguistics"></button>
+                                <button type="button" class="chip" data-domain="philosophy" data-i18n="onboarding.domains.philosophy"></button>
+                            </div>
+                        </div>
+
+                        <div class="onboarding-section">
+                            <label class="field__label" for="onboarding-level-select" data-i18n="onboarding.level_label"></label>
+                            <select class="input select-input" id="onboarding-level-select">
+                                <option value="ground_zero" data-i18n="onboarding.level_ground_zero"></option>
+                                <option value="builder" selected data-i18n="onboarding.level_builder"></option>
+                                <option value="deep" data-i18n="onboarding.level_deep"></option>
+                            </select>
+                        </div>
+
+                        <div class="onboarding-section">
+                            <label class="field__label" for="onboarding-recent-input" data-i18n="onboarding.recent_label"></label>
+                            <textarea class="textarea" id="onboarding-recent-input" rows="2" data-i18n-placeholder="onboarding.recent_placeholder"></textarea>
+                        </div>
+
+                        <div class="onboarding-actions">
+                            <button type="submit" class="btn btn--primary btn--lg btn--full" id="btn-onboarding-submit">
+                                <span class="btn__text" data-i18n="onboarding.submit_btn"></span>
+                                <span class="btn__loader" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- 3. COLD START (DYNAMIC 2x2 SPARK CARDS) -->
             <section class="view view--cold-start" id="view-cold-start" hidden aria-label="Cold Start">
                 <div class="view__content">
                     <span class="badge" data-i18n="cold_start.badge"></span>
@@ -103,7 +155,7 @@
                 </div>
             </section>
 
-            <!-- 3. COMPASS & FOCUS HUB (MAIN ZEN DASHBOARD) -->
+            <!-- 4. COMPASS & FOCUS HUB (MAIN ZEN DASHBOARD) -->
             <section class="view view--dashboard" id="view-dashboard" hidden aria-label="Curiosity Dashboard">
                 <div class="view__content">
                     
@@ -204,7 +256,7 @@
                 </div>
             </section>
 
-            <!-- 4. KNOWLEDGE CONSTELLATION VIEW -->
+            <!-- 5. KNOWLEDGE CONSTELLATION VIEW -->
             <section class="view view--constellation" id="view-constellation" hidden aria-label="Knowledge Constellation">
                 <div class="constellation-header">
                     <div>
@@ -221,7 +273,7 @@
                 </div>
             </section>
 
-            <!-- 5. HISTORY ARCHIVE VIEW -->
+            <!-- 6. HISTORY ARCHIVE VIEW -->
             <section class="view view--history" id="view-history" hidden aria-label="History Archive">
                 <div class="view__content view__content--wide">
                     <div class="history-header">
@@ -233,7 +285,7 @@
                 </div>
             </section>
 
-            <!-- 6. SETTINGS VIEW -->
+            <!-- 7. SETTINGS VIEW -->
             <section class="view view--settings" id="view-settings" hidden aria-label="Settings">
                 <div class="view__content view__content--wide">
                     <div class="history-header">
@@ -315,9 +367,17 @@
         </div>
 
         <!-- Floating Quick Spark Trigger Button (Mobile & Desktop) -->
-        <button class="floating-spark-btn" id="btn-floating-spark" aria-label="Złap Dygresję" title="Złap dygresję (Spacja)">
+        <button class="floating-spark-btn" id="btn-floating-spark" hidden aria-label="Złap Dygresję" title="Złap dygresję (Spacja)">
             <span class="icon">⚡</span>
         </button>
+
+        <!-- Global Zen Loading Overlay -->
+        <div class="loading-overlay" id="loading-overlay" hidden aria-live="polite">
+            <div class="loading-box">
+                <div class="loading-spinner-orb"></div>
+                <p class="loading-text" id="loading-text" data-i18n="loading.generating"></p>
+            </div>
+        </div>
 
         <!-- Notification Toast -->
         <div class="toast" id="toast" hidden role="alert">

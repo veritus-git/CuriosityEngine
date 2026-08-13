@@ -28,7 +28,7 @@ from .ai import get_ai_status, AIError, generate_embedding
 from .auth import register_user, login_user, get_current_user_token
 from .engine import (
     generate_concept_suggestion, complete_session_with_coexplored,
-    get_learning_prompt
+    get_learning_prompt, generate_dynamic_starter_cards
 )
 from .prompts import load_prompts
 
@@ -68,6 +68,11 @@ class CompleteSessionRequest(BaseModel):
 class SparkCreateRequest(BaseModel):
     text: str
     parent_concept_id: Optional[int] = None
+
+class OnboardingRequest(BaseModel):
+    interests: List[str] = Field(default_factory=list)
+    level: str = "builder"
+    recent_thought: Optional[str] = None
 
 class ProfileUpdateRequest(BaseModel):
     learning_style: Optional[str] = None
@@ -279,6 +284,21 @@ async def get_starter_cards(username: str = Depends(get_current_user_token)):
     prompts = load_prompts(lang)
     cards = prompts.get("cold_start_cards", [])
     return {"cards": cards}
+
+
+@app.post("/api/onboarding")
+async def complete_onboarding_route(req: OnboardingRequest, username: str = Depends(get_current_user_token)):
+    update_profile(
+        active_domains=req.interests,
+        grounding_level=req.level,
+        custom_instructions=req.recent_thought
+    )
+    cards = await generate_dynamic_starter_cards(
+        interests=req.interests,
+        level=req.level,
+        recent_thought=req.recent_thought
+    )
+    return {"cards": cards, "profile": get_profile()}
 
 
 @app.get("/api/languages")

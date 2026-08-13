@@ -20,19 +20,48 @@
         "night_owl": "Night owl mode."
     },
     "auth": {
-        "subtitle": "CuriosityEngine — Your personal associative knowledge engine.",
-        "description": "Log in or create an account to start building your knowledge graph.",
+        "title": "CuriosityEngine",
+        "subtitle": "Your personal associative curiosity engine.",
+        "description": "Log in or create a local profile.",
         "username": "Username",
         "password": "Password",
         "submit": "Enter Engine"
     },
-    "cold_start": {
-        "badge": "Cold Start",
+    "onboarding": {
+        "badge": "Personalization",
         "title": "Welcome to CuriosityEngine",
-        "subtitle": "Pick one idea that sparks your curiosity — no quizzes, no pressure:",
+        "subtitle": "Select a few broad areas and your rough background — we'll generate 4 unique starter sparks for you:",
+        "domains_label": "1. What pulls your curiosity most? (Select a few)",
+        "domains": {
+            "math": "📐 Mathematics",
+            "cs": "💻 Computer Science",
+            "gamedev": "🎮 3D Graphics / GameDev",
+            "ai": "🧠 Artificial Intelligence",
+            "hardware": "⚡ Computer Architecture",
+            "physics": "🌌 Physics",
+            "linguistics": "🗣️ Linguistics",
+            "philosophy": "🏛️ Philosophy & Logic"
+        },
+        "level_label": "2. Your rough baseline:",
+        "level_ground_zero": "🟢 Complete Beginner (Explain from scratch & intuitive analogies)",
+        "level_builder": "🟡 Intermediate / Self-taught (I know the basics)",
+        "level_deep": "🔴 Deep Explorer (Jump straight into advanced connections)",
+        "recent_label": "3. Any specific questions or thoughts on your mind recently? (Optional)",
+        "recent_placeholder": "e.g. how GPUs render scenes, data compression algorithms, number theory...",
+        "submit_btn": "Generate My Starter Sparks ✨"
+    },
+    "cold_start": {
+        "badge": "Starter Sparks",
+        "title": "Choose Your First Topic",
+        "subtitle": "Here are 4 topics generated specifically for your interests. Pick one to begin:",
         "or_custom": "Or enter your own question or thought:",
         "custom_placeholder": "e.g. how computers synthesize audio...",
         "custom_submit": "Explore this"
+    },
+    "loading": {
+        "generating": "CuriosityEngine is synthesizing your concept...",
+        "connecting": "Bridging associative concepts...",
+        "onboarding": "Generating your 4 custom starter sparks..."
     },
     "compass": {
         "title": "Curiosity Compass",

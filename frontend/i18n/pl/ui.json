@@ -20,19 +20,48 @@
         "night_owl": "Tryb nocnej sowy."
     },
     "auth": {
-        "subtitle": "CuriosityEngine — Twój osobisty silnik asocjacyjny.",
-        "description": "Zaloguj się lub utwórz konto, aby budować swój graf wiedzy.",
+        "title": "CuriosityEngine",
+        "subtitle": "Osobisty silnik asocjacyjny i mapa ciekawości.",
+        "description": "Zaloguj się lub utwórz profil lokalny.",
         "username": "Nazwa użytkownika",
         "password": "Hasło",
         "submit": "Wejdź do systemu"
     },
+    "onboarding": {
+        "badge": "Personalizacja",
+        "title": "Witaj w CuriosityEngine",
+        "subtitle": "Wybierz kilka ogólnych dziedzin i orientacyjny poziom — wygenerujemy dla Ciebie 4 unikalne, porywające tematy startowe:",
+        "domains_label": "1. Co Cię najbardziej pociąga? (Zaznacz kilka)",
+        "domains": {
+            "math": "📐 Matematyka",
+            "cs": "💻 Computer Science",
+            "gamedev": "🎮 Grafika 3D / Silniki Gier",
+            "ai": "🧠 Sztuczna Inteligencja",
+            "hardware": "⚡ Architektura Komputerów",
+            "physics": "🌌 Fizyka",
+            "linguistics": "🗣️ Lingwistyka",
+            "philosophy": "🏛️ Filozofia i Logika"
+        },
+        "level_label": "2. Twój orientacyjny punkt wyjścia:",
+        "level_ground_zero": "🟢 Zupełny Laik (Tłumacz od zera i intuicyjnych analogii)",
+        "level_builder": "🟡 Średniozaawansowany / Samouk (Znam podstawy)",
+        "level_deep": "🔴 Głęboka woda (Nietrywialne, zaawansowane powiązania)",
+        "recent_label": "3. O czym ostatnio myślałeś lub co Cię ciekawi? (Opcjonalne)",
+        "recent_placeholder": "np. jak działają GPU, algorytmy kompresji, teoria liczb...",
+        "submit_btn": "Wygeneruj moje tematy startowe ✨"
+    },
     "cold_start": {
         "badge": "Zimny Start",
-        "title": "Witaj w CuriosityEngine",
-        "subtitle": "Wybierz jedną myśl, która Cię intryguje — bez pytań o poziom i bez stresu:",
+        "title": "Wybierz Swój Pierwszy Temat",
+        "subtitle": "Oto 4 tematy wygenerowane specjalnie pod Twoje zainteresowania. Wybierz jeden, by zacząć:",
         "or_custom": "Albo wpisz własną myśl lub pytanie:",
         "custom_placeholder": "np. jak komputery generują dźwięk...",
         "custom_submit": "Zbadaj to"
+    },
+    "loading": {
+        "generating": "CuriosityEngine syntezuje propozycję...",
+        "connecting": "Łączenie mostów asocjacyjnych...",
+        "onboarding": "Generowanie Twoich 4 unikalnych tematów startowych..."
     },
     "compass": {
         "title": "Kompas Eksploracji",

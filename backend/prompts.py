@@ -153,6 +153,30 @@ def build_external_learning_prompt(
     prompt = template.replace("{topic}", concept_title)
     prompt = prompt.replace("{domain}", domain)
     prompt = prompt.replace("{known_concepts}", known_str)
-    prompt = prompt.replace("{intuitive_model}", model_str)
-
     return prompt.strip()
+
+
+def build_cold_start_generation_prompts(
+    interests: List[str],
+    level: str,
+    recent_thought: Optional[str] = None,
+    language: str = "en"
+) -> tuple[str, str]:
+    """
+    Build prompts for dynamically generating 4 starter spark cards based on onboarding inputs.
+    """
+    prompts = load_prompts(language)
+    system_prompt = _get(prompts, "cold_start_generation", "system", default="")
+    lang_instruction = _get(prompts, "language_instruction", default="")
+    system_prompt = system_prompt.replace("{language_instruction}", lang_instruction)
+
+    user_template = _get(prompts, "cold_start_generation", "user", default="")
+    interests_str = ", ".join(interests) if interests else "General STEM & Curiosity"
+    thought_str = recent_thought if recent_thought else "None provided"
+
+    user_msg = user_template.replace("{interests}", interests_str)
+    user_msg = user_msg.replace("{level}", level or "General")
+    user_msg = user_msg.replace("{recent_thought}", thought_str)
+
+    return system_prompt, user_msg
+

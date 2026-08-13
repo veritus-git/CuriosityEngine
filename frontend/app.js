@@ -1,6 +1,6 @@
 /**
  * CuriosityEngine — Zen Dashboard Frontend Application
- * Fully associative, vector-backed knowledge interface with Zero-Interrogation start.
+ * Fully associative, vector-backed knowledge interface with Dynamic Starter Sparks & Onboarding.
  * Adheres strictly to i18n — zero hardcoded UI strings.
  */
 
@@ -130,12 +130,26 @@
 
     const views = {
         AUTH: $('#view-auth'),
+        ONBOARDING: $('#view-onboarding'),
         COLD_START: $('#view-cold-start'),
         DASHBOARD: $('#view-dashboard'),
         CONSTELLATION: $('#view-constellation'),
         HISTORY: $('#view-history'),
         SETTINGS: $('#view-settings'),
     };
+
+    // ─── Global Loading Indicator ───
+    function setGlobalLoading(isLoading, textKey = 'loading.generating') {
+        const overlay = $('#loading-overlay');
+        const textEl = $('#loading-text');
+        if (!overlay) return;
+        if (isLoading) {
+            if (textEl) textEl.textContent = t(textKey);
+            overlay.hidden = false;
+        } else {
+            overlay.hidden = true;
+        }
+    }
 
     // ─── API Helper ───
     async function api(method, url, body = null) {
@@ -170,6 +184,17 @@
             if (!el) return;
             el.hidden = (name !== viewName);
         });
+
+        // Hide navigation items when unauthenticated or during onboarding
+        const navLinks = $('#topbar-nav-links');
+        const floatingBtn = $('#btn-floating-spark');
+        if (viewName === 'AUTH' || viewName === 'ONBOARDING') {
+            if (navLinks) navLinks.hidden = true;
+            if (floatingBtn) floatingBtn.hidden = true;
+        } else {
+            if (navLinks) navLinks.hidden = false;
+            if (floatingBtn) floatingBtn.hidden = false;
+        }
     }
 
     function showToast(message) {
@@ -208,7 +233,7 @@
         }
     }
 
-    // ─── Cold Start & Starter Cards ───
+    // ─── Cold Start & Dynamic Starter Cards ───
     async function loadColdStartCards() {
         try {
             const data = await api('GET', '/api/cold-start-cards');
@@ -243,6 +268,7 @@
     async function triggerSuggestion(vector, userInput = null, sparkId = null) {
         const btn = document.querySelector(`[data-vector="${vector}"]`);
         if (btn) btn.classList.add('loading');
+        setGlobalLoading(true, 'loading.generating');
 
         try {
             const res = await api('POST', '/api/topics/suggest', {
@@ -254,12 +280,14 @@
 
             state.concept = res.concept;
             state.prompt = res.prompt;
+            state.coldStartActive = false;
             renderFocusCard('suggested');
             showView('DASHBOARD');
         } catch (err) {
             showToast(err.message || t('errors.server_down'));
         } finally {
             if (btn) btn.classList.remove('loading');
+            setGlobalLoading(false);
         }
     }
 
@@ -342,7 +370,6 @@
         const width = rect.width;
         const height = rect.height;
 
-        // Position nodes randomly / circular
         nodes.forEach((node, i) => {
             const angle = (i / nodes.length) * 2 * Math.PI;
             const radius = Math.min(width, height) * 0.35;
@@ -380,7 +407,6 @@
                 if (node.x < 30 || node.x > width - 30) node.vx *= -1;
                 if (node.y < 30 || node.y > height - 30) node.vy *= -1;
 
-                // Node circle
                 ctx.beginPath();
                 ctx.arc(node.x, node.y, node.radius, 0, 2 * Math.PI);
                 ctx.fillStyle = node.status === 'active' ? '#10b981' : '#6366f1';
@@ -389,7 +415,6 @@
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                // Label
                 ctx.fillStyle = '#f1f0f7';
                 ctx.font = '11px Inter, sans-serif';
                 ctx.textAlign = 'center';
@@ -454,53 +479,46 @@
             }
 
             if (sparks.length === 0) {
-                container.innerHTML = `<p style="color: var(--text-tertiary); font-size: var(--fs-sm);">${t('spark_box.empty')}</p>`;
+                container.innerHTML = `<p class="empty-state" style="color: var(--text-tertiary); font-size: var(--fs-sm); padding: var(--space-md) 0;">${t('spark_box.empty')}</p>`;
                 return;
             }
 
-            sparks.forEach(sp => {
-                const row = document.createElement('div');
-                row.className = 'spark-item';
-                row.innerHTML = `
-                    <span class="spark-item__text">${escapeHtml(sp.raw_text)}</span>
+            sparks.forEach(s => {
+                const item = document.createElement('div');
+                item.className = 'spark-item';
+                item.innerHTML = `
+                    <span class="spark-item__text">${escapeHtml(s.raw_text)}</span>
                     <div style="display: flex; gap: var(--space-xs);">
-                        <button class="btn btn--secondary btn--small btn-explore-spark" data-id="${sp.id}">
-                            ${t('spark_box.explore_btn')}
-                        </button>
-                        <button class="btn btn--ghost btn--small btn-dismiss-spark" data-id="${sp.id}">
-                            ${t('spark_box.dismiss_btn')}
-                        </button>
+                        <button class="btn btn--small btn--primary btn-unpack" data-id="${s.id}" data-text="${escapeHtml(s.raw_text)}">${t('spark_box.explore_btn')}</button>
+                        <button class="btn btn--small btn--ghost btn-dismiss" data-id="${s.id}">✕</button>
                     </div>
                 `;
-                row.querySelector('.btn-explore-spark').addEventListener('click', () => {
+                item.querySelector('.btn-unpack').addEventListener('click', () => {
                     $('#spark-modal-backdrop').hidden = true;
-                    triggerSuggestion('spark', null, sp.id);
+                    triggerSuggestion('spark', null, s.id);
                 });
-                row.querySelector('.btn-dismiss-spark').addEventListener('click', async () => {
-                    await api('POST', `/api/sparks/${sp.id}/dismiss`);
+                item.querySelector('.btn-dismiss').addEventListener('click', async () => {
+                    await api('POST', `/api/sparks/${s.id}/dismiss`).catch(() => {});
                     loadSparksList();
                 });
-                container.appendChild(row);
+                container.appendChild(item);
             });
         } catch (err) {
             console.error('Failed to load sparks:', err);
         }
     }
 
-    // ─── Main State Initialization ───
+    // ─── Main Application Initialization ───
     async function init() {
-        let savedLang = navigator.language.startsWith('pl') ? 'pl' : 'en';
-        try {
-            if (localStorage.getItem('curiosity_token')) {
-                const prof = await api('GET', '/api/profile');
-                savedLang = prof.language || savedLang;
-            }
-        } catch (e) {
-            if (e.message === 'Unauthorized') {
-                await loadLanguage(savedLang);
-                showView('AUTH');
-                return;
-            }
+        const token = localStorage.getItem('curiosity_token');
+        const savedLang = localStorage.getItem('curiosity_lang') || 'pl';
+
+        if (!token) {
+            await loadLanguage(savedLang);
+            await loadLanguageList();
+            bindEvents();
+            showView('AUTH');
+            return;
         }
 
         await loadLanguage(savedLang);
@@ -524,8 +542,13 @@
             }
 
             if (state.coldStartActive) {
-                await loadColdStartCards();
-                showView('COLD_START');
+                const domains = state.profile.active_domains || [];
+                if (!domains || domains.length === 0) {
+                    showView('ONBOARDING');
+                } else {
+                    await loadColdStartCards();
+                    showView('COLD_START');
+                }
             } else {
                 if (data.state === 'CONCEPT_ACTIVE') {
                     renderFocusCard('active');
@@ -543,7 +566,11 @@
     }
 
     // ─── Event Bindings ───
+    let eventsBound = false;
     function bindEvents() {
+        if (eventsBound) return;
+        eventsBound = true;
+
         // Auth Form
         $('#auth-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -560,19 +587,53 @@
                 try {
                     data = await api('POST', '/api/auth/login', { username, password });
                 } catch (loginErr) {
-                    if (loginErr.message.includes('Invalid') || loginErr.message.includes('Unauthorized')) {
+                    if (loginErr.message.includes('Invalid') || loginErr.message.includes('Unauthorized') || loginErr.message.includes('not found')) {
                         data = await api('POST', '/api/auth/register', { username, password });
                     } else {
                         throw loginErr;
                     }
                 }
                 localStorage.setItem('curiosity_token', data.token);
+                eventsBound = false;
                 init();
             } catch (error) {
                 err.textContent = error.message;
                 err.style.display = 'block';
             } finally {
                 btn.classList.remove('loading');
+            }
+        });
+
+        // Onboarding Chips Toggle
+        $$('#onboarding-domains-chips .chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                chip.classList.toggle('active');
+            });
+        });
+
+        // Onboarding Form Submission
+        $('#onboarding-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const activeChips = Array.from($$('#onboarding-domains-chips .chip.active')).map(c => c.dataset.domain);
+            const level = $('#onboarding-level-select').value;
+            const recentThought = $('#onboarding-recent-input').value.trim();
+
+            setGlobalLoading(true, 'loading.onboarding');
+            try {
+                const res = await api('POST', '/api/onboarding', {
+                    interests: activeChips,
+                    level: level,
+                    recent_thought: recentThought
+                });
+
+                state.coldStartCards = res.cards || [];
+                state.profile = res.profile || {};
+                renderColdStartCards();
+                showView('COLD_START');
+            } catch (err) {
+                showToast(err.message || t('errors.server_down'));
+            } finally {
+                setGlobalLoading(false);
             }
         });
 
@@ -688,6 +749,7 @@
             const btn = $('#btn-confirm-complete');
 
             btn.classList.add('loading');
+            setGlobalLoading(true, 'complete_modal.save_btn');
             try {
                 await api('POST', `/api/topics/${state.concept.id}/complete`, {
                     co_explored_text: coexplored,
@@ -700,11 +762,12 @@
                 state.prompt = null;
                 state.coldStartActive = false;
                 renderFocusCard(null);
-                showToast(t('saved.title'));
+                showToast(t('complete_modal.title'));
             } catch (err) {
                 showToast(err.message);
             } finally {
                 btn.classList.remove('loading');
+                setGlobalLoading(false);
             }
         });
 
@@ -753,7 +816,7 @@
                 parent_concept_id: state.concept ? state.concept.id : null
             });
             input.value = '';
-            showToast(t('spark_box.saved_toast'));
+            showToast(t('spark_box.title'));
             loadSparksList();
         } catch (err) {
             showToast(err.message);

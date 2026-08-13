@@ -15,7 +15,8 @@ from .database import (
 from .ai import generate_ai_json, generate_embedding, cosine_similarity, AIError
 from .prompts import (
     build_generation_prompts, build_multiconcept_parse_prompts,
-    build_external_learning_prompt
+    build_external_learning_prompt, build_cold_start_generation_prompts,
+    load_prompts
 )
 
 logger = logging.getLogger("curiosity.engine")
@@ -185,3 +186,34 @@ def get_learning_prompt(concept_id: int) -> str:
         known_concepts=known,
         profile=profile
     )
+
+
+async def generate_dynamic_starter_cards(
+    interests: List[str],
+    level: str,
+    recent_thought: Optional[str] = None
+) -> List[Dict[str, Any]]:
+    """
+    Generate 4 custom, captivating starter cards using AI based on the user's onboarding choices.
+    Falls back gracefully to localized default cards if AI fails.
+    """
+    profile = get_profile()
+    lang = profile.get("language", "en")
+
+    try:
+        sys_prompt, user_prompt = build_cold_start_generation_prompts(
+            interests=interests,
+            level=level,
+            recent_thought=recent_thought,
+            language=lang
+        )
+        parsed = await generate_ai_json(sys_prompt, user_prompt)
+        cards = parsed.get("cards", [])
+        if len(cards) >= 4:
+            return cards[:4]
+    except Exception as e:
+        logger.warning(f"Dynamic starter cards generation notice ({e}), using default cards.")
+
+    prompts = load_prompts(lang)
+    return prompts.get("cold_start_cards", [])
+
