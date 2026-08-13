@@ -35,75 +35,43 @@ CuriosityEngine removes that friction. Open the page, get a topic, explore it. N
 - Python 3.9+
 - An AI API key (OpenAI, Anthropic, or Google Gemini)
 
-## Installation
+## Setup & Installation
+
+Whether you are running this on your personal laptop or deploying to a home server, the steps are exactly the same:
 
 ```bash
-# Clone the repository
-git clone https://github.com/veritus-git/CuriosityEngine CuriosityEngine
-cd CuriosityEngine
+# 1. Install prerequisites (Debian/Ubuntu example)
+sudo apt update && sudo apt install git python3 python3-pip python3-venv
 
-# Create virtual environment (recommended)
+# 2. Clone the repository
+git clone https://github.com/veritus-git/CuriosityEngine ~/CuriosityEngine
+cd ~/CuriosityEngine
+
+# 3. Set up Python environment
 python3 -m venv venv
 source venv/bin/activate
-
-# Install dependencies
 pip install -r requirements.txt
 
-# Create your configuration
+# 4. Configure AI
 cp .env.example .env
+# Edit .env to add your API key:
+nano .env
 ```
 
-Edit `.env` with your API key, AI model, AI provider, host, and port:
+### Running Locally
 
-```env
-AI_PROVIDER=gemini
-AI_MODEL=gemini-2.0-flash
-AI_API_KEY=your-key-here
-HOST=0.0.0.0
-PORT=8080
-```
-
-
-## Running
-
+To run the app interactively in your terminal:
 ```bash
 python -m backend.server
 ```
+Open `http://localhost:8080` in your browser. (Since the server binds to `0.0.0.0`, you can also access it from your phone on the same network via `http://<your-local-ip>:8080`).
 
-Open `http://localhost:8080` in your browser.
+### Running as a Background Service (Servers)
 
-### Access from another device (phone, tablet)
+If you want it to run permanently in the background (and auto-start on boot):
 
-Since the server binds to `0.0.0.0`, you can access it from any device on your local network:
-
-1. Find your machine's local IP: `hostname -I`
-2. Open `http://<your-ip>:8080` on your phone/tablet
-
-
-## Server Deployment
-
-If you want CuriosityEngine to run permanently on a home server (Raspberry Pi, any Linux box, old laptop, VPS, etc.):
-
-### 1. Install on the server
-
-```bash
-# Make sure Python is available
-sudo apt update && sudo apt install python3 python3-pip python3-venv
-
-# Clone and set up
-git clone https://github.com/veritus-git/CuriosityEngine ~/CuriosityEngine
-cd ~/CuriosityEngine
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-# Edit .env with your API key: nano .env
-```
-
-### 2. Run as a systemd service (auto-start on boot)
-
-Create `/etc/systemd/system/curiosity-engine.service`:
-
+1. Create a service file: `sudo nano /etc/systemd/system/curiosity-engine.service`
+2. Add the following (replace `YOUR_USERNAME` with your actual Linux user, e.g. `pi` or `linux`):
 ```ini
 [Unit]
 Description=CuriosityEngine
@@ -121,25 +89,35 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
 ```
-
-> Replace `YOUR_USERNAME` with your actual user (e.g. `pi`, `linux`, `ubuntu`).
-
-Then enable and start:
-
+3. Enable and start the service:
 ```bash
 sudo systemctl enable curiosity-engine
 sudo systemctl start curiosity-engine
-
-# Check if it's running
-sudo systemctl status curiosity-engine
-
-# View logs
-sudo journalctl -u curiosity-engine -f
 ```
 
-### 3. Access from any device
+## Uninstallation & Cleanup
 
-Once running, open `http://<server-ip>:8080` from any device on the same network.
+If you want to completely remove CuriosityEngine or free up port `8080`:
+
+**1. Stop the server & free the port**
+If you ran it in the terminal and accidentally sent it to the background (e.g., by pressing `Ctrl+Z`), you can forcefully kill whatever is using port 8080:
+```bash
+fuser -k 8080/tcp
+```
+
+If you set it up as a systemd background service, stop and disable it:
+```bash
+sudo systemctl stop curiosity-engine
+sudo systemctl disable curiosity-engine
+sudo rm /etc/systemd/system/curiosity-engine.service
+sudo systemctl daemon-reload
+```
+
+**2. Delete all files and data**
+Because CuriosityEngine is completely self-contained and privacy-first, all your data (database, settings, history) is stored right inside the project folder. To wipe everything permanently, simply delete the folder:
+```bash
+rm -rf ~/CuriosityEngine
+```
 
 
 
