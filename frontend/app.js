@@ -177,12 +177,15 @@
 
     // ─── Initialize ───
     async function init() {
-        // Load preferences first to get language
         let savedLang = 'en';
         try {
-            const prefs = await api('GET', '/api/preferences');
-            savedLang = prefs.language || 'en';
-        } catch (e) { /* use default */ }
+            if (localStorage.getItem('curiosity_token')) {
+                const prefs = await api('GET', '/api/preferences');
+                savedLang = prefs.language || 'en';
+            }
+        } catch (e) { 
+            if (e.message === 'Unauthorized') return;
+        }
 
         await loadLanguage(savedLang);
         await loadLanguageList();
@@ -213,6 +216,7 @@
                 }
             }
         } catch (err) {
+            if (err.message === 'Unauthorized') return;
             showView('NO_TOPIC');
             showError(t('errors.server_down'));
         }
