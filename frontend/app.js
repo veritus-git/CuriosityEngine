@@ -194,6 +194,8 @@
         // Hide navigation items when unauthenticated or during onboarding
         const navLinks = $('#topbar-nav-links');
         const floatingBtn = $('#btn-floating-spark');
+        const globalProgress = $('#onboarding-global-progress');
+
         if (viewName === 'AUTH' || viewName === 'ONBOARDING') {
             if (navLinks) navLinks.hidden = true;
             if (floatingBtn) floatingBtn.hidden = true;
@@ -203,7 +205,10 @@
         }
 
         if (viewName === 'ONBOARDING') {
+            if (globalProgress) globalProgress.hidden = false;
             setWizardStep(1);
+        } else {
+            if (globalProgress) globalProgress.hidden = true;
         }
     }
 
@@ -636,11 +641,11 @@
             }
         });
 
-        // Dynamic Event Delegation for Chips Grid (Clicking predefined or custom chips)
+        // Dynamic Event Delegation for Chips List (Clicking predefined or custom chip-row items)
         const chipsContainer = $('#onboarding-domains-chips');
         if (chipsContainer) {
             chipsContainer.addEventListener('click', (e) => {
-                const chip = e.target.closest('.chip');
+                const chip = e.target.closest('.chip-row, .chip');
                 if (chip) {
                     chip.classList.toggle('active');
                 }
@@ -656,7 +661,7 @@
 
             const newChip = document.createElement('button');
             newChip.type = 'button';
-            newChip.className = 'chip active';
+            newChip.className = 'chip-row active';
             newChip.dataset.domain = text.toLowerCase().replace(/\s+/g, '_');
             newChip.textContent = `✨ ${text}`;
             
@@ -716,7 +721,7 @@
         if (btnOnboardingSubmit) {
             btnOnboardingSubmit.addEventListener('click', async (e) => {
                 e.preventDefault();
-                const activeChips = Array.from($$('#onboarding-domains-chips .chip.active')).map(c => c.textContent.trim().replace(/^✨\s*/, ''));
+                const activeChips = Array.from($$('#onboarding-domains-chips .chip-row.active, #onboarding-domains-chips .chip.active')).map(c => c.textContent.trim().replace(/^✨\s*/, ''));
                 const recentThought = ($('#onboarding-recent-input')?.value || '').trim();
 
                 setGlobalLoading(true, 'loading.onboarding');

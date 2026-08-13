@@ -15,6 +15,11 @@
 </head>
 <body>
     <div id="app">
+        <!-- Top Fixed Global Progress Bar (Full Window Width) -->
+        <div class="global-progress-bar" id="onboarding-global-progress" hidden>
+            <div class="global-progress-fill" id="wizard-progress-fill"></div>
+        </div>
+
         <!-- Ambient animated background -->
         <div class="ambient-bg" aria-hidden="true">
             <div class="ambient-orb ambient-orb--1"></div>
@@ -86,56 +91,48 @@
                 </div>
             </section>
 
-            <!-- 2. ONBOARDING VIEW (3-STEP INTERACTIVE SLIDE WIZARD) -->
+            <!-- 2. ONBOARDING VIEW (3-STEP SLIDE WIZARD) -->
             <section class="view view--onboarding" id="view-onboarding" hidden aria-label="Onboarding Wizard">
                 <div class="view__content onboarding-container">
-                    
-                    <!-- Wizard Header & Progress Bar -->
-                    <div class="wizard-header">
-                        <div class="wizard-meta">
-                            <span class="badge" data-i18n="onboarding.badge"></span>
-                            <span class="wizard-step-indicator" id="wizard-step-text"></span>
-                        </div>
-                        <div class="wizard-progress-bar">
-                            <div class="wizard-progress-fill" id="wizard-progress-fill"></div>
-                        </div>
-                    </div>
 
                     <!-- Slide Card Container -->
                     <div class="wizard-card">
                         
-                        <!-- SLIDE 1: DOMAINS & PASSIONS -->
+                        <!-- SLIDE 1: DOMAINS & PASSIONS (1 ITEM PER ROW, CENTERED) -->
                         <div class="wizard-slide" id="wizard-slide-1">
-                            <h2 class="slide-title" data-i18n="onboarding.step1_title"></h2>
-                            <p class="slide-subtitle" data-i18n="onboarding.step1_subtitle"></p>
-
-                            <div class="chips-grid" id="onboarding-domains-chips">
-                                <button type="button" class="chip active" data-domain="math" data-i18n="onboarding.domains.math"></button>
-                                <button type="button" class="chip active" data-domain="cs" data-i18n="onboarding.domains.cs"></button>
-                                <button type="button" class="chip" data-domain="gamedev" data-i18n="onboarding.domains.gamedev"></button>
-                                <button type="button" class="chip" data-domain="ai" data-i18n="onboarding.domains.ai"></button>
-                                <button type="button" class="chip" data-domain="hardware" data-i18n="onboarding.domains.hardware"></button>
-                                <button type="button" class="chip" data-domain="physics" data-i18n="onboarding.domains.physics"></button>
-                                <button type="button" class="chip" data-domain="linguistics" data-i18n="onboarding.domains.linguistics"></button>
-                                <button type="button" class="chip" data-domain="philosophy" data-i18n="onboarding.domains.philosophy"></button>
+                            <div class="slide-header">
+                                <h2 class="slide-title" data-i18n="onboarding.step1_title"></h2>
+                                <p class="slide-subtitle" data-i18n="onboarding.step1_subtitle"></p>
                             </div>
 
-                            <!-- Custom Tag Input -->
+                            <div class="chips-column" id="onboarding-domains-chips">
+                                <button type="button" class="chip-row active" data-domain="math" data-i18n="onboarding.domains.math"></button>
+                                <button type="button" class="chip-row active" data-domain="cs" data-i18n="onboarding.domains.cs"></button>
+                                <button type="button" class="chip-row" data-domain="gamedev" data-i18n="onboarding.domains.gamedev"></button>
+                                <button type="button" class="chip-row" data-domain="ai" data-i18n="onboarding.domains.ai"></button>
+                                <button type="button" class="chip-row" data-domain="hardware" data-i18n="onboarding.domains.hardware"></button>
+                                <button type="button" class="chip-row" data-domain="physics" data-i18n="onboarding.domains.physics"></button>
+                                <button type="button" class="chip-row" data-domain="linguistics" data-i18n="onboarding.domains.linguistics"></button>
+                                <button type="button" class="chip-row" data-domain="philosophy" data-i18n="onboarding.domains.philosophy"></button>
+                            </div>
+
+                            <!-- Custom Tag Input (Minimal at bottom) -->
                             <div class="custom-chip-builder">
-                                <input type="text" class="input" id="input-custom-chip" data-i18n-placeholder="onboarding.custom_chip_placeholder">
-                                <button type="button" class="btn btn--secondary" id="btn-add-custom-chip" data-i18n="onboarding.add_chip_btn"></button>
+                                <input type="text" class="input input--compact" id="input-custom-chip" data-i18n-placeholder="onboarding.custom_chip_placeholder">
+                                <button type="button" class="btn btn--secondary btn--compact" id="btn-add-custom-chip" data-i18n="onboarding.add_chip_btn"></button>
                             </div>
 
-                            <div class="wizard-actions">
-                                <div></div>
+                            <div class="wizard-actions wizard-actions--end">
                                 <button type="button" class="btn btn--primary" id="btn-wizard-step1-next" data-i18n="onboarding.btn_next"></button>
                             </div>
                         </div>
 
-                        <!-- SLIDE 2: GROUNDING LEVEL CARDS -->
+                        <!-- SLIDE 2: GROUNDING LEVEL TILES -->
                         <div class="wizard-slide" id="wizard-slide-2" hidden>
-                            <h2 class="slide-title" data-i18n="onboarding.step2_title"></h2>
-                            <p class="slide-subtitle" data-i18n="onboarding.step2_subtitle"></p>
+                            <div class="slide-header">
+                                <h2 class="slide-title" data-i18n="onboarding.step2_title"></h2>
+                                <p class="slide-subtitle" data-i18n="onboarding.step2_subtitle"></p>
+                            </div>
 
                             <div class="level-cards-grid">
                                 <div class="level-tile" data-level="ground_zero">
@@ -158,13 +155,15 @@
                             </div>
                         </div>
 
-                        <!-- SLIDE 3: RECENT INTRIGUES & SUBMIT -->
+                        <!-- SLIDE 3: RECENT INTRIGUES (SPACIOUS TEXTAREA) -->
                         <div class="wizard-slide" id="wizard-slide-3" hidden>
-                            <h2 class="slide-title" data-i18n="onboarding.step3_title"></h2>
-                            <p class="slide-subtitle" data-i18n="onboarding.step3_subtitle"></p>
+                            <div class="slide-header">
+                                <h2 class="slide-title" data-i18n="onboarding.step3_title"></h2>
+                                <p class="slide-subtitle" data-i18n="onboarding.step3_subtitle"></p>
+                            </div>
 
-                            <div class="field">
-                                <textarea class="textarea" id="onboarding-recent-input" rows="4" data-i18n-placeholder="onboarding.recent_placeholder"></textarea>
+                            <div class="slide-content-fill">
+                                <textarea class="textarea textarea--spacious" id="onboarding-recent-input" data-i18n-placeholder="onboarding.recent_placeholder"></textarea>
                             </div>
 
                             <div class="wizard-actions">
