@@ -1,0 +1,115 @@
+{
+    "meta": {
+        "code": "pl",
+        "name": "Polish",
+        "native_name": "Polski"
+    },
+    "nav": {
+        "history": "Historia",
+        "settings": "Ustawienia"
+    },
+    "greeting": {
+        "late_night": "Nocne przemy\u015blenia.",
+        "morning": "Dzie\u0144 dobry.",
+        "afternoon": "Dobre po\u0142udnie.",
+        "evening": "Dobry wiecz\u00f3r.",
+        "night_owl": "Tryb nocnego marka."
+    },
+    "no_topic": {
+        "subtitle": "Czego dzi\u015b b\u0119dziemy szuka\u0107?",
+        "suggest_btn": "Zasugeruj temat",
+        "random_btn": "Co\u015b zupe\u0142nie innego",
+        "interest_toggle": "Albo powiedz, co Ci\u0119 ciekawi\u2026",
+        "interest_placeholder": "np. jak komputery rozumiej\u0105 obrazy\u2026",
+        "interest_submit": "Zbadaj to"
+    },
+    "suggested": {
+        "label": "Dzisiejsza sugestia",
+        "accept_btn": "Zbadaj ten temat",
+        "reject_btn": "Zasugeruj inny"
+    },
+    "active": {
+        "label": "Dzisiejsza eksploracja",
+        "fallback_reason": "Zbadaj go, jak tylko chcesz.",
+        "started": "Rozpocz\u0119to {date}",
+        "copy_prompt_btn": "Kopiuj prompt do nauki",
+        "finish_btn": "Sko\u0144czy\u0142em",
+        "prompt_copied": "Prompt skopiowany do schowka \u2713"
+    },
+    "reflection": {
+        "label": "Refleksja",
+        "title": "Jak posz\u0142o?",
+        "notes_label": "Czego si\u0119 nauczy\u0142e\u015b?",
+        "notes_placeholder": "G\u0142\u00f3wne wnioski\u2026",
+        "discoveries_label": "Co przyku\u0142o Twoj\u0105 uwag\u0119?",
+        "discoveries_placeholder": "Ciekawe rzeczy, kt\u00f3re zauwa\u017cy\u0142e\u015b\u2026",
+        "sidepaths_label": "Czy zboczy\u0142e\u015b na inny temat?",
+        "sidepaths_placeholder": "np. zacz\u0105\u0142em od macierzy, sko\u0144czy\u0142em czytaj\u0105c o tensorach\u2026",
+        "interest_label": "Zainteresowanie",
+        "difficulty_label": "Trudno\u015b\u0107",
+        "save_btn": "Zapisz eksploracj\u0119"
+    },
+    "saved": {
+        "title": "Zapisano.",
+        "topic_saved": "{topic} jest teraz cz\u0119\u015bci\u0105 Twojej historii nauki.",
+        "hint": "Nast\u0119pnym razem mo\u017cemy to rozwin\u0105\u0107 \u2014 albo uda\u0107 si\u0119 w zupe\u0142nie innym kierunku.",
+        "next_btn": "Zbadaj co\u015b nowego",
+        "home_btn": "Powr\u00f3t na start"
+    },
+    "history": {
+        "title": "Archiwum nauki",
+        "back_btn": "\u2190 Wr\u00f3\u0107",
+        "empty": "\u017badnych eksploracji. Twoja podr\u00f3\u017c zaczyna si\u0119 od pierwszej.",
+        "interest": "zainteresowanie",
+        "difficulty": "trudno\u015b\u0107"
+    },
+    "detail": {
+        "back_btn": "\u2190 Wr\u00f3\u0107 do archiwum",
+        "difficulty_label": "Trudno\u015b\u0107",
+        "mode_label": "Tryb",
+        "why_label": "Dlaczego ten temat",
+        "connection_label": "Po\u0142\u0105czenie",
+        "notes_label": "Notatki",
+        "discoveries_label": "Odkrycia",
+        "sidepaths_label": "Boczne \u015bcie\u017cki",
+        "interest_label": "Zainteresowanie",
+        "difficulty_detail_label": "Trudno\u015b\u0107"
+    },
+    "settings": {
+        "title": "Ustawienia",
+        "back_btn": "\u2190 Wr\u00f3\u0107",
+        "ai_heading": "Konfiguracja AI",
+        "ai_hint": "Skonfiguruj AI w pliku <code>.env</code> i uruchom serwer ponownie.",
+        "ai_provider": "Dostawca",
+        "ai_model": "Model",
+        "ai_status": "Status",
+        "ai_configured": "Skonfigurowano \u2713",
+        "ai_not_configured": "Nie skonfigurowano \u2717",
+        "ai_set_key": "Ustaw <code>AI_API_KEY</code> w pliku <code>.env</code>.",
+        "preferred_heading": "Preferowane tematy",
+        "preferred_hint": "Tematy, w kierunku kt\u00f3rych AI powinno sk\u0142ania\u0107.",
+        "preferred_placeholder": "Dodaj temat\u2026",
+        "disliked_heading": "Tematy do unikania",
+        "disliked_hint": "Tematy, od kt\u00f3rych AI powinno stroni\u0107.",
+        "disliked_placeholder": "Dodaj temat\u2026",
+        "add_btn": "Dodaj",
+        "style_heading": "Styl nauki",
+        "style_topdown": "Od og\u00f3\u0142u do szczeg\u00f3\u0142u",
+        "style_bottomup": "Od przyk\u0142ad\u00f3w do teorii",
+        "style_mixed": "Mieszany",
+        "language_heading": "J\u0119zyk",
+        "language_hint": "Wybierz j\u0119zyk interfejsu.",
+        "privacy_heading": "Prywatno\u015b\u0107",
+        "privacy_text": "Wszystkie dane s\u0105 przechowywane lokalnie w SQLite. Nic nie jest wysy\u0142ane nigdzie poza skonfigurowanego dostawc\u0119 AI podczas generowania temat\u00f3w. Tw\u00f3j klucz API nigdy nie trafia do przegl\u0105darki."
+    },
+    "errors": {
+        "server_down": "Nie uda\u0142o si\u0119 po\u0142\u0105czy\u0107 z serwerem. Upewnij si\u0119, \u017ce backend dzia\u0142a.",
+        "copy_failed": "Nie uda\u0142o si\u0119 skopiowa\u0107 promptu."
+    },
+    "dates": {
+        "today": "dzisiaj",
+        "yesterday": "wczoraj",
+        "days_ago": "{n} dni temu",
+        "locale": "pl-PL"
+    }
+}

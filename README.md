@@ -58,7 +58,7 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Edit `.env` with your API key:
+Edit `.env` with your API key, AI model, AI provider, host, and port:
 
 ```env
 AI_PROVIDER=gemini

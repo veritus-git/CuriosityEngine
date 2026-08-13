@@ -1,0 +1,115 @@
+{
+    "meta": {
+        "code": "en",
+        "name": "English",
+        "native_name": "English"
+    },
+    "nav": {
+        "history": "History",
+        "settings": "Settings"
+    },
+    "greeting": {
+        "late_night": "Late night thoughts.",
+        "morning": "Good morning.",
+        "afternoon": "Good afternoon.",
+        "evening": "Good evening.",
+        "night_owl": "Night owl mode."
+    },
+    "no_topic": {
+        "subtitle": "What shall we explore?",
+        "suggest_btn": "Suggest a topic",
+        "random_btn": "Something completely different",
+        "interest_toggle": "Or tell me what you're curious about\u2026",
+        "interest_placeholder": "e.g. how computers understand images\u2026",
+        "interest_submit": "Explore this"
+    },
+    "suggested": {
+        "label": "Today's suggestion",
+        "accept_btn": "Explore this topic",
+        "reject_btn": "Suggest another"
+    },
+    "active": {
+        "label": "Today's exploration",
+        "fallback_reason": "Explore it however you like.",
+        "started": "Started {date}",
+        "copy_prompt_btn": "Copy learning prompt",
+        "finish_btn": "I'm done exploring",
+        "prompt_copied": "Prompt copied to clipboard \u2713"
+    },
+    "reflection": {
+        "label": "Reflection",
+        "title": "How did it go?",
+        "notes_label": "What did you learn?",
+        "notes_placeholder": "Key takeaways\u2026",
+        "discoveries_label": "What caught your attention?",
+        "discoveries_placeholder": "Interesting things you noticed\u2026",
+        "sidepaths_label": "Did you wander to another topic?",
+        "sidepaths_placeholder": "e.g. started with matrices, ended up reading about tensors\u2026",
+        "interest_label": "Interest",
+        "difficulty_label": "Difficulty",
+        "save_btn": "Save exploration"
+    },
+    "saved": {
+        "title": "Saved.",
+        "topic_saved": "{topic} is now part of your learning history.",
+        "hint": "Next time we can build on this \u2014 or go somewhere entirely different.",
+        "next_btn": "Explore something new",
+        "home_btn": "Back to start"
+    },
+    "history": {
+        "title": "Learning Archive",
+        "back_btn": "\u2190 Back",
+        "empty": "No explorations yet. Your journey starts with the first one.",
+        "interest": "interest",
+        "difficulty": "difficulty"
+    },
+    "detail": {
+        "back_btn": "\u2190 Back to archive",
+        "difficulty_label": "Difficulty",
+        "mode_label": "Mode",
+        "why_label": "Why this topic",
+        "connection_label": "Connection",
+        "notes_label": "Notes",
+        "discoveries_label": "Discoveries",
+        "sidepaths_label": "Side paths",
+        "interest_label": "Interest",
+        "difficulty_detail_label": "Difficulty"
+    },
+    "settings": {
+        "title": "Settings",
+        "back_btn": "\u2190 Back",
+        "ai_heading": "AI Configuration",
+        "ai_hint": "Configure AI in the <code>.env</code> file and restart the server.",
+        "ai_provider": "Provider",
+        "ai_model": "Model",
+        "ai_status": "Status",
+        "ai_configured": "Configured \u2713",
+        "ai_not_configured": "Not configured \u2717",
+        "ai_set_key": "Set <code>AI_API_KEY</code> in your <code>.env</code> file.",
+        "preferred_heading": "Preferred subjects",
+        "preferred_hint": "Topics you'd like AI to lean towards.",
+        "preferred_placeholder": "Add subject\u2026",
+        "disliked_heading": "Subjects to avoid",
+        "disliked_hint": "Topics AI should steer away from.",
+        "disliked_placeholder": "Add subject\u2026",
+        "add_btn": "Add",
+        "style_heading": "Learning style",
+        "style_topdown": "Top-down (big picture first)",
+        "style_bottomup": "Bottom-up (examples first)",
+        "style_mixed": "Mixed",
+        "language_heading": "Language",
+        "language_hint": "Choose interface language.",
+        "privacy_heading": "Privacy",
+        "privacy_text": "All your data is stored locally in SQLite. Nothing is sent anywhere except to your configured AI provider when generating topics. Your API key never touches the browser."
+    },
+    "errors": {
+        "server_down": "Could not connect to the server. Make sure the backend is running.",
+        "copy_failed": "Could not copy prompt."
+    },
+    "dates": {
+        "today": "today",
+        "yesterday": "yesterday",
+        "days_ago": "{n} days ago",
+        "locale": "en-US"
+    }
+}

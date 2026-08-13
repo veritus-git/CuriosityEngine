@@ -1,6 +1,7 @@
 /**
  * CuriosityEngine — Frontend Application
  * State machine: NO_TOPIC → TOPIC_SUGGESTED → TOPIC_ACTIVE → REFLECTION → SAVED
+ * i18n: loads language JSON files from /i18n/{code}.json
  */
 
 (function () {
@@ -8,7 +9,7 @@
 
     // ─── State ───
     let state = {
-        view: 'NO_TOPIC', // NO_TOPIC | TOPIC_SUGGESTED | TOPIC_ACTIVE | REFLECTION | SAVED | HISTORY | DETAIL | SETTINGS
+        view: 'NO_TOPIC',
         topic: null,
         session: null,
         ai: { configured: false },
@@ -16,6 +17,67 @@
         interestRating: null,
         difficultyRating: null,
     };
+
+    // ─── i18n ───
+    let lang = {};       // current language strings
+    let langCode = 'en'; // current language code
+    let languages = [];  // available languages
+
+    /** Resolve a dotted key like "nav.history" from the lang object */
+    function t(key, vars) {
+        const parts = key.split('.');
+        let val = lang;
+        for (const p of parts) {
+            if (val && typeof val === 'object') val = val[p];
+            else return key;
+        }
+        if (typeof val !== 'string') return key;
+        if (vars) {
+            return val.replace(/\{(\w+)\}/g, (_, k) => vars[k] !== undefined ? vars[k] : `{${k}}`);
+        }
+        return val;
+    }
+
+    /** Apply translations to all elements with data-i18n attributes */
+    function applyTranslations() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            el.textContent = t(el.dataset.i18n);
+        });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            el.placeholder = t(el.dataset.i18nPlaceholder);
+        });
+        document.querySelectorAll('[data-i18n-html]').forEach(el => {
+            el.innerHTML = t(el.dataset.i18nHtml);
+        });
+        // Update html lang attribute
+        document.documentElement.lang = langCode;
+    }
+
+    /** Load a language file */
+    async function loadLanguage(code) {
+        try {
+            const res = await fetch(`/i18n/${code}.json`);
+            if (!res.ok) throw new Error(`Language file not found: ${code}`);
+            lang = await res.json();
+            langCode = code;
+            applyTranslations();
+        } catch (err) {
+            console.warn(`Failed to load language ${code}, falling back to en`, err);
+            if (code !== 'en') {
+                await loadLanguage('en');
+            }
+        }
+    }
+
+    /** Load available languages list */
+    async function loadLanguageList() {
+        try {
+            const data = await api('GET', '/api/languages');
+            languages = data.languages || [];
+        } catch (err) {
+            languages = [{ code: 'en', name: 'English', native_name: 'English' }];
+        }
+    }
 
     // ─── DOM refs ───
     const $ = (sel) => document.querySelector(sel);
@@ -60,7 +122,7 @@
             if (name === viewName) {
                 el.hidden = false;
                 el.style.animation = 'none';
-                el.offsetHeight; // trigger reflow
+                el.offsetHeight;
                 el.style.animation = '';
             } else {
                 el.hidden = true;
@@ -71,15 +133,16 @@
     // ─── Greeting ───
     function getGreeting() {
         const h = new Date().getHours();
-        if (h < 6) return 'Late night thoughts.';
-        if (h < 12) return 'Good morning.';
-        if (h < 17) return 'Good afternoon.';
-        if (h < 21) return 'Good evening.';
-        return 'Night owl mode.';
+        if (h < 6) return t('greeting.late_night');
+        if (h < 12) return t('greeting.morning');
+        if (h < 17) return t('greeting.afternoon');
+        if (h < 21) return t('greeting.evening');
+        return t('greeting.night_owl');
     }
 
     function formatDate() {
-        return new Date().toLocaleDateString('en-US', {
+        const locale = t('dates.locale') || 'en-US';
+        return new Date().toLocaleDateString(locale, {
             weekday: 'long',
             month: 'long',
             day: 'numeric',
@@ -92,14 +155,25 @@
         const now = new Date();
         const diffMs = now - d;
         const diffDays = Math.floor(diffMs / 86400000);
-        if (diffDays === 0) return 'today';
-        if (diffDays === 1) return 'yesterday';
-        if (diffDays < 7) return `${diffDays} days ago`;
-        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        if (diffDays === 0) return t('dates.today');
+        if (diffDays === 1) return t('dates.yesterday');
+        if (diffDays < 7) return t('dates.days_ago', { n: diffDays });
+        const locale = t('dates.locale') || 'en-US';
+        return d.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
     }
 
     // ─── Initialize ───
     async function init() {
+        // Load preferences first to get language
+        let savedLang = 'en';
+        try {
+            const prefs = await api('GET', '/api/preferences');
+            savedLang = prefs.language || 'en';
+        } catch (e) { /* use default */ }
+
+        await loadLanguage(savedLang);
+        await loadLanguageList();
+
         $('#topbar-date').textContent = formatDate();
         $('#greeting-text').textContent = getGreeting();
 
@@ -123,7 +197,7 @@
             }
         } catch (err) {
             showView('NO_TOPIC');
-            showError('Could not connect to the server. Make sure the backend is running.');
+            showError(t('errors.server_down'));
         }
     }
 
@@ -264,7 +338,7 @@
             el.hidden = false;
             setTimeout(() => { el.hidden = true; }, 3000);
         } catch (err) {
-            showError('Could not copy prompt. ' + err.message);
+            showError(t('errors.copy_failed') + ' ' + err.message);
         }
     }
 
@@ -344,9 +418,9 @@
     function renderActive() {
         if (!state.topic) return;
         $('#active-title').textContent = state.topic.title;
-        $('#active-reason').textContent = state.topic.short_reason || 'Explore it however you like.';
+        $('#active-reason').textContent = state.topic.short_reason || t('active.fallback_reason');
         const started = relativeDate(state.topic.created_at);
-        $('#active-meta').textContent = started ? `Started ${started}` : '';
+        $('#active-meta').textContent = started ? t('active.started', { date: started }) : '';
     }
 
     function renderReflection() {
@@ -356,7 +430,8 @@
 
     function renderSaved() {
         if (!state.topic) return;
-        $('#saved-topic-name').textContent = state.topic.title;
+        const topicText = $('#saved-topic-text');
+        topicText.innerHTML = t('saved.topic_saved', { topic: `<span style="font-family:var(--font-mono);color:var(--text-accent)">${esc(state.topic.title)}</span>` });
     }
 
     // ─── History ───
@@ -380,7 +455,7 @@
                 el.className = 'history-item';
                 el.tabIndex = 0;
                 el.setAttribute('role', 'button');
-                el.setAttribute('aria-label', `View details for ${item.title}`);
+                el.setAttribute('aria-label', item.title);
 
                 const notesPreview = item.notes ? item.notes.substring(0, 100) : '';
                 const date = relativeDate(item.session_completed || item.created_at);
@@ -392,8 +467,8 @@
                     </div>
                     ${notesPreview ? `<p class="history-item__notes">${esc(notesPreview)}</p>` : ''}
                     <div class="history-item__ratings">
-                        ${item.interest_rating ? `<span>interest: ${item.interest_rating}/5</span>` : ''}
-                        ${item.difficulty_rating ? `<span>difficulty: ${item.difficulty_rating}/5</span>` : ''}
+                        ${item.interest_rating ? `<span>${t('history.interest')}: ${item.interest_rating}/5</span>` : ''}
+                        ${item.difficulty_rating ? `<span>${t('history.difficulty')}: ${item.difficulty_rating}/5</span>` : ''}
                     </div>
                 `;
 
@@ -419,29 +494,29 @@
 
         try {
             const data = await api('GET', `/api/topics/${topicId}`);
-            const t = data.topic;
+            const tp = data.topic;
             const s = data.session;
 
-            let html = `<h2 class="detail-title">${esc(t.title)}</h2>`;
+            let html = `<h2 class="detail-title">${esc(tp.title)}</h2>`;
             html += `<div class="detail-meta">`;
-            if (t.difficulty) html += `<span>Difficulty: ${esc(t.difficulty)}</span>`;
-            if (t.created_at) html += `<span>${relativeDate(t.created_at)}</span>`;
-            if (t.source_mode) html += `<span>Mode: ${esc(t.source_mode)}</span>`;
+            if (tp.difficulty) html += `<span>${t('detail.difficulty_label')}: ${esc(tp.difficulty)}</span>`;
+            if (tp.created_at) html += `<span>${relativeDate(tp.created_at)}</span>`;
+            if (tp.source_mode) html += `<span>${t('detail.mode_label')}: ${esc(tp.source_mode)}</span>`;
             html += `</div>`;
 
-            if (t.short_reason) {
-                html += `<div class="detail-section"><div class="detail-section__label">Why this topic</div><p class="detail-section__text">${esc(t.short_reason)}</p></div>`;
+            if (tp.short_reason) {
+                html += `<div class="detail-section"><div class="detail-section__label">${t('detail.why_label')}</div><p class="detail-section__text">${esc(tp.short_reason)}</p></div>`;
             }
-            if (t.connection) {
-                html += `<div class="detail-section"><div class="detail-section__label">Connection</div><p class="detail-section__text">${esc(t.connection)}</p></div>`;
+            if (tp.connection) {
+                html += `<div class="detail-section"><div class="detail-section__label">${t('detail.connection_label')}</div><p class="detail-section__text">${esc(tp.connection)}</p></div>`;
             }
 
             if (s) {
-                if (s.notes) html += `<div class="detail-section"><div class="detail-section__label">Notes</div><p class="detail-section__text">${esc(s.notes)}</p></div>`;
-                if (s.discoveries) html += `<div class="detail-section"><div class="detail-section__label">Discoveries</div><p class="detail-section__text">${esc(s.discoveries)}</p></div>`;
-                if (s.side_paths) html += `<div class="detail-section"><div class="detail-section__label">Side paths</div><p class="detail-section__text">${esc(s.side_paths)}</p></div>`;
-                if (s.interest_rating) html += `<div class="detail-section"><div class="detail-section__label">Interest</div><p class="detail-section__text">${s.interest_rating}/5</p></div>`;
-                if (s.difficulty_rating) html += `<div class="detail-section"><div class="detail-section__label">Difficulty</div><p class="detail-section__text">${s.difficulty_rating}/5</p></div>`;
+                if (s.notes) html += `<div class="detail-section"><div class="detail-section__label">${t('detail.notes_label')}</div><p class="detail-section__text">${esc(s.notes)}</p></div>`;
+                if (s.discoveries) html += `<div class="detail-section"><div class="detail-section__label">${t('detail.discoveries_label')}</div><p class="detail-section__text">${esc(s.discoveries)}</p></div>`;
+                if (s.side_paths) html += `<div class="detail-section"><div class="detail-section__label">${t('detail.sidepaths_label')}</div><p class="detail-section__text">${esc(s.side_paths)}</p></div>`;
+                if (s.interest_rating) html += `<div class="detail-section"><div class="detail-section__label">${t('detail.interest_label')}</div><p class="detail-section__text">${s.interest_rating}/5</p></div>`;
+                if (s.difficulty_rating) html += `<div class="detail-section"><div class="detail-section__label">${t('detail.difficulty_detail_label')}</div><p class="detail-section__text">${s.difficulty_rating}/5</p></div>`;
             }
 
             container.innerHTML = html;
@@ -460,9 +535,9 @@
 
             const aiInfo = $('#settings-ai-info');
             if (ai.configured) {
-                aiInfo.innerHTML = `Provider: <span class="status-ok">${esc(ai.provider)}</span><br>Model: ${esc(ai.model)}<br>Status: <span class="status-ok">Configured ✓</span>`;
+                aiInfo.innerHTML = `${t('settings.ai_provider')}: <span class="status-ok">${esc(ai.provider)}</span><br>${t('settings.ai_model')}: ${esc(ai.model)}<br>${t('settings.ai_status')}: <span class="status-ok">${t('settings.ai_configured')}</span>`;
             } else {
-                aiInfo.innerHTML = `Status: <span class="status-err">Not configured ✗</span><br>Set <code>AI_API_KEY</code> in your <code>.env</code> file.`;
+                aiInfo.innerHTML = `${t('settings.ai_status')}: <span class="status-err">${t('settings.ai_not_configured')}</span><br>${t('settings.ai_set_key')}`;
             }
 
             const prefs = await api('GET', '/api/preferences');
@@ -472,12 +547,31 @@
             const styleSelect = $('#select-style');
             styleSelect.value = prefs.learning_style || 'top-down';
 
+            // Language selector — populate from discovered languages
+            const langSelect = $('#select-language');
+            langSelect.innerHTML = '';
+            languages.forEach(l => {
+                const opt = document.createElement('option');
+                opt.value = l.code;
+                opt.textContent = `${l.native_name} (${l.name})`;
+                langSelect.appendChild(opt);
+            });
+            langSelect.value = prefs.language || 'en';
+
             // Bind settings events
             $('#btn-add-preferred').onclick = () => addTag('preferred');
             $('#input-preferred').onkeydown = (e) => { if (e.key === 'Enter') addTag('preferred'); };
             $('#btn-add-disliked').onclick = () => addTag('disliked');
             $('#input-disliked').onkeydown = (e) => { if (e.key === 'Enter') addTag('disliked'); };
             styleSelect.onchange = () => savePrefs();
+            langSelect.onchange = async () => {
+                const newLang = langSelect.value;
+                await api('POST', '/api/preferences', { language: newLang });
+                await loadLanguage(newLang);
+                // Re-render dynamic content
+                $('#topbar-date').textContent = formatDate();
+                $('#greeting-text').textContent = getGreeting();
+            };
         } catch (err) {
             showError(err.message);
         }

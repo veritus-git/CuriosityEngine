@@ -4,6 +4,7 @@ Serves the frontend and provides API endpoints.
 """
 
 import os
+import json
 import logging
 from pathlib import Path
 from contextlib import asynccontextmanager
@@ -66,6 +67,7 @@ class PreferencesRequest(BaseModel):
     disliked_subjects: Optional[List[str]] = None
     learning_style: Optional[str] = None
     current_interests: Optional[List[str]] = None
+    language: Optional[str] = None
 
 class LearningPromptRequest(BaseModel):
     topic_title: str
@@ -243,6 +245,7 @@ async def update_preferences_endpoint(req: PreferencesRequest):
         disliked_subjects=req.disliked_subjects,
         learning_style=req.learning_style,
         current_interests=req.current_interests,
+        language=req.language,
     )
     logger.info("Preferences updated.")
     return result
@@ -254,6 +257,26 @@ async def generate_learning_prompt(req: LearningPromptRequest):
     prefs = get_preferences()
     prompt = build_learning_prompt(req.topic_title, prefs)
     return {"prompt": prompt}
+
+
+@app.get("/api/languages")
+async def get_languages():
+    """List available languages by scanning i18n directory."""
+    i18n_dir = FRONTEND_DIR / "i18n"
+    languages = []
+    if i18n_dir.exists():
+        for f in sorted(i18n_dir.glob("*.json")):
+            try:
+                data = json.loads(f.read_text(encoding="utf-8"))
+                meta = data.get("meta", {})
+                languages.append({
+                    "code": meta.get("code", f.stem),
+                    "name": meta.get("name", f.stem),
+                    "native_name": meta.get("native_name", f.stem),
+                })
+            except (json.JSONDecodeError, Exception) as e:
+                logger.warning(f"Skipping invalid i18n file {f.name}: {e}")
+    return {"languages": languages}
 
 
 # --- Error Handlers ---

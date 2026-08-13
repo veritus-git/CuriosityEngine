@@ -25,19 +25,19 @@
         <header class="topbar" id="topbar">
             <div class="topbar__date" id="topbar-date"></div>
             <nav class="topbar__nav">
-                <button class="topbar__btn" id="btn-history" aria-label="Learning history">
+                <button class="topbar__btn" id="btn-history" aria-label="History">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"/>
                         <polyline points="12 6 12 12 16 14"/>
                     </svg>
-                    <span class="topbar__label">History</span>
+                    <span class="topbar__label" data-i18n="nav.history"></span>
                 </button>
                 <button class="topbar__btn" id="btn-settings" aria-label="Settings">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="3"/>
                         <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
                     </svg>
-                    <span class="topbar__label">Settings</span>
+                    <span class="topbar__label" data-i18n="nav.settings"></span>
                 </button>
             </nav>
         </header>
@@ -48,30 +48,28 @@
             <section class="view view--no-topic" id="view-no-topic" aria-label="Get a topic">
                 <div class="view__content">
                     <p class="greeting" id="greeting-text"></p>
-                    <p class="subtitle">What shall we explore?</p>
+                    <p class="subtitle" data-i18n="no_topic.subtitle"></p>
 
                     <div class="actions">
                         <button class="btn btn--primary" id="btn-get-topic">
-                            <span class="btn__text">Suggest a topic</span>
+                            <span class="btn__text" data-i18n="no_topic.suggest_btn"></span>
                             <span class="btn__loader" aria-hidden="true"></span>
                         </button>
-                        <button class="btn btn--ghost" id="btn-random-topic">Something completely different</button>
+                        <button class="btn btn--ghost" id="btn-random-topic" data-i18n="no_topic.random_btn"></button>
                     </div>
 
                     <div class="interest-input" id="interest-input-section">
-                        <button class="interest-toggle" id="btn-toggle-interest">
-                            Or tell me what you're curious about…
-                        </button>
+                        <button class="interest-toggle" id="btn-toggle-interest" data-i18n="no_topic.interest_toggle"></button>
                         <div class="interest-form" id="interest-form" hidden>
                             <input
                                 type="text"
                                 class="input"
                                 id="input-interest"
-                                placeholder="e.g. how computers understand images…"
+                                data-i18n-placeholder="no_topic.interest_placeholder"
                                 aria-label="Your interest"
                                 maxlength="300"
                             >
-                            <button class="btn btn--secondary" id="btn-submit-interest">Explore this</button>
+                            <button class="btn btn--secondary" id="btn-submit-interest" data-i18n="no_topic.interest_submit"></button>
                         </div>
                     </div>
                 </div>
@@ -80,15 +78,15 @@
             <!-- TOPIC_SUGGESTED state -->
             <section class="view view--suggested" id="view-suggested" hidden aria-label="Topic suggestion">
                 <div class="view__content">
-                    <p class="label label--subtle">Today's suggestion</p>
+                    <p class="label label--subtle" data-i18n="suggested.label"></p>
                     <h1 class="topic-title" id="suggested-title"></h1>
                     <p class="topic-reason" id="suggested-reason"></p>
                     <p class="topic-connection" id="suggested-connection"></p>
 
                     <div class="actions">
-                        <button class="btn btn--primary" id="btn-accept">Explore this topic</button>
+                        <button class="btn btn--primary" id="btn-accept" data-i18n="suggested.accept_btn"></button>
                         <button class="btn btn--ghost" id="btn-reject">
-                            <span class="btn__text">Suggest another</span>
+                            <span class="btn__text" data-i18n="suggested.reject_btn"></span>
                             <span class="btn__loader" aria-hidden="true"></span>
                         </button>
                     </div>
@@ -98,7 +96,7 @@
             <!-- TOPIC_ACTIVE state -->
             <section class="view view--active" id="view-active" hidden aria-label="Active exploration">
                 <div class="view__content">
-                    <p class="label label--subtle">Today's exploration</p>
+                    <p class="label label--subtle" data-i18n="active.label"></p>
                     <h1 class="topic-title" id="active-title"></h1>
                     <p class="topic-reason" id="active-reason"></p>
                     <p class="topic-meta" id="active-meta"></p>
@@ -109,13 +107,13 @@
                                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                                 <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
                             </svg>
-                            <span>Copy learning prompt</span>
+                            <span data-i18n="active.copy_prompt_btn"></span>
                         </button>
-                        <button class="btn btn--primary" id="btn-finish">I'm done exploring</button>
+                        <button class="btn btn--primary" id="btn-finish" data-i18n="active.finish_btn"></button>
                     </div>
 
                     <div class="prompt-copied" id="prompt-copied" hidden>
-                        <span>Prompt copied to clipboard ✓</span>
+                        <span data-i18n="active.prompt_copied"></span>
                     </div>
                 </div>
             </section>
@@ -123,29 +121,29 @@
             <!-- REFLECTION state -->
             <section class="view view--reflection" id="view-reflection" hidden aria-label="Reflection">
                 <div class="view__content">
-                    <p class="label label--subtle">Reflection</p>
-                    <h2 class="reflection-title">How did it go?</h2>
+                    <p class="label label--subtle" data-i18n="reflection.label"></p>
+                    <h2 class="reflection-title" data-i18n="reflection.title"></h2>
                     <p class="reflection-topic" id="reflection-topic"></p>
 
                     <form class="reflection-form" id="reflection-form">
                         <div class="field">
-                            <label class="field__label" for="field-notes">What did you learn?</label>
-                            <textarea class="textarea" id="field-notes" rows="3" placeholder="Key takeaways…"></textarea>
+                            <label class="field__label" for="field-notes" data-i18n="reflection.notes_label"></label>
+                            <textarea class="textarea" id="field-notes" rows="3" data-i18n-placeholder="reflection.notes_placeholder"></textarea>
                         </div>
 
                         <div class="field">
-                            <label class="field__label" for="field-discoveries">What caught your attention?</label>
-                            <textarea class="textarea" id="field-discoveries" rows="2" placeholder="Interesting things you noticed…"></textarea>
+                            <label class="field__label" for="field-discoveries" data-i18n="reflection.discoveries_label"></label>
+                            <textarea class="textarea" id="field-discoveries" rows="2" data-i18n-placeholder="reflection.discoveries_placeholder"></textarea>
                         </div>
 
                         <div class="field">
-                            <label class="field__label" for="field-sidepaths">Did you wander to another topic?</label>
-                            <input type="text" class="input" id="field-sidepaths" placeholder="e.g. started with matrices, ended up reading about tensors…">
+                            <label class="field__label" for="field-sidepaths" data-i18n="reflection.sidepaths_label"></label>
+                            <input type="text" class="input" id="field-sidepaths" data-i18n-placeholder="reflection.sidepaths_placeholder">
                         </div>
 
                         <div class="ratings">
                             <div class="rating-group">
-                                <span class="field__label">Interest</span>
+                                <span class="field__label" data-i18n="reflection.interest_label"></span>
                                 <div class="rating" id="rating-interest" role="radiogroup" aria-label="Interest rating">
                                     <button type="button" class="rating__dot" data-value="1" aria-label="1 of 5">1</button>
                                     <button type="button" class="rating__dot" data-value="2" aria-label="2 of 5">2</button>
@@ -155,7 +153,7 @@
                                 </div>
                             </div>
                             <div class="rating-group">
-                                <span class="field__label">Difficulty</span>
+                                <span class="field__label" data-i18n="reflection.difficulty_label"></span>
                                 <div class="rating" id="rating-difficulty" role="radiogroup" aria-label="Difficulty rating">
                                     <button type="button" class="rating__dot" data-value="1" aria-label="1 of 5">1</button>
                                     <button type="button" class="rating__dot" data-value="2" aria-label="2 of 5">2</button>
@@ -166,7 +164,7 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn--primary" id="btn-save">Save exploration</button>
+                        <button type="submit" class="btn btn--primary" id="btn-save" data-i18n="reflection.save_btn"></button>
                     </form>
                 </div>
             </section>
@@ -175,16 +173,16 @@
             <section class="view view--saved" id="view-saved" hidden aria-label="Saved">
                 <div class="view__content">
                     <p class="saved-check" aria-hidden="true">✓</p>
-                    <h2 class="saved-title">Saved.</h2>
-                    <p class="saved-topic"><span id="saved-topic-name"></span> is now part of your learning history.</p>
-                    <p class="saved-hint">Next time we can build on this — or go somewhere entirely different.</p>
+                    <h2 class="saved-title" data-i18n="saved.title"></h2>
+                    <p class="saved-topic" id="saved-topic-text"></p>
+                    <p class="saved-hint" data-i18n="saved.hint"></p>
 
                     <div class="actions">
                         <button class="btn btn--primary" id="btn-next-topic">
-                            <span class="btn__text">Explore something new</span>
+                            <span class="btn__text" data-i18n="saved.next_btn"></span>
                             <span class="btn__loader" aria-hidden="true"></span>
                         </button>
-                        <button class="btn btn--ghost" id="btn-go-home">Back to start</button>
+                        <button class="btn btn--ghost" id="btn-go-home" data-i18n="saved.home_btn"></button>
                     </div>
                 </div>
             </section>
@@ -193,18 +191,18 @@
             <section class="view view--history" id="view-history" hidden aria-label="Learning history">
                 <div class="view__content view__content--wide">
                     <div class="history-header">
-                        <h2 class="history-title">Learning Archive</h2>
-                        <button class="btn btn--ghost btn--small" id="btn-history-back">← Back</button>
+                        <h2 class="history-title" data-i18n="history.title"></h2>
+                        <button class="btn btn--ghost btn--small" id="btn-history-back" data-i18n="history.back_btn"></button>
                     </div>
                     <div class="history-list" id="history-list"></div>
-                    <p class="history-empty" id="history-empty" hidden>No explorations yet. Your journey starts with the first one.</p>
+                    <p class="history-empty" id="history-empty" hidden data-i18n="history.empty"></p>
                 </div>
             </section>
 
             <!-- HISTORY DETAIL view -->
             <section class="view view--detail" id="view-detail" hidden aria-label="Topic detail">
                 <div class="view__content view__content--wide">
-                    <button class="btn btn--ghost btn--small" id="btn-detail-back">← Back to archive</button>
+                    <button class="btn btn--ghost btn--small" id="btn-detail-back" data-i18n="detail.back_btn"></button>
                     <div id="detail-content"></div>
                 </div>
             </section>
@@ -213,50 +211,54 @@
             <section class="view view--settings" id="view-settings" hidden aria-label="Settings">
                 <div class="view__content view__content--wide">
                     <div class="history-header">
-                        <h2 class="history-title">Settings</h2>
-                        <button class="btn btn--ghost btn--small" id="btn-settings-back">← Back</button>
+                        <h2 class="history-title" data-i18n="settings.title"></h2>
+                        <button class="btn btn--ghost btn--small" id="btn-settings-back" data-i18n="settings.back_btn"></button>
                     </div>
 
                     <div class="settings-section">
-                        <h3 class="settings-heading">AI Configuration</h3>
+                        <h3 class="settings-heading" data-i18n="settings.ai_heading"></h3>
                         <div class="settings-info" id="settings-ai-info"></div>
-                        <p class="settings-hint">Configure AI in the <code>.env</code> file and restart the server.</p>
+                        <p class="settings-hint" data-i18n-html="settings.ai_hint"></p>
                     </div>
 
                     <div class="settings-section">
-                        <h3 class="settings-heading">Preferred subjects</h3>
-                        <p class="settings-hint">Topics you'd like AI to lean towards.</p>
+                        <h3 class="settings-heading" data-i18n="settings.preferred_heading"></h3>
+                        <p class="settings-hint" data-i18n="settings.preferred_hint"></p>
                         <div class="tag-input" id="preferred-tags"></div>
                         <div class="tag-add">
-                            <input type="text" class="input input--small" id="input-preferred" placeholder="Add subject…" maxlength="100">
-                            <button class="btn btn--secondary btn--small" id="btn-add-preferred">Add</button>
+                            <input type="text" class="input input--small" id="input-preferred" data-i18n-placeholder="settings.preferred_placeholder" maxlength="100">
+                            <button class="btn btn--secondary btn--small" id="btn-add-preferred" data-i18n="settings.add_btn"></button>
                         </div>
                     </div>
 
                     <div class="settings-section">
-                        <h3 class="settings-heading">Subjects to avoid</h3>
-                        <p class="settings-hint">Topics AI should steer away from.</p>
+                        <h3 class="settings-heading" data-i18n="settings.disliked_heading"></h3>
+                        <p class="settings-hint" data-i18n="settings.disliked_hint"></p>
                         <div class="tag-input" id="disliked-tags"></div>
                         <div class="tag-add">
-                            <input type="text" class="input input--small" id="input-disliked" placeholder="Add subject…" maxlength="100">
-                            <button class="btn btn--secondary btn--small" id="btn-add-disliked">Add</button>
+                            <input type="text" class="input input--small" id="input-disliked" data-i18n-placeholder="settings.disliked_placeholder" maxlength="100">
+                            <button class="btn btn--secondary btn--small" id="btn-add-disliked" data-i18n="settings.add_btn"></button>
                         </div>
                     </div>
 
                     <div class="settings-section">
-                        <h3 class="settings-heading">Learning style</h3>
+                        <h3 class="settings-heading" data-i18n="settings.style_heading"></h3>
                         <select class="input" id="select-style" aria-label="Learning style">
-                            <option value="top-down">Top-down (big picture first)</option>
-                            <option value="bottom-up">Bottom-up (examples first)</option>
-                            <option value="mixed">Mixed</option>
+                            <option value="top-down" data-i18n="settings.style_topdown"></option>
+                            <option value="bottom-up" data-i18n="settings.style_bottomup"></option>
+                            <option value="mixed" data-i18n="settings.style_mixed"></option>
                         </select>
                     </div>
 
                     <div class="settings-section">
-                        <h3 class="settings-heading">Privacy</h3>
-                        <p class="settings-hint">
-                            All your data is stored locally in SQLite. Nothing is sent anywhere except to your configured AI provider when generating topics. Your API key never touches the browser.
-                        </p>
+                        <h3 class="settings-heading" data-i18n="settings.language_heading"></h3>
+                        <p class="settings-hint" data-i18n="settings.language_hint"></p>
+                        <select class="input" id="select-language" aria-label="Language"></select>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3 class="settings-heading" data-i18n="settings.privacy_heading"></h3>
+                        <p class="settings-hint" data-i18n="settings.privacy_text"></p>
                     </div>
                 </div>
             </section>

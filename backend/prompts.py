@@ -1,6 +1,24 @@
 """
 Prompt templates for AI topic generation and learning prompt creation.
+All prompts are language-aware — the AI responds in the user's chosen UI language.
 """
+
+# Map language codes to language names for AI instructions
+LANG_NAMES = {
+    "en": "English",
+    "pl": "Polish",
+    "de": "German",
+    "es": "Spanish",
+    "fr": "French",
+    "uk": "Ukrainian",
+    "ja": "Japanese",
+    "zh": "Chinese",
+}
+
+
+def _get_lang_name(code):
+    """Get the human-readable language name for a code."""
+    return LANG_NAMES.get(code, code)
 
 
 def build_topic_generation_prompt(mode, recent_topics, all_titles, preferences, user_request=None):
@@ -13,6 +31,11 @@ def build_topic_generation_prompt(mode, recent_topics, all_titles, preferences, 
     - user_interest: user gives a direction
     - expand: go deeper on a specific topic
     """
+
+    language = "en"
+    if preferences and preferences.get("language"):
+        language = preferences["language"]
+    lang_name = _get_lang_name(language)
 
     # Build context about what user has learned
     history_context = ""
@@ -46,7 +69,15 @@ def build_topic_generation_prompt(mode, recent_topics, all_titles, preferences, 
         if parts:
             prefs_context = "\nUser preferences:\n" + "\n".join(parts)
 
-    system_prompt = """You are CuriosityEngine — a personal guide that suggests ONE specific, focused concept for someone to learn today.
+    # Language instruction for AI output
+    lang_instruction = ""
+    if language != "en":
+        lang_instruction = f"""
+LANGUAGE: You MUST respond entirely in {lang_name}.
+The topic name, short_reason, and connection MUST ALL be written in {lang_name}.
+Do NOT use English for any field values."""
+
+    system_prompt = f"""You are CuriosityEngine — a personal guide that suggests ONE specific, focused concept for someone to learn today.
 
 CRITICAL RULES:
 1. NEVER suggest broad categories like "Mathematics", "Programming", "Physics", "Computer Science", "Economics"
@@ -55,14 +86,14 @@ CRITICAL RULES:
 4. The topic should be small enough to explore meaningfully in one session
 5. NEVER repeat a topic the user has already explored
 6. Respond ONLY with valid JSON in the exact format specified
-
+{lang_instruction}
 Your response must be valid JSON with this exact structure:
-{
+{{
   "topic": "Topic Name",
   "short_reason": "One sentence explaining why this topic is suggested now",
   "connection": "Previous Topic → This Topic (or null if random)",
   "difficulty": "beginner|intermediate|advanced"
-}"""
+}}"""
 
     # Build user message based on mode
     if mode == "connected":
@@ -114,37 +145,78 @@ Consider my learning history and preferences. Choose something that would genuin
 
 
 def build_learning_prompt(topic_title, preferences=None):
-    """Build a learning prompt that the user can copy to another LLM."""
+    """
+    Build a learning prompt that the user can copy to another LLM.
+
+    This is NOT a rigid script — it's a flexible template that tells the LLM
+    to adapt its explanation to the specific topic. The LLM decides what's
+    relevant (examples, math, analogies, etc.) based on the topic itself.
+    """
+
+    language = "en"
+    if preferences and preferences.get("language"):
+        language = preferences["language"]
+    lang_name = _get_lang_name(language)
 
     style = "top-down"
     if preferences and preferences.get("learning_style"):
         style = preferences["learning_style"]
 
-    style_instruction = ""
-    if style == "top-down":
-        style_instruction = "I prefer learning top-down — start with the big picture and intuition, then gradually introduce formal definitions and details."
-    elif style == "bottom-up":
-        style_instruction = "I prefer learning bottom-up — start with concrete examples and build up to the general concept."
+    style_instructions = {
+        "top-down": {
+            "en": "I prefer learning top-down — start with the big picture and intuition, then gradually go into details.",
+            "pl": "Preferuję naukę od ogółu do szczegółu — zacznij od ogólnego obrazu i intuicji, potem stopniowo przechodź do detali.",
+        },
+        "bottom-up": {
+            "en": "I prefer learning bottom-up — start with concrete examples and build up to the general concept.",
+            "pl": "Preferuję naukę od szczegółu do ogółu — zacznij od konkretnych przykładów i buduj ku ogólnej koncepcji.",
+        },
+        "mixed": {
+            "en": "Use a mix of intuitive explanations and concrete examples as you see fit.",
+            "pl": "Używaj mieszanki intuicyjnych wyjaśnień i konkretnych przykładów, jak uznasz za stosowne.",
+        },
+    }
+
+    style_text = style_instructions.get(style, style_instructions["top-down"]).get(language)
+    if not style_text:
+        style_text = style_instructions.get(style, style_instructions["top-down"])["en"]
+
+    if language == "pl":
+        prompt = f"""Jesteś moim osobistym nauczycielem.
+
+Dzisiejszy temat: {topic_title}
+
+Jestem ciekawskim uczniem z analitycznym umysłem. {style_text}
+
+Dostosuj swoje wyjaśnienie do tego konkretnego tematu:
+- Wyjaśnij koncepcję intuicyjnie, używając analogii lub przykładów które pasują do tematu
+- Jeśli temat tego wymaga, wprowadź formalną definicję — ale tylko gdy to pomaga zrozumieniu
+- Nie zakładaj wiedzy specjalistycznej, której nie wyjaśniłeś
+- Nie przytłaczaj niepotrzebną teorią — skup się na zrozumieniu
+
+Na koniec:
+1. Krótkie podsumowanie najważniejszych punktów
+2. Zaproponuj 2 powiązane koncepcje do dalszej eksploracji, lub zapytaj czy coś było niejasne
+
+Temat:
+{topic_title}"""
+
     else:
-        style_instruction = f"My learning style: {style}."
+        prompt = f"""You are my personal tutor.
 
-    prompt = f"""You are my personal tutor.
+Today's topic: {topic_title}
 
-Today I want to understand: {topic_title}
+I'm a curious learner with an analytical mind. {style_text}
 
-I'm a curious learner with an analytical mind. {style_instruction}
-
-First explain the concept intuitively, then gradually introduce the formal definition.
-
-Don't assume I know advanced mathematics or specialized terminology without explaining it.
-
-Use concrete examples and analogies.
-
-Don't overwhelm me with unnecessary theory.
+Adapt your explanation to this specific topic:
+- Explain the concept intuitively, using analogies or examples that fit the subject
+- If the topic calls for it, introduce formal definitions — but only when it aids understanding
+- Don't assume specialized knowledge you haven't explained
+- Don't overwhelm with unnecessary theory — focus on building understanding
 
 At the end:
-1. Give a brief summary.
-2. Suggest 2 related concepts I could explore next, or ask if something was unclear.
+1. Brief summary of the key points
+2. Suggest 2 related concepts to explore next, or ask if something was unclear
 
 Topic:
 {topic_title}"""

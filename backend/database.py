@@ -59,11 +59,18 @@ def init_db():
             disliked_subjects TEXT DEFAULT '[]',
             learning_style TEXT DEFAULT 'top-down',
             current_interests TEXT DEFAULT '[]',
+            language TEXT DEFAULT 'en',
             updated_at TEXT NOT NULL DEFAULT (datetime('now'))
         );
 
         INSERT OR IGNORE INTO user_preferences (id) VALUES (1);
     """)
+
+    # Migration: add language column if missing (existing DBs)
+    try:
+        cursor.execute("ALTER TABLE user_preferences ADD COLUMN language TEXT DEFAULT 'en'")
+    except sqlite3.OperationalError:
+        pass  # column already exists
 
     conn.commit()
     conn.close()
@@ -250,17 +257,20 @@ def get_preferences():
         prefs["preferred_subjects"] = json.loads(prefs.get("preferred_subjects") or "[]")
         prefs["disliked_subjects"] = json.loads(prefs.get("disliked_subjects") or "[]")
         prefs["current_interests"] = json.loads(prefs.get("current_interests") or "[]")
+        prefs.setdefault("language", "en")
         return prefs
     return {
         "preferred_subjects": [],
         "disliked_subjects": [],
         "learning_style": "top-down",
-        "current_interests": []
+        "current_interests": [],
+        "language": "en"
     }
 
 
 def update_preferences(preferred_subjects=None, disliked_subjects=None,
-                        learning_style=None, current_interests=None):
+                        learning_style=None, current_interests=None,
+                        language=None):
     """Update user preferences."""
     conn = get_connection()
     current = get_preferences()
@@ -269,6 +279,7 @@ def update_preferences(preferred_subjects=None, disliked_subjects=None,
     disliked = json.dumps(disliked_subjects if disliked_subjects is not None else current["disliked_subjects"])
     style = learning_style if learning_style is not None else current["learning_style"]
     interests = json.dumps(current_interests if current_interests is not None else current["current_interests"])
+    lang = language if language is not None else current.get("language", "en")
 
     conn.execute(
         """UPDATE user_preferences
@@ -276,9 +287,10 @@ def update_preferences(preferred_subjects=None, disliked_subjects=None,
                disliked_subjects = ?,
                learning_style = ?,
                current_interests = ?,
+               language = ?,
                updated_at = datetime('now')
            WHERE id = 1""",
-        (preferred, disliked, style, interests)
+        (preferred, disliked, style, interests, lang)
     )
     conn.commit()
     conn.close()
