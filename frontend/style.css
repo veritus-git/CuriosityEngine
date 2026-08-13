@@ -306,7 +306,7 @@ body {
     flex-direction: column;
     gap: var(--space-sm);
     width: 100%;
-    max-width: 320px;
+    max-width: 380px;
 }
 
 .btn {
@@ -326,6 +326,7 @@ body {
     white-space: nowrap;
     position: relative;
     overflow: hidden;
+    letter-spacing: 0.02em;
 }
 
 .btn:focus-visible {
@@ -339,16 +340,17 @@ body {
 }
 
 .btn--primary {
-    background: var(--accent);
-    color: #0a0a12;
-    border-color: var(--accent);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 100%);
+    color: #ffffff;
+    border-color: transparent;
+    font-weight: 600;
+    box-shadow: 0 4px 14px var(--accent-glow);
 }
 
 .btn--primary:hover:not(:disabled) {
-    background: var(--accent-dim);
-    border-color: var(--accent-dim);
-    box-shadow: 0 0 30px var(--accent-glow);
-    transform: translateY(-1px);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent) 100%);
+    box-shadow: 0 6px 20px var(--accent-glow-strong);
+    transform: translateY(-2px);
 }
 
 .btn--primary:active:not(:disabled) {
@@ -371,11 +373,13 @@ body {
     color: var(--text-secondary);
     border-color: transparent;
     padding: var(--space-sm) var(--space-md);
+    transition: color var(--duration-fast) var(--ease-out), text-shadow var(--duration-fast) var(--ease-out);
 }
 
 .btn--ghost:hover:not(:disabled) {
     color: var(--text-primary);
-    background: var(--bg-elevated);
+    background: transparent;
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
 }
 
 .btn--small {
