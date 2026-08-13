@@ -112,7 +112,7 @@
         const res = await fetch(url, opts);
         const data = await res.json();
 
-        if (res.status === 401) {
+        if (res.status === 401 || res.status === 403) {
             localStorage.removeItem('curiosity_token');
             showView('AUTH');
             throw new Error('Unauthorized');
@@ -255,7 +255,7 @@
                 }
                 
                 localStorage.setItem('curiosity_token', data.token);
-                initState();
+                init();
             } catch (error) {
                 err.textContent = error.message;
                 err.style.display = 'block';
