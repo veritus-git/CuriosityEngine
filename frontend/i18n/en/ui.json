@@ -63,6 +63,7 @@
         "badge": "Starter Sparks",
         "title": "Choose Your First Topic",
         "subtitle": "Here are 4 topics generated specifically for your interests. Pick one to begin:",
+        "reroll_btn": "Suggest 4 different sparks 🔄",
         "or_custom": "Or enter your own question or thought:",
         "custom_placeholder": "e.g. how computers synthesize audio...",
         "custom_submit": "Explore this"

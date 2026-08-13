@@ -160,6 +160,7 @@ def build_cold_start_generation_prompts(
     interests: List[str],
     level: str,
     recent_thought: Optional[str] = None,
+    rejected_topics: Optional[List[str]] = None,
     language: str = "en"
 ) -> tuple[str, str]:
     """
@@ -174,9 +175,17 @@ def build_cold_start_generation_prompts(
     interests_str = ", ".join(interests) if interests else "General STEM & Curiosity"
     thought_str = recent_thought if recent_thought else "None provided"
 
+    rejected_context = ""
+    if rejected_topics:
+        if language == "pl":
+            rejected_context = f"\nUŻYTKOWNIK ODRZUCIŁ TE PROPOZYCJE (nie sugeruj ich ani pokrewnych): {', '.join(rejected_topics)}."
+        else:
+            rejected_context = f"\nTHE USER REJECTED THESE TOPICS (do NOT suggest them or close synonyms): {', '.join(rejected_topics)}."
+
     user_msg = user_template.replace("{interests}", interests_str)
     user_msg = user_msg.replace("{level}", level or "General")
     user_msg = user_msg.replace("{recent_thought}", thought_str)
+    user_msg = user_msg.replace("{rejected_context}", rejected_context)
 
     return system_prompt, user_msg
 

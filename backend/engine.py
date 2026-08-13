@@ -192,6 +192,7 @@ async def generate_dynamic_starter_cards(
     interests: List[str],
     level: str,
     recent_thought: Optional[str] = None,
+    rejected_topics: Optional[List[str]] = None,
     language: Optional[str] = None
 ) -> List[Dict[str, Any]]:
     """
@@ -206,6 +207,7 @@ async def generate_dynamic_starter_cards(
             interests=interests,
             level=level,
             recent_thought=recent_thought,
+            rejected_topics=rejected_topics,
             language=lang
         )
         parsed = await generate_ai_json(sys_prompt, user_prompt)

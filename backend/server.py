@@ -75,6 +75,10 @@ class OnboardingRequest(BaseModel):
     recent_thought: Optional[str] = None
     language: Optional[str] = None
 
+class RegenerateColdStartRequest(BaseModel):
+    rejected_topics: List[str] = Field(default_factory=list)
+    language: Optional[str] = None
+
 class ProfileUpdateRequest(BaseModel):
     learning_style: Optional[str] = None
     grounding_level: Optional[str] = None
@@ -305,6 +309,32 @@ async def complete_onboarding_route(req: OnboardingRequest, username: str = Depe
         language=target_lang
     )
     return {"cards": cards, "profile": get_profile()}
+
+
+@app.post("/api/cold-start/regenerate")
+async def regenerate_cold_start_route(req: RegenerateColdStartRequest, username: str = Depends(get_current_user_token)):
+    profile = get_profile()
+    target_lang = req.language or profile.get("language", "pl")
+
+    # Record skipped topics in database to learn user negative preferences
+    for title in req.rejected_topics:
+        if title:
+            create_concept(
+                title=title,
+                domain="cold_start",
+                summary="Rejected starter spark during cold-start reroll",
+                status="skipped",
+                source_mode="cold_start_reroll"
+            )
+
+    cards = await generate_dynamic_starter_cards(
+        interests=profile.get("active_domains", []),
+        level=profile.get("grounding_level", "builder"),
+        recent_thought=profile.get("custom_instructions", ""),
+        rejected_topics=req.rejected_topics,
+        language=target_lang
+    )
+    return {"cards": cards}
 
 
 @app.get("/api/languages")

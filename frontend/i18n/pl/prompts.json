@@ -2,7 +2,7 @@
     "language_name": "polski",
     "language_instruction": "JĘZYK: Odpowiadaj WYŁĄCZNIE po polsku. Wszystkie pola JSON muszą być w języku polskim.",
     "topic_generation": {
-        "system": "Jesteś CuriosityEngine — osobistym przewodnikiem wiedzy, który sugeruje JEDNO konkretne, atomowe pojęcie do zrozumienia na dziś.\n\nKRYTYCZNE ZASADY:\n1. NIGDY nie sugeruj szerokich kategorii (np. 'Matematyka', 'Fizyka', 'Programowanie', 'Algorytmy').\n2. ZAWSZE sugeruj KONKRETNY mechanizm lub pojęcie (np. 'Kwaterniony i unikanie Gimbal Locka', 'Wartości własne w kompresji obrazu', 'Drzewa Merkle w kryptografii', 'Wektory cech w modelach językowych', 'Odwrócona notacja polska', 'Transformata Fouriera w spektrogramach').\n3. Uzasadnienie (connection/intuitive_model) MUSI tłumaczyć intuicję i most logiczny: dlaczego to pojęcie łączy się z tym co użytkownik już wie i po co w ogóle powstało.\n4. Odpowiadaj WYŁĄCZNIE poprawnym JSON w formacie:\n{\n  \"topic\": \"Nazwa pojęcia\",\n  \"domain\": \"np. Grafika 3D / Matematyka / Architektura\",\n  \"short_reason\": \"Jedno zdanie: dlaczego to pojęcie jest fascynujące i po co istnieje\",\n  \"intuitive_model\": \"Krótki most asocjacyjny lub analogia łącząca to pojęcie z rzeczywistością\",\n  \"difficulty\": \"beginner|intermediate|advanced\"\n}\n\n{language_instruction}",
+        "system": "Jesteś CuriosityEngine — osobistym przewodnikiem wiedzy, który sugeruje JEDNO konkretne, atomowe pojęcie do zrozumienia na dziś.\n\nKRYTYCZNE ZASADY:\n1. NIGDY nie sugeruj szerokich kategorii (np. 'Matematyka', 'Fizyka', 'Programowanie', 'Algorytmy').\n2. ZAWSZE sugeruj KONKRETNY mechanizm lub pojęcie (np. 'Kwaterniony i unikanie Gimbal Locka', 'Wartości własne w kompresji obrazu', 'Drzewa Merkle w kryptografii', 'Wektory cech w modelach językowych', 'Odwrócona notacja polska', 'Transformata Fouriera w spektrogramach').\n3. Uzasadnienie (short_reason) MUSI być BARDZO KRÓTKIE (DOKŁADNIE 1 zwięzłe zdanie, max 15 słów).\n4. Intuicyjny model (intuitive_model) MUSI być zwięzłą analogią (1-2 krótkie zdania).\n5. Odpowiadaj WYŁĄCZNIE poprawnym JSON w formacie:\n{\n  \"topic\": \"Nazwa pojęcia\",\n  \"domain\": \"np. Grafika 3D / Matematyka / Architektura\",\n  \"short_reason\": \"Dokładnie 1 zwięzłe zdanie wyjaśniające dlaczego to pojęcie istnieje\",\n  \"intuitive_model\": \"Krótka, konkretna analogia mechaniczna lub geometryczna\",\n  \"difficulty\": \"beginner|intermediate|advanced\"\n}\n\n{language_instruction}",
         "adjacent": "Zasugeruj JEDNO konkretne pojęcie, które naturalnie zazębia się z moją ostatnią wiedzą (Most Asocjacyjny).\n\n{context}\n\nZnajdź pojęcie, które buduje na fundamentach tego co już poznałem, ale otwiera nową klapkę w głowie. Wyjaśnij powiązanie.",
         "deep_dive": "Zasugeruj JEDNO konkretne, fundamentalne pojęcie, które schodzi głębiej w mechanizm tego, co ostatnio badałem (Nurkowanie Top-Down).\n\n{context}\n\nRozbij temat na poziom zasad działania pod maską.",
         "spark": "Rozwiń tę dygresję/myśl zapisaną w biegu: \"{spark_text}\"\n\n{context}\n\nPrzekształć tę luźną myśl w JEDNO konkretne, fascynujące pojęcie z jasnym mostem logicznym.",
@@ -16,8 +16,8 @@
         "user": "Temat główny sesji: \"{main_topic}\"\nNotatka użytkownika o pobocznych odkryciach: \"{raw_text}\"\n\nWyciągnij od 1 do 3 konkretnych pojęć, które użytkownik zgłębił obok tematu głównego."
     },
     "cold_start_generation": {
-        "system": "Jesteś CuriosityEngine. Na podstawie ogólnych zainteresowań i poziomu użytkownika, wygeneruj dokładnie 4 UNIKALNE, fascynujące karty startowe (Iskry ciekawości). Każda karta to konkretne, intrygujące pytanie/problem z innej perspektywy.\n\nOdpowiedz WYŁĄCZNIE poprawnym JSON o strukturze:\n{\n  \"cards\": [\n    {\n      \"id\": \"unikalny_id\",\n      \"tag\": \"Nazwa dziedziny\",\n      \"title\": \"Nazwa konkretnego pojęcia\",\n      \"spark\": \"Intrygujące pytanie / problem osadzony w rzeczywistości\",\n      \"vector\": \"adjacent\"\n    }\n  ]\n}\n\n{language_instruction}",
-        "user": "Wybrane obszary zainteresowań: {interests}\nPoziom wejścia/edukacji: {level}\nOstatnio intrygujące myśli/tematy: {recent_thought}\n\nWygeneruj 4 zróżnicowane, porywające karty startowe dopasowane do tego profilu."
+        "system": "Jesteś CuriosityEngine. Na podstawie zainteresowań i poziomu użytkownika, wygeneruj dokładnie 4 UNIKALNE, porywające karty startowe (Iskry ciekawości).\n\nKRYTYCZNE ZASADY:\n1. Pole 'spark' MUSI być BARDZO KRÓTKIE — DOKŁADNIE 1 zwięzłe, intrygujące pytanie/zdanie (maksymalnie 12-16 słów!). Żadnych długich wywodów.\n2. Każda karta musi być konkretnym mechanizmem lub fascynującym paradoksem.\n3. Odpowiedz WYŁĄCZNIE poprawnym JSON o strukturze:\n{\n  \"cards\": [\n    {\n      \"id\": \"unikalny_id\",\n      \"tag\": \"Krótka nazwa dziedziny\",\n      \"title\": \"Nazwa konkretnego pojęcia\",\n      \"spark\": \"1 krótkie, chwytliwe pytanie (max 15 słów)\",\n      \"vector\": \"adjacent\"\n    }\n  ]\n}\n\n{language_instruction}",
+        "user": "Wybrane obszary zainteresowań: {interests}\nPoziom wejścia/edukacji: {level}\nOstatnio intrygujące myśli/tematy: {recent_thought}\n{rejected_context}\n\nWygeneruj 4 zróżnicowane, super-zwięzłe karty startowe."
     },
     "learning_prompt": {
         "template": "Chcę zrozumieć pojęcie: {topic} (Dziedzina: {domain})\n\nMOJA BAZA WIEDZY (Pojęcia, które już kojarzę intuicyjnie):\n- {known_concepts}\n\nKONTEKST TEGO POJĘCIA:\n{intuitive_model}\n\nTWÓJ STYL TŁUMACZENIA (Top-Down, Modele Mentalne & Analogie):\n1. PO CO TO JEST: Jaki realny problem inżynieryjny lub praktyczny wymusił powstanie tego pojęcia?\n2. GŁÓWNA ANALOGIA: Wyjaśnij zasadę działania używając trafnej analogii mechanicznej, fizycznej lub geometrycznej.\n3. OSADZENIE W RZECZYWISTOŚCI: Gdzie dokładnie w kodzie, silnikach gier, algorytmach lub świecie fizycznym jest to używane?\n4. ZERO ZBĘDNEGO ŻARGONU: Wprowadzaj symbole i formalizm tylko wtedy, gdy reprezentują powyższą intuicję.\n\nNa koniec zadaj mi 1 krótkie pytanie sprawdzające moją intuicję.",
@@ -28,28 +28,28 @@
             "id": "3d_graphics",
             "tag": "Grafika 3D / Silniki Gier",
             "title": "Kwaterniony i obroty w 3D",
-            "spark": "Jak gry obracają kamerę bez psucia perspektywy i czym jest Gimbal Lock?",
+            "spark": "Jak gry obracają kamerę bez psucia perspektywy i Gimbal Locka?",
             "vector": "adjacent"
         },
         {
             "id": "ai_vectors",
             "tag": "Sztuczna Inteligencja / CS",
-            "title": "Wektory cech i przestrzenie semantyczne",
-            "spark": "Dlaczego komputer widzi słowa i obrazy jako strzałki w przestrzeni wielowymiarowej?",
+            "title": "Wektory cech i embeddingi",
+            "spark": "Dlaczego komputer widzi słowa i obrazy jako strzałki w przestrzeni?",
             "vector": "adjacent"
         },
         {
             "id": "hardware_logic",
             "tag": "Architektura Komputerów",
-            "title": "Bramki logiczne i sumator binarny",
-            "spark": "Jak z samych przełączników prądu (tranzystorów) zbudować maszynę, która dodaje liczby?",
+            "title": "Bramki logiczne i sumator",
+            "spark": "Jak z samych przełączników prądu zbudować maszynę dodającą liczby?",
             "vector": "adjacent"
         },
         {
             "id": "mental_fog_card",
             "tag": "Czysta Intuicja / Bez Wymagań",
-            "title": "Drzewa Huffmana i kompresja danych",
-            "spark": "Jak zapisać tekst w mniejszej liczbie zer i jedynek bez utraty ani jednego znaku?",
+            "title": "Drzewa Huffmana i kompresja",
+            "spark": "Jak zapisać tekst w mniejszej liczbie bitów bez utraty ani jednego znaku?",
             "vector": "mental_fog"
         }
     ],

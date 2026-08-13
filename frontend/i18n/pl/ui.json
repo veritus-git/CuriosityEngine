@@ -63,6 +63,7 @@
         "badge": "Zimny Start",
         "title": "Wybierz Swój Pierwszy Temat",
         "subtitle": "Oto 4 tematy wygenerowane specjalnie pod Twoje zainteresowania. Wybierz jeden, by zacząć:",
+        "reroll_btn": "Zaproponuj inne 4 tematy 🔄",
         "or_custom": "Albo wpisz własną myśl lub pytanie:",
         "custom_placeholder": "np. jak komputery generują dźwięk...",
         "custom_submit": "Zbadaj to"

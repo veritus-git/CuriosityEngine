@@ -791,7 +791,29 @@
             }
         });
 
-        // Cold Start Custom Input
+        // Cold Start Custom Input & Reroll
+        const btnColdStartReroll = $('#btn-cold-start-reroll');
+        if (btnColdStartReroll) {
+            btnColdStartReroll.addEventListener('click', async () => {
+                const rejected = (state.coldStartCards || []).map(c => c.title);
+                btnColdStartReroll.classList.add('loading');
+                setGlobalLoading(true, 'loading.generating');
+                try {
+                    const res = await api('POST', '/api/cold-start/regenerate', {
+                        rejected_topics: rejected,
+                        language: langCode
+                    });
+                    state.coldStartCards = res.cards || [];
+                    renderColdStartCards();
+                } catch (err) {
+                    showToast(err.message || t('errors.server_down'));
+                } finally {
+                    btnColdStartReroll.classList.remove('loading');
+                    setGlobalLoading(false);
+                }
+            });
+        }
+
         $('#btn-cold-start-custom-submit').addEventListener('click', () => {
             const val = $('#input-cold-start-custom').value.trim();
             if (val) triggerSuggestion('user_spark', val);

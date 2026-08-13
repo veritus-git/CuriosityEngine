@@ -163,7 +163,7 @@ async def _call_openai(system_prompt: str, user_prompt: str, model_name: str) ->
                 ],
                 "temperature": 0.7,
                 "response_format": {"type": "json_object"} if "gpt-4" in model_name or "gpt-3.5" in model_name else None,
-                "max_tokens": 800,
+                "max_tokens": 2048,
             },
         )
         if response.status_code == 401:
@@ -190,7 +190,7 @@ async def _call_anthropic(system_prompt: str, user_prompt: str, model_name: str)
             },
             json={
                 "model": model_name,
-                "max_tokens": 800,
+                "max_tokens": 2048,
                 "system": system_prompt,
                 "messages": [
                     {"role": "user", "content": user_prompt},
@@ -228,7 +228,7 @@ async def _call_gemini(system_prompt: str, user_prompt: str, model_name: str) ->
                 ],
                 "generationConfig": {
                     "temperature": 0.7,
-                    "maxOutputTokens": 800,
+                    "maxOutputTokens": 2048,
                     "responseMimeType": "application/json",
                 },
             },

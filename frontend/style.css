@@ -520,6 +520,13 @@ body {
     line-height: 1.45;
 }
 
+.cold-start-actions {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: var(--space-xl);
+}
+
 .custom-spark-box {
     width: 100%;
     max-width: 540px;
