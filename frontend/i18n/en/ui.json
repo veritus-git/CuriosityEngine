@@ -29,8 +29,8 @@
     "cold_start": {
         "badge": "Cold Start",
         "title": "Welcome to CuriosityEngine",
-        "subtitle": "Pick one spark that catches your eye — zero stress, zero level interrogation:",
-        "or_custom": "Or enter any thought or question on your mind:",
+        "subtitle": "Pick one idea that sparks your curiosity — no quizzes, no pressure:",
+        "or_custom": "Or enter your own question or thought:",
         "custom_placeholder": "e.g. how computers synthesize audio...",
         "custom_submit": "Explore this"
     },

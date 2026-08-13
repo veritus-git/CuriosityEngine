@@ -29,8 +29,8 @@
     "cold_start": {
         "badge": "Zimny Start",
         "title": "Witaj w CuriosityEngine",
-        "subtitle": "Wybierz jedną myśl, która przyciąga Twój wzrok — bez stresu, bez pytań o poziom:",
-        "or_custom": "Albo wpisz cokolwiek, co chodzi Ci po głowie:",
+        "subtitle": "Wybierz jedną myśl, która Cię intryguje — bez pytań o poziom i bez stresu:",
+        "or_custom": "Albo wpisz własną myśl lub pytanie:",
         "custom_placeholder": "np. jak komputery generują dźwięk...",
         "custom_submit": "Zbadaj to"
     },

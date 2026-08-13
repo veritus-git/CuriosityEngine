@@ -1,7 +1,7 @@
 """
 CuriosityEngine — AI Layer.
 Supports OpenAI, Anthropic, and Google Gemini APIs with structured JSON output and embeddings.
-Includes graceful fallback for vector generation.
+Includes automatic fallback model routing (e.g. 3.7 Flash -> 3.5 Flash Lite) on rate limits or errors.
 """
 
 import os
@@ -15,7 +15,8 @@ from typing import List, Dict, Any, Optional
 logger = logging.getLogger("curiosity.ai")
 
 PROVIDER = os.getenv("AI_PROVIDER", "gemini")
-MODEL = os.getenv("AI_MODEL", "gemini-2.0-flash")
+MODEL = os.getenv("AI_MODEL", "gemini-3.7-flash")
+FALLBACK_MODEL = os.getenv("AI_FALLBACK_MODEL", "gemini-3.5-flash-lite")
 API_KEY = os.getenv("AI_API_KEY", "")
 
 TIMEOUT = 60.0
@@ -97,43 +98,55 @@ async def generate_embedding(text: str) -> List[float]:
                 if resp.status_code == 200:
                     return resp.json()["embedding"]["values"]
     except Exception as e:
-        logger.warning(f"Embedding API call failed ({e}), using fallback semantic vector.")
+        logger.warning(f"Embedding API call notice ({e}), using fallback semantic vector.")
 
     return fallback_semantic_vector(text)
 
 
-# ─── Chat Completion & JSON Structured Outputs ───
+# ─── Chat Completion & JSON Structured Outputs with Fallback ───
 
 async def generate_ai_json(system_prompt: str, user_prompt: str) -> dict:
     """
     Call configured AI provider and return parsed JSON object.
+    Automatically tries the fallback model if the primary model hits rate limits or errors.
     """
     if not API_KEY:
         raise AIError("AI API key is not configured. Please set AI_API_KEY in your .env file.")
 
     provider = PROVIDER.lower().strip()
+    primary_model = MODEL
+    fallback_model = FALLBACK_MODEL
 
     try:
+        return await _dispatch_provider_call(provider, primary_model, system_prompt, user_prompt)
+    except Exception as primary_err:
+        if fallback_model and fallback_model != primary_model:
+            logger.warning(f"Primary model '{primary_model}' encountered error ({primary_err}). Automatically falling back to '{fallback_model}'...")
+            try:
+                return await _dispatch_provider_call(provider, fallback_model, system_prompt, user_prompt)
+            except Exception as fb_err:
+                logger.error(f"Fallback model '{fallback_model}' also failed: {fb_err}")
+                raise AIError(f"AI call failed on both '{primary_model}' and '{fallback_model}': {fb_err}")
+        raise primary_err
+
+
+async def _dispatch_provider_call(provider: str, model_name: str, system_prompt: str, user_prompt: str) -> dict:
+    try:
         if provider == "openai":
-            return await _call_openai(system_prompt, user_prompt)
+            return await _call_openai(system_prompt, user_prompt, model_name)
         elif provider == "anthropic":
-            return await _call_anthropic(system_prompt, user_prompt)
+            return await _call_anthropic(system_prompt, user_prompt, model_name)
         elif provider in ("gemini", "google"):
-            return await _call_gemini(system_prompt, user_prompt)
+            return await _call_gemini(system_prompt, user_prompt, model_name)
         else:
             raise AIError(f"Unsupported AI provider: {provider}. Use 'gemini', 'openai', or 'anthropic'.")
-    except AIError:
-        raise
     except httpx.TimeoutException:
-        raise AIError("AI request timed out. The provider might be slow or unreachable.")
+        raise AIError(f"Model '{model_name}' timed out.")
     except httpx.ConnectError:
-        raise AIError("Could not connect to the AI provider. Check your internet connection.")
-    except Exception as e:
-        logger.exception("Unexpected AI error")
-        raise AIError(f"AI request failed: {str(e)}")
+        raise AIError("Could not connect to the AI provider. Check internet connection.")
 
 
-async def _call_openai(system_prompt: str, user_prompt: str) -> dict:
+async def _call_openai(system_prompt: str, user_prompt: str, model_name: str) -> dict:
     base_url = os.getenv("AI_BASE_URL", "https://api.openai.com/v1")
     async with httpx.AsyncClient(timeout=TIMEOUT) as client:
         response = await client.post(
@@ -143,20 +156,20 @@ async def _call_openai(system_prompt: str, user_prompt: str) -> dict:
                 "Content-Type": "application/json",
             },
             json={
-                "model": MODEL or "gpt-4o-mini",
+                "model": model_name,
                 "messages": [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
                 ],
                 "temperature": 0.7,
-                "response_format": {"type": "json_object"} if "gpt-4" in MODEL or "gpt-3.5" in MODEL else None,
+                "response_format": {"type": "json_object"} if "gpt-4" in model_name or "gpt-3.5" in model_name else None,
                 "max_tokens": 800,
             },
         )
         if response.status_code == 401:
             raise AIError("Invalid API key. Please check your AI_API_KEY.")
         if response.status_code == 429:
-            raise AIError("Rate limited by AI provider. Please wait a moment.")
+            raise AIError(f"Rate limited on {model_name} (429).")
         if response.status_code != 200:
             logger.error(f"OpenAI error {response.status_code}: {response.text}")
             raise AIError(f"AI provider returned error {response.status_code}.")
@@ -166,7 +179,7 @@ async def _call_openai(system_prompt: str, user_prompt: str) -> dict:
         return _parse_json_response(content)
 
 
-async def _call_anthropic(system_prompt: str, user_prompt: str) -> dict:
+async def _call_anthropic(system_prompt: str, user_prompt: str, model_name: str) -> dict:
     async with httpx.AsyncClient(timeout=TIMEOUT) as client:
         response = await client.post(
             "https://api.anthropic.com/v1/messages",
@@ -176,7 +189,7 @@ async def _call_anthropic(system_prompt: str, user_prompt: str) -> dict:
                 "anthropic-version": "2023-06-01",
             },
             json={
-                "model": MODEL or "claude-3-5-sonnet-20241022",
+                "model": model_name,
                 "max_tokens": 800,
                 "system": system_prompt,
                 "messages": [
@@ -188,7 +201,7 @@ async def _call_anthropic(system_prompt: str, user_prompt: str) -> dict:
         if response.status_code == 401:
             raise AIError("Invalid API key. Please check your AI_API_KEY.")
         if response.status_code == 429:
-            raise AIError("Rate limited by AI provider.")
+            raise AIError(f"Rate limited on {model_name} (429).")
         if response.status_code != 200:
             logger.error(f"Anthropic error {response.status_code}: {response.text}")
             raise AIError(f"AI provider returned error {response.status_code}.")
@@ -198,13 +211,12 @@ async def _call_anthropic(system_prompt: str, user_prompt: str) -> dict:
         return _parse_json_response(content)
 
 
-async def _call_gemini(system_prompt: str, user_prompt: str) -> dict:
+async def _call_gemini(system_prompt: str, user_prompt: str, model_name: str) -> dict:
     base_url = os.getenv("AI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta")
-    model = MODEL or "gemini-2.0-flash"
 
     async with httpx.AsyncClient(timeout=TIMEOUT) as client:
         response = await client.post(
-            f"{base_url}/models/{model}:generateContent",
+            f"{base_url}/models/{model_name}:generateContent",
             params={"key": API_KEY},
             headers={"Content-Type": "application/json"},
             json={
@@ -222,21 +234,21 @@ async def _call_gemini(system_prompt: str, user_prompt: str) -> dict:
             },
         )
         if response.status_code == 400:
-            logger.error(f"Gemini API 400: {response.text}")
+            logger.error(f"Gemini API 400 for {model_name}: {response.text}")
             if "API_KEY_INVALID" in response.text:
                 raise AIError("Invalid API key. Please check your AI_API_KEY.")
-            raise AIError(f"Gemini request error. Check model '{model}'.")
+            raise AIError(f"Gemini request error on model '{model_name}'.")
         if response.status_code == 429:
-            raise AIError("Rate limited by Google. Please wait a moment.")
+            raise AIError(f"Rate limited on {model_name} (429).")
         if response.status_code != 200:
-            logger.error(f"Gemini API {response.status_code}: {response.text}")
+            logger.error(f"Gemini API {response.status_code} on {model_name}: {response.text}")
             raise AIError(f"AI provider returned error {response.status_code}.")
 
         data = response.json()
         try:
             content = data["candidates"][0]["content"]["parts"][0]["text"].strip()
         except (KeyError, IndexError):
-            logger.error(f"Gemini format error: {json.dumps(data)[:500]}")
+            logger.error(f"Gemini format error on {model_name}: {json.dumps(data)[:500]}")
             raise AIError("AI returned unexpected format.")
 
         return _parse_json_response(content)
@@ -261,4 +273,5 @@ def get_ai_status() -> dict:
         "configured": bool(API_KEY),
         "provider": PROVIDER,
         "model": MODEL,
+        "fallback_model": FALLBACK_MODEL,
     }
