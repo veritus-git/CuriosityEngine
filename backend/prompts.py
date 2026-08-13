@@ -1,43 +1,43 @@
 """
-Prompt templates for AI topic generation and learning prompt creation.
-All text is loaded from i18n/{lang}/prompts.json — nothing is hardcoded here.
+CuriosityEngine — Prompt Templates & Loader.
+All text, templates, and system prompts are loaded dynamically from i18n/{lang}/prompts.json.
+Zero hardcoded language strings in Python code.
 """
 
 import json
 import logging
 from pathlib import Path
+from typing import Dict, Any, List, Optional
 
 logger = logging.getLogger("curiosity.prompts")
-
 I18N_DIR = Path(__file__).parent.parent / "frontend" / "i18n"
 
-# Cache loaded prompt files
-_prompts_cache = {}
+_prompts_cache: Dict[str, dict] = {}
 
 
-def _load_prompts(language: str) -> dict:
-    """Load prompts.json for the given language. Falls back to 'en'."""
-    if language in _prompts_cache:
-        return _prompts_cache[language]
+def load_prompts(language: str = "en") -> dict:
+    """Load prompts.json for the given language with fallback to 'en'."""
+    lang = language or "en"
+    if lang in _prompts_cache:
+        return _prompts_cache[lang]
 
-    prompts_file = I18N_DIR / language / "prompts.json"
+    prompts_file = I18N_DIR / lang / "prompts.json"
     if not prompts_file.exists():
-        logger.warning(f"Prompts file not found for '{language}', falling back to 'en'")
+        logger.warning(f"Prompts file not found for '{lang}', falling back to 'en'")
         prompts_file = I18N_DIR / "en" / "prompts.json"
-        language = "en"
+        lang = "en"
 
     try:
         data = json.loads(prompts_file.read_text(encoding="utf-8"))
-        _prompts_cache[language] = data
+        _prompts_cache[lang] = data
         return data
     except (json.JSONDecodeError, OSError) as e:
-        logger.error(f"Failed to load prompts for '{language}': {e}")
+        logger.error(f"Failed to load prompts for '{lang}': {e}")
         return {}
 
 
-def _get(prompts: dict, *keys, default=""):
-    """Safely traverse nested dict keys."""
-    val = prompts
+def _get(data: dict, *keys, default="") -> Any:
+    val = data
     for k in keys:
         if isinstance(val, dict):
             val = val.get(k, default)
@@ -46,103 +46,113 @@ def _get(prompts: dict, *keys, default=""):
     return val if val is not None else default
 
 
-def build_topic_generation_prompt(mode, recent_topics, all_titles, preferences, user_request=None):
+def build_generation_prompts(
+    vector: str,
+    recent_concepts: List[Dict[str, Any]],
+    all_titles: List[str],
+    profile: Dict[str, Any],
+    extra_context: Optional[str] = None
+) -> tuple[str, str]:
     """
-    Build the system + user prompt for topic generation.
-    All text comes from i18n/{lang}/prompts.json.
+    Build system and user prompts for topic generation based on the chosen vector.
     """
-    language = "en"
-    if preferences and preferences.get("language"):
-        language = preferences["language"]
+    lang = profile.get("language", "en") if profile else "en"
+    prompts = load_prompts(lang)
 
-    prompts = _load_prompts(language)
+    # 1. Build Context
     labels = _get(prompts, "context_labels", default={})
+    ctx_parts = []
 
-    # Build context about what user has learned
-    history_context = ""
-    if recent_topics:
-        history_lines = []
-        for t in recent_topics[:10]:
-            line = f"- {t['title']}"
-            if t.get("notes"):
-                line += f" (notes: {t['notes'][:150]})"
-            if t.get("interest_rating"):
-                line += f" [interest: {t['interest_rating']}/5]"
-            history_lines.append(line)
-        history_context = _get(labels, "recent_history", default="Recent learning history:") + "\n" + "\n".join(history_lines)
+    if recent_concepts:
+        lines = []
+        for c in recent_concepts[:8]:
+            line = f"- {c['title']} ({c.get('domain', 'general')})"
+            if c.get("summary"):
+                line += f": {c['summary'][:120]}"
+            lines.append(line)
+        recent_label = _get(labels, "recent_history", default="Recent knowledge nodes:")
+        ctx_parts.append(f"{recent_label}\n" + "\n".join(lines))
 
-    all_titles_context = ""
     if all_titles:
-        titles_list = [t["title"] for t in all_titles]
-        label = _get(labels, "all_topics", default="All topics explored so far:")
-        all_titles_context = f"\n{label} {', '.join(titles_list)}"
+        all_label = _get(labels, "all_topics", default="All explored titles:")
+        ctx_parts.append(f"{all_label} {', '.join(all_titles[:50])}")
 
-    prefs_context = ""
-    if preferences:
-        parts = []
-        if preferences.get("preferred_subjects"):
-            label = _get(labels, "preferred_areas", default="Preferred areas:")
-            parts.append(f"{label} {', '.join(preferences['preferred_subjects'])}")
-        if preferences.get("disliked_subjects"):
-            label = _get(labels, "areas_to_avoid", default="Areas to avoid:")
-            parts.append(f"{label} {', '.join(preferences['disliked_subjects'])}")
-        if preferences.get("learning_style"):
-            label = _get(labels, "learning_style", default="Learning style:")
-            parts.append(f"{label} {preferences['learning_style']}")
-        if preferences.get("current_interests"):
-            label = _get(labels, "current_interests", default="Current interests:")
-            parts.append(f"{label} {', '.join(preferences['current_interests'])}")
-        if parts:
-            header = _get(labels, "user_preferences", default="User preferences:")
-            prefs_context = f"\n{header}\n" + "\n".join(parts)
+    if profile:
+        pref_lines = []
+        if profile.get("grounding_level"):
+            g_label = _get(labels, "grounding_level", default="Grounding level:")
+            pref_lines.append(f"{g_label} {profile['grounding_level']}")
+        if profile.get("active_domains"):
+            d_label = _get(labels, "preferred_areas", default="Active domains:")
+            pref_lines.append(f"{d_label} {', '.join(profile['active_domains'])}")
+        if profile.get("custom_instructions"):
+            c_label = _get(labels, "custom_notes", default="User notes:")
+            pref_lines.append(f"{c_label} {profile['custom_instructions']}")
+        if pref_lines:
+            header = _get(labels, "user_preferences", default="Cognitive profile:")
+            ctx_parts.append(f"{header}\n" + "\n".join(pref_lines))
 
-    # Combine context
-    context = f"{history_context}{all_titles_context}{prefs_context}".strip()
+    full_context = "\n\n".join(ctx_parts).strip()
 
-    # Get system prompt, inject language instruction if present
+    # 2. System Prompt
     system_prompt = _get(prompts, "topic_generation", "system", default="")
     lang_instruction = _get(prompts, "language_instruction", default="")
-    if lang_instruction:
-        system_prompt = system_prompt.replace("{language_instruction}", lang_instruction)
-    else:
-        system_prompt = system_prompt.replace("{language_instruction}", "")
+    system_prompt = system_prompt.replace("{language_instruction}", lang_instruction)
 
-    # Get mode-specific user message template
+    # 3. User Message Template
     tg = _get(prompts, "topic_generation", default={})
-    user_template = _get(tg, mode, default="") or _get(tg, "default", default="")
-    user_msg = user_template.replace("{context}", context)
-    if user_request:
-        user_msg = user_msg.replace("{user_request}", user_request)
+    user_template = _get(tg, vector, default="") or _get(tg, "default", default="")
+    
+    user_msg = user_template.replace("{context}", full_context)
+    if extra_context:
+        user_msg = user_msg.replace("{user_request}", extra_context)
+        user_msg = user_msg.replace("{spark_text}", extra_context)
 
     return system_prompt, user_msg
 
 
-def build_learning_prompt(topic_title, preferences=None):
+def build_multiconcept_parse_prompts(
+    raw_text: str,
+    main_topic: str,
+    language: str = "en"
+) -> tuple[str, str]:
     """
-    Build a learning prompt that the user can copy to another LLM.
-    Template and style text come from i18n/{lang}/prompts.json.
+    Prompt to parse multiple co-explored concepts from user's freeform session reflections.
     """
-    language = "en"
-    if preferences and preferences.get("language"):
-        language = preferences["language"]
+    prompts = load_prompts(language)
+    system_prompt = _get(prompts, "concept_parsing", "system", default="")
+    lang_instruction = _get(prompts, "language_instruction", default="")
+    system_prompt = system_prompt.replace("{language_instruction}", lang_instruction)
 
-    prompts = _load_prompts(language)
+    user_template = _get(prompts, "concept_parsing", "user", default="")
+    user_msg = user_template.replace("{raw_text}", raw_text).replace("{main_topic}", main_topic)
 
-    style_key = "top-down"
-    if preferences and preferences.get("learning_style"):
-        style_key = preferences["learning_style"]
+    return system_prompt, user_msg
 
-    # Get style text from prompts.json
-    styles = _get(prompts, "learning_styles", default={})
-    style_text = _get(styles, style_key, default="")
-    if not style_text:
-        # Fallback: use the key as-is
-        style_text = style_key
 
-    # Get prompt template
+def build_external_learning_prompt(
+    concept_title: str,
+    domain: str = "general",
+    intuitive_model: Optional[str] = None,
+    known_concepts: Optional[List[str]] = None,
+    profile: Optional[Dict[str, Any]] = None
+) -> str:
+    """
+    Build the copyable prompt for external LLMs (ChatGPT/Claude/Gemini) adhering to the 4 Pillars of Intuition.
+    """
+    lang = profile.get("language", "en") if profile else "en"
+    prompts = load_prompts(lang)
+
     template = _get(prompts, "learning_prompt", "template", default="")
     if not template:
-        # Absolute fallback if prompts.json is broken
-        return f"Teach me about: {topic_title}"
+        return f"Explain {concept_title} top-down with intuitive analogies."
 
-    return template.replace("{topic}", topic_title).replace("{style}", style_text)
+    known_str = ", ".join(known_concepts[:5]) if known_concepts else _get(prompts, "learning_prompt", "no_prereqs", default="None yet (start from scratch)")
+    model_str = intuitive_model or ""
+
+    prompt = template.replace("{topic}", concept_title)
+    prompt = prompt.replace("{domain}", domain)
+    prompt = prompt.replace("{known_concepts}", known_str)
+    prompt = prompt.replace("{intuitive_model}", model_str)
+
+    return prompt.strip()

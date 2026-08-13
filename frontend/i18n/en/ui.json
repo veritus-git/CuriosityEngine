@@ -5,8 +5,12 @@
         "native_name": "English"
     },
     "nav": {
+        "compass": "Compass",
+        "constellation": "Constellation",
+        "sparks": "Sparks ({n})",
         "history": "History",
-        "settings": "Settings"
+        "settings": "Settings",
+        "logout": "Logout"
     },
     "greeting": {
         "late_night": "Late night thoughts.",
@@ -16,119 +20,97 @@
         "night_owl": "Night owl mode."
     },
     "auth": {
-        "subtitle": "Login or create an account",
+        "subtitle": "CuriosityEngine — Your personal associative knowledge engine.",
+        "description": "Log in or create an account to start building your knowledge graph.",
         "username": "Username",
         "password": "Password",
-        "submit": "Login / Register"
+        "submit": "Enter Engine"
     },
-    "onboarding": {
+    "cold_start": {
+        "badge": "Cold Start",
         "title": "Welcome to CuriosityEngine",
-        "subtitle": "Let's configure your learning profile.",
-        "placeholder": "e.g., physics, art history, coding...",
-        "q1_label": "1. What are your general interests?",
-        "q1_placeholder": "e.g., art history, programming, biology...",
-        "q2_label": "2. Where do you want to start today?",
-        "q2_placeholder": "e.g., artificial intelligence",
-        "q3_label": "3. What is your main goal?",
-        "q3_placeholder": "Enter your goal...",
-        "q4_label": "4. What is your education level / what do you know?",
-        "level_primary": "Primary school",
-        "level_secondary": "High school",
-        "level_university": "University",
-        "level_selftaught": "Self-taught / Outside formal education",
-        "level_custom": "Other level (type below)",
-        "level_custom_placeholder": "Enter major, profile, or details...",
-        "next_btn": "Next",
-        "save_btn": "Start exploring",
-        "skip_btn": "Skip for now"
+        "subtitle": "Pick one spark that catches your eye — zero stress, zero level interrogation:",
+        "or_custom": "Or enter any thought or question on your mind:",
+        "custom_placeholder": "e.g. how computers synthesize audio...",
+        "custom_submit": "Explore this"
     },
-    "no_topic": {
-        "subtitle": "What shall we explore?",
-        "suggest_btn": "Suggest a topic",
-        "random_btn": "Something completely different",
-        "interest_toggle": "Or tell me what you're curious about\u2026",
-        "interest_placeholder": "e.g. how computers understand images\u2026",
-        "interest_submit": "Explore this"
+    "compass": {
+        "title": "Curiosity Compass",
+        "subtitle": "Choose an exploration vector for today:",
+        "adjacent": "Adjacent Bridge",
+        "adjacent_desc": "A concept intersecting with what you already know",
+        "deep_dive": "Top-Down Deep Dive",
+        "deep_dive_desc": "How the underlying mechanism works under the hood",
+        "spark": "Unpack Spark",
+        "spark_desc": "Develop a fleeting thought from your inbox",
+        "cross_domain": "Cross-Domain Leap",
+        "cross_domain_desc": "Jump into an entirely different field",
+        "mental_fog": "Mental Fog Mode",
+        "mental_fog_desc": "Simple, deeply fascinating idea (zero friction)",
+        "custom_spark": "Custom Spark",
+        "custom_spark_desc": "Type any topic or question",
+        "input_placeholder": "What are you curious about?",
+        "input_submit": "Generate concept"
     },
-    "suggested": {
-        "label": "Today's suggestion",
-        "accept_btn": "Explore this topic",
-        "skip_btn": "Not today",
-        "reject_btn": "Never suggest this"
+    "focus_card": {
+        "suggested_label": "Today's Suggestion",
+        "active_label": "Active Exploration",
+        "why_label": "Logical Bridge",
+        "model_label": "Intuition & Mental Model",
+        "accept_btn": "Explore this concept",
+        "skip_btn": "Different suggestion",
+        "reject_btn": "Not interested",
+        "copy_prompt_btn": "Copy Prompt for ChatGPT / Claude",
+        "prompt_copied": "Prompt copied to clipboard ✓",
+        "finish_btn": "Mark as Mastered ✓",
+        "loading": "Generating concept..."
     },
-    "active": {
-        "label": "Today's exploration",
-        "fallback_reason": "Explore it however you like.",
-        "started": "Started {date}",
-        "copy_prompt_btn": "Copy learning prompt",
-        "finish_btn": "I'm done exploring",
-        "prompt_copied": "Prompt copied to clipboard \u2713"
+    "complete_modal": {
+        "title": "Complete Exploration Session",
+        "subtitle": "{topic} is being added to your knowledge graph.",
+        "co_explored_label": "Did you also explore any side concepts during your session?",
+        "co_explored_placeholder": "e.g. while studying matrices, I also grasped vectors and affine transformations...",
+        "co_explored_hint": "AI will automatically extract these concepts and link them into your graph with associative bridges.",
+        "notes_label": "Short personal note (optional):",
+        "notes_placeholder": "Key takeaway...",
+        "save_btn": "Save to Knowledge Graph",
+        "cancel_btn": "Cancel"
     },
-    "reflection": {
-        "label": "Reflection",
-        "title": "How did it go?",
-        "notes_label": "What did you learn?",
-        "notes_placeholder": "Key takeaways\u2026",
-        "discoveries_label": "What caught your attention?",
-        "discoveries_placeholder": "Interesting things you noticed\u2026",
-        "sidepaths_label": "Did you wander to another topic?",
-        "sidepaths_placeholder": "e.g. started with matrices, ended up reading about tensors\u2026",
-        "interest_label": "Interest",
-        "difficulty_label": "Difficulty",
-        "save_btn": "Save exploration"
+    "spark_box": {
+        "title": "Spark Inbox",
+        "subtitle": "Capture fleeting thoughts that arise during your study — the engine will save them for later.",
+        "input_placeholder": "Type your spark and hit Enter...",
+        "add_btn": "Save Spark",
+        "empty": "No pending sparks. You can capture thoughts anytime.",
+        "explore_btn": "Explore now",
+        "dismiss_btn": "Dismiss",
+        "quick_tip": "Shortcut: press Space on the dashboard to quickly capture a spark."
     },
-    "saved": {
-        "title": "Saved.",
-        "topic_saved": "{topic} is now part of your learning history.",
-        "hint": "Next time we can build on this \u2014 or go somewhere entirely different.",
-        "next_btn": "Explore something new",
-        "home_btn": "Back to start"
+    "constellation": {
+        "title": "Knowledge Constellation",
+        "subtitle": "Interactive graph of your mastered concepts and associative bridges.",
+        "nodes_count": "{n} mastered concepts",
+        "empty": "Your knowledge garden is waiting for its first concept. Start with the Compass!",
+        "back_btn": "← Back to Compass"
     },
     "history": {
         "title": "Learning Archive",
-        "back_btn": "\u2190 Back",
-        "empty": "No explorations yet. Your journey starts with the first one.",
-        "interest": "interest",
-        "difficulty": "difficulty"
-    },
-    "detail": {
-        "back_btn": "\u2190 Back to archive",
-        "difficulty_label": "Difficulty",
-        "mode_label": "Mode",
-        "why_label": "Why this topic",
-        "connection_label": "Connection",
-        "notes_label": "Notes",
-        "discoveries_label": "Discoveries",
-        "sidepaths_label": "Side paths",
-        "interest_label": "Interest",
-        "difficulty_detail_label": "Difficulty"
+        "back_btn": "← Back",
+        "empty": "No history yet. Your journey begins with your first topic."
     },
     "settings": {
-        "title": "Settings",
-        "back_btn": "\u2190 Back",
-        "ai_heading": "AI Configuration",
-        "ai_hint": "Configure AI in the <code>.env</code> file and restart the server.",
-        "ai_provider": "Provider",
-        "ai_model": "Model",
-        "ai_status": "Status",
-        "ai_configured": "Configured \u2713",
-        "ai_not_configured": "Not configured \u2717",
-        "ai_set_key": "Set <code>AI_API_KEY</code> in your <code>.env</code> file.",
-        "preferred_heading": "Preferred subjects",
-        "preferred_hint": "Topics you'd like AI to lean towards.",
-        "preferred_placeholder": "Add subject\u2026",
-        "disliked_heading": "Subjects to avoid",
-        "disliked_hint": "Topics AI should steer away from.",
-        "disliked_placeholder": "Add subject\u2026",
-        "add_btn": "Add",
-        "style_heading": "Learning style",
-        "style_topdown": "Top-down (big picture first)",
-        "style_bottomup": "Bottom-up (examples first)",
-        "style_mixed": "Mixed",
-        "language_heading": "Language",
-        "language_hint": "Choose interface language.",
-        "privacy_heading": "Privacy",
-        "privacy_text": "All your data is stored locally in SQLite. Nothing is sent anywhere except to your configured AI provider when generating topics. Your API key never touches the browser."
+        "title": "Settings & Profile",
+        "back_btn": "← Back",
+        "theme_heading": "Appearance",
+        "theme_light": "Light",
+        "theme_dark": "Dark",
+        "language_heading": "Interface Language",
+        "language_hint": "Select your preferred language.",
+        "ai_heading": "AI Status",
+        "ai_configured": "Configured ✓",
+        "ai_not_configured": "Missing API Key ✗",
+        "privacy_heading": "Privacy & Local Database",
+        "privacy_text": "All your data, embeddings, and learning history are stored in a local SQLite database. Your API key never leaves your server."
     },
     "errors": {
         "server_down": "Could not connect to the server. Make sure the backend is running.",

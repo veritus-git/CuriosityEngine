@@ -1,0 +1,187 @@
+"""
+CuriosityEngine — Associative & Knowledge Graph Engine.
+Coordinates vector-based matching, prompt generation, multi-concept parsing, and session closure.
+"""
+
+import logging
+from typing import Dict, Any, Optional, List
+from .database import (
+    create_concept, get_concept, get_active_concept, get_suggested_concept,
+    update_concept_status, reject_all_suggested_concepts, get_mastered_concepts,
+    get_recent_concepts, get_all_concept_titles, get_sparks, update_spark_status,
+    create_bridge, complete_multiconcept_session, get_profile,
+    get_all_concepts_with_embeddings, get_sparks_with_embeddings
+)
+from .ai import generate_ai_json, generate_embedding, cosine_similarity, AIError
+from .prompts import (
+    build_generation_prompts, build_multiconcept_parse_prompts,
+    build_external_learning_prompt
+)
+
+logger = logging.getLogger("curiosity.engine")
+
+
+async def generate_concept_suggestion(
+    vector: str = "adjacent",
+    user_input: Optional[str] = None,
+    spark_id: Optional[int] = None,
+    current_action: str = "skip"
+) -> Dict[str, Any]:
+    """
+    Generate an associative concept suggestion according to the chosen compass vector.
+    """
+    # 1. Update any existing suggested concept
+    reject_all_suggested_concepts(new_status=current_action)
+
+    # 2. Gather context
+    recent = get_recent_concepts(limit=8)
+    all_titles = get_all_concept_titles()
+    profile = get_profile()
+
+    extra_context = user_input
+    selected_spark = None
+
+    # Special handling for 'spark' vector
+    if vector == "spark":
+        sparks = get_sparks(status="inbox", limit=10)
+        if spark_id:
+            selected_spark = next((s for s in sparks if s["id"] == spark_id), None)
+        elif sparks:
+            selected_spark = sparks[0]
+
+        if selected_spark:
+            extra_context = selected_spark["raw_text"]
+        else:
+            # Fallback if no sparks exist: treat as adjacent
+            vector = "adjacent"
+
+    # 3. Build generation prompts from i18n templates
+    system_prompt, user_prompt = build_generation_prompts(
+        vector=vector,
+        recent_concepts=recent,
+        all_titles=all_titles,
+        profile=profile,
+        extra_context=extra_context
+    )
+
+    # 4. Generate with AI
+    result = await generate_ai_json(system_prompt, user_prompt)
+
+    title = result.get("topic") or result.get("title")
+    if not title:
+        raise AIError("AI did not return a valid topic title.")
+
+    domain = result.get("domain", "general")
+    summary = result.get("short_reason") or result.get("summary", "")
+    intuitive_model = result.get("intuitive_model") or result.get("connection", "")
+    difficulty = result.get("difficulty", "intermediate")
+    logical_reason = result.get("logical_reason") or result.get("connection") or summary
+
+    # 5. Generate embedding for new concept
+    emb = await generate_embedding(f"{title} {domain} {summary}")
+
+    # 6. Save concept
+    concept = create_concept(
+        title=title,
+        domain=domain,
+        summary=summary,
+        intuitive_model=intuitive_model,
+        difficulty=difficulty,
+        status="suggested",
+        embedding=emb,
+        source_mode=vector
+    )
+
+    # 7. If there's a recent concept or parent, create an associative bridge
+    if recent and vector in ("adjacent", "deep_dive", "cross_domain"):
+        parent_id = recent[0]["id"]
+        create_bridge(
+            source_id=parent_id,
+            target_id=concept["id"],
+            bridge_type=vector,
+            logical_reason=logical_reason
+        )
+
+    # If converted from spark, mark spark converted
+    if selected_spark:
+        update_spark_status(selected_spark["id"], "converted")
+
+    logger.info(f"Generated concept: {title} via vector: {vector}")
+    return concept
+
+
+async def complete_session_with_coexplored(
+    concept_id: int,
+    co_explored_text: Optional[str] = None,
+    notes: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Complete active session. If user mentions co-explored side topics in freeform text,
+    parse them with AI and create linked nodes in the knowledge graph.
+    """
+    concept = get_concept(concept_id)
+    if not concept:
+        raise ValueError(f"Concept {concept_id} not found")
+
+    profile = get_profile()
+    extra_concepts = []
+
+    if co_explored_text and co_explored_text.strip():
+        try:
+            sys_prompt, user_prompt = build_multiconcept_parse_prompts(
+                raw_text=co_explored_text.strip(),
+                main_topic=concept["title"],
+                language=profile.get("language", "en")
+            )
+            parsed = await generate_ai_json(sys_prompt, user_prompt)
+            items = parsed.get("concepts", [])
+            for it in items:
+                if it.get("title") and it["title"].lower() != concept["title"].lower():
+                    extra_concepts.append({
+                        "title": it["title"].strip(),
+                        "domain": it.get("domain", concept.get("domain", "general")),
+                        "summary": it.get("summary", ""),
+                        "reason": it.get("reason", "Co-explored in session")
+                    })
+        except Exception as e:
+            logger.warning(f"Co-explored concept parsing notice: {e}")
+
+    result = complete_multiconcept_session(
+        active_concept_id=concept_id,
+        extra_concepts=extra_concepts,
+        notes=notes
+    )
+
+    # Generate embeddings for newly created co-explored concepts
+    for cid in result.get("co_explored_ids", []):
+        c = get_concept(cid)
+        if c and not c.get("embedding"):
+            emb = await generate_embedding(f"{c['title']} {c.get('domain', '')} {c.get('summary', '')}")
+            create_concept(
+                title=c["title"],
+                domain=c["domain"],
+                summary=c["summary"],
+                status="mastered",
+                embedding=emb
+            )
+
+    return result
+
+
+def get_learning_prompt(concept_id: int) -> str:
+    """Build the external LLM prompt for a specific concept."""
+    concept = get_concept(concept_id)
+    if not concept:
+        return ""
+
+    mastered = get_mastered_concepts(limit=6)
+    known = [m["title"] for m in mastered if m["id"] != concept_id]
+    profile = get_profile()
+
+    return build_external_learning_prompt(
+        concept_title=concept["title"],
+        domain=concept.get("domain", "general"),
+        intuitive_model=concept.get("intuitive_model"),
+        known_concepts=known,
+        profile=profile
+    )

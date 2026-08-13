@@ -1,29 +1,60 @@
 {
     "language_name": "polski",
-    "language_instruction": "JĘZYK: MUSISZ odpowiadać WYŁĄCZNIE po polsku.\nNazwa tematu, short_reason i connection MUSZĄ być napisane po polsku.\nNIE używaj angielskiego w żadnym z pól.",
+    "language_instruction": "JĘZYK: Odpowiadaj WYŁĄCZNIE po polsku. Wszystkie pola JSON muszą być w języku polskim.",
     "topic_generation": {
-        "system": "Jesteś CuriosityEngine — osobistym przewodnikiem, który sugeruje JEDNĄ konkretną, skupioną koncepcję do nauki na dziś.\n\nKRYTYCZNE ZASADY:\n1. NIGDY nie sugeruj szerokich kategorii jak \"Matematyka\", \"Programowanie\", \"Fizyka\", \"Informatyka\", \"Ekonomia\"\n2. ZAWSZE sugeruj KONKRETNĄ koncepcję o rozsądnym poziomie szczegółowości\n3. Dobre przykłady: \"Wartości własne\", \"Metoda gradientu prostego\", \"Trójetapowe uzgadnianie TCP\", \"Liczba Eulera\", \"Tablice haszujące\", \"Transformata Fouriera\", \"Alokacja pamięci\", \"Wnioskowanie bayesowskie\", \"Generowanie kluczy RSA\", \"Łańcuchy Markowa\"\n4. Temat powinien być na tyle mały, aby można go było sensownie zgłębić w jednej sesji\n5. NIGDY nie powtarzaj tematu, który użytkownik już zgłębiał\n6. Odpowiadaj WYŁĄCZNIE prawidłowym JSON w dokładnie określonym formacie\n\n{language_instruction}\n\nTwoja odpowiedź musi być prawidłowym JSON o dokładnie tej strukturze:\n{\n  \"topic\": \"Nazwa tematu\",\n  \"short_reason\": \"Jedno zdanie wyjaśniające, dlaczego ten temat jest sugerowany teraz\",\n  \"connection\": \"Poprzedni temat → Ten temat (lub null jeśli losowy)\",\n  \"difficulty\": \"beginner|intermediate|advanced\"\n}",
-        "connected": "Zasugeruj JEDEN konkretny temat, który naturalnie łączy się z moją ostatnią nauką.\n\n{context}\n\nZnajdź koncepcję, która buduje na tym, co już zgłębiałem, rozszerza to lub jest blisko powiązana. Połączenie powinno być naturalne i intelektualnie satysfakcjonujące.",
-        "random": "Zasugeruj JEDEN konkretny temat z zupełnie innej dziedziny niż moja ostatnia nauka.\n\n{context}\n\nWybierz coś zaskakującego i stymulującego z dziedziny, której nie zgłębiałem. Powinno wzbudzić autentyczną ciekawość. Bądź kreatywny — wykraczaj poza typowe tematy STEM jeśli to stosowne.",
-        "user_interest": "Użytkownik wyraził to zainteresowanie: \"{user_request}\"\n\n{context}\n\nNa podstawie tego zainteresowania zasugeruj JEDNĄ konkretną, skupioną koncepcję do zgłębienia. Nie powtarzaj po prostu zainteresowania — znajdź konkretną koncepcję w tym obszarze.",
-        "expand": "Użytkownik chce zgłębić temat: \"{user_request}\"\n\n{context}\n\nZasugeruj JEDNĄ konkretną koncepcję, która idzie głębiej w ten obszar tematyczny. Powinna budować zrozumienie i odkrywać nowe warstwy.",
-        "default": "Zasugeruj JEDEN konkretny, interesujący temat do nauki na dziś.\n\n{context}\n\nWeź pod uwagę moją historię nauki i preferencje. Wybierz coś, co autentycznie zainteresowałoby ciekawy, analityczny umysł."
+        "system": "Jesteś CuriosityEngine — osobistym przewodnikiem wiedzy, który sugeruje JEDNO konkretne, atomowe pojęcie do zrozumienia na dziś.\n\nKRYTYCZNE ZASADY:\n1. NIGDY nie sugeruj szerokich kategorii (np. 'Matematyka', 'Fizyka', 'Programowanie', 'Algorytmy').\n2. ZAWSZE sugeruj KONKRETNY mechanizm lub pojęcie (np. 'Kwaterniony i unikanie Gimbal Locka', 'Wartości własne w kompresji obrazu', 'Drzewa Merkle w kryptografii', 'Wektory cech w modelach językowych', 'Odwrócona notacja polska', 'Transformata Fouriera w spektrogramach').\n3. Uzasadnienie (connection/intuitive_model) MUSI tłumaczyć intuicję i most logiczny: dlaczego to pojęcie łączy się z tym co użytkownik już wie i po co w ogóle powstało.\n4. Odpowiadaj WYŁĄCZNIE poprawnym JSON w formacie:\n{\n  \"topic\": \"Nazwa pojęcia\",\n  \"domain\": \"np. Grafika 3D / Matematyka / Architektura\",\n  \"short_reason\": \"Jedno zdanie: dlaczego to pojęcie jest fascynujące i po co istnieje\",\n  \"intuitive_model\": \"Krótki most asocjacyjny lub analogia łącząca to pojęcie z rzeczywistością\",\n  \"difficulty\": \"beginner|intermediate|advanced\"\n}\n\n{language_instruction}",
+        "adjacent": "Zasugeruj JEDNO konkretne pojęcie, które naturalnie zazębia się z moją ostatnią wiedzą (Most Asocjacyjny).\n\n{context}\n\nZnajdź pojęcie, które buduje na fundamentach tego co już poznałem, ale otwiera nową klapkę w głowie. Wyjaśnij powiązanie.",
+        "deep_dive": "Zasugeruj JEDNO konkretne, fundamentalne pojęcie, które schodzi głębiej w mechanizm tego, co ostatnio badałem (Nurkowanie Top-Down).\n\n{context}\n\nRozbij temat na poziom zasad działania pod maską.",
+        "spark": "Rozwiń tę dygresję/myśl zapisaną w biegu: \"{spark_text}\"\n\n{context}\n\nPrzekształć tę luźną myśl w JEDNO konkretne, fascynujące pojęcie z jasnym mostem logicznym.",
+        "cross_domain": "Zasugeruj JEDNO pojęcie z ZUPEŁNIE INNEJ dziedziny niż moje ostatnie tematy, które jednak dzieli analogiczny mechanizm myślowy (Skok Międzydziedzinowy).\n\n{context}\n\nZaskocz mnie czymś pobudzającym ciekawość z fizyki, kognitywistyki, biologii, lingwistyki lub inżynierii.",
+        "mental_fog": "Zasugeruj JEDNO fascynujące, przystępne pojęcie, które NIE WYMAGA żadnej wiedzy wstępnej i daje natychmiastowe 'Aha!' (Tryb Mental Fog).\n\n{context}\n\nWybierz małą, piękną ideę, która daje czystą satysfakcję ze zrozumienia mechanizmu świata (np. paradoks Monty Halla, kompresja Huffmana, jak działa pamięć flash, jak żyroskop wykrywa ruch).",
+        "user_spark": "Użytkownik ma ten impuls ciekawości: \"{user_request}\"\n\n{context}\n\nPrzekształć to w JEDNO konkretne pojęcie stanowiące pierwszy, najbardziej intuicyjny krok do zrozumienia tego zjawiska.",
+        "default": "Zasugeruj JEDNO konkretne pojęcie do nauki na dziś oparte na moim profilu i intuicji.\n\n{context}"
+    },
+    "concept_parsing": {
+        "system": "Jesteś parserem wiedzy CuriosityEngine. Z notatki użytkownika po sesji wyciągnij pojęcia poboczne, które użytkownik również zrozumiał/zgłębił w trakcie.\n\nOdpowiedz WYŁĄCZNIE JSON o strukturze:\n{\n  \"concepts\": [\n    {\n      \"title\": \"Nazwa pojęcia\",\n      \"domain\": \"dziedzina\",\n      \"summary\": \"Krótka intuicja (1 zdanie)\",\n      \"reason\": \"Jak łączy się z tematem głównym\"\n    }\n  ]\n}\n\n{language_instruction}",
+        "user": "Temat główny sesji: \"{main_topic}\"\nNotatka użytkownika o pobocznych odkryciach: \"{raw_text}\"\n\nWyciągnij od 1 do 3 konkretnych pojęć, które użytkownik zgłębił obok tematu głównego."
     },
     "learning_prompt": {
-        "template": "Chc\u0119 dzisiaj zrozumie\u0107: {topic}\n\nMam analityczny umys\u0142. {style}\n\nDostosuj swoje wyja\u015bnienie:\n- Wyja\u015bnij g\u0142\u00f3wn\u0105 ide\u0119 intuicyjnie, u\u017cywaj\u0105c trafnych analogii.\n- Wprowadzaj formalne definicje tylko wtedy, gdy faktycznie pomagaj\u0105 w zrozumieniu.\n- Unikaj niepotrzebnego \u017cargonu. Je\u015bli musisz u\u017cy\u0107 specjalistycznego poj\u0119cia, najpierw je wyja\u015bnij.\n- Staraj si\u0119 by teoria by\u0142a osadzona w rzeczywisto\u015bci.\n\nNa koniec:\n1. Przedstaw bardzo kr\u00f3tkie podsumowanie.\n2. Zaproponuj 2 powi\u0105zane koncepcje, kt\u00f3re warto zbada\u0107 jako nast\u0119pne."
+        "template": "Chcę zrozumieć pojęcie: {topic} (Dziedzina: {domain})\n\nMOJA BAZA WIEDZY (Pojęcia, które już kojarzę intuicyjnie):\n- {known_concepts}\n\nKONTEKST TEGO POJĘCIA:\n{intuitive_model}\n\nTWÓJ STYL TŁUMACZENIA (Top-Down, Modele Mentalne & Analogie):\n1. PO CO TO JEST: Jaki realny problem inżynieryjny lub praktyczny wymusił powstanie tego pojęcia?\n2. GŁÓWNA ANALOGIA: Wyjaśnij zasadę działania używając trafnej analogii mechanicznej, fizycznej lub geometrycznej.\n3. OSADZENIE W RZECZYWISTOŚCI: Gdzie dokładnie w kodzie, silnikach gier, algorytmach lub świecie fizycznym jest to używane?\n4. ZERO ZBĘDNEGO ŻARGONU: Wprowadzaj symbole i formalizm tylko wtedy, gdy reprezentują powyższą intuicję.\n\nNa koniec zadaj mi 1 krótkie pytanie sprawdzające moją intuicję.",
+        "no_prereqs": "Brak (tłumacz od zupełnych podstaw i analogii jak z klocków LEGO)"
     },
-    "learning_styles": {
-        "top-down": "Preferuję naukę od ogółu do szczegółu — zacznij od ogólnego obrazu i intuicji, potem stopniowo przechodź do detali.",
-        "bottom-up": "Preferuję naukę od szczegółu do ogółu — zacznij od konkretnych przykładów i buduj ku ogólnej koncepcji.",
-        "mixed": "Używaj mieszanki intuicyjnych wyjaśnień i konkretnych przykładów, jak uznasz za stosowne."
-    },
+    "cold_start_cards": [
+        {
+            "id": "3d_graphics",
+            "tag": "Grafika 3D / Silniki Gier",
+            "title": "Kwaterniony i obroty w 3D",
+            "spark": "Jak gry obracają kamerę bez psucia perspektywy i czym jest Gimbal Lock?",
+            "vector": "adjacent"
+        },
+        {
+            "id": "ai_vectors",
+            "tag": "Sztuczna Inteligencja / CS",
+            "title": "Wektory cech i przestrzenie semantyczne",
+            "spark": "Dlaczego komputer widzi słowa i obrazy jako strzałki w przestrzeni wielowymiarowej?",
+            "vector": "adjacent"
+        },
+        {
+            "id": "hardware_logic",
+            "tag": "Architektura Komputerów",
+            "title": "Bramki logiczne i sumator binarny",
+            "spark": "Jak z samych przełączników prądu (tranzystorów) zbudować maszynę, która dodaje liczby?",
+            "vector": "adjacent"
+        },
+        {
+            "id": "mental_fog_card",
+            "tag": "Czysta Intuicja / Bez Wymagań",
+            "title": "Drzewa Huffmana i kompresja danych",
+            "spark": "Jak zapisać tekst w mniejszej liczbie zer i jedynek bez utraty ani jednego znaku?",
+            "vector": "mental_fog"
+        }
+    ],
     "context_labels": {
-        "recent_history": "Ostatnia historia nauki:",
-        "all_topics": "Wszystkie dotychczas zgłębione tematy:",
-        "preferred_areas": "Preferowane obszary:",
-        "areas_to_avoid": "Obszary do unikania:",
-        "learning_style": "Styl nauki:",
-        "current_interests": "Aktualne zainteresowania:",
-        "user_preferences": "Preferencje użytkownika:"
+        "recent_history": "Ostatnio opanowane pojęcia:",
+        "all_topics": "Dotychczas poznane tytuły:",
+        "preferred_areas": "Aktywne dziedziny:",
+        "grounding_level": "Poziom ugruntowania:",
+        "custom_notes": "Notatki użytkownika:",
+        "user_preferences": "Profil kognitywny:"
     }
 }

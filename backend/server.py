@@ -1,6 +1,6 @@
 """
-CuriosityEngine — FastAPI server.
-Serves the frontend and provides API endpoints.
+CuriosityEngine — FastAPI Server.
+Provides the reactive REST API for the Zen Curiosity Dashboard.
 """
 
 import os
@@ -10,8 +10,6 @@ from pathlib import Path
 from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
-
-# Load .env before any other imports that use env vars
 load_dotenv()
 
 from fastapi import FastAPI, HTTPException, Request, Depends
@@ -20,66 +18,66 @@ from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
 from typing import Optional, List
 
-from backend.database import (
-    init_db, get_active_topic, get_suggested_topic, get_topic,
-    create_topic, update_topic_status, reject_all_suggested,
-    create_session, complete_session, get_session_for_topic,
-    get_recent_topics, get_all_topic_titles, get_completed_topics,
-    get_preferences, update_preferences, get_history, get_history_count,
+from .database import (
+    init_db, get_active_concept, get_suggested_concept, get_concept,
+    update_concept_status, get_mastered_concepts, get_sparks,
+    create_spark, update_spark_status, get_graph_data, get_profile,
+    update_profile
 )
-from backend.ai import generate_topic, get_ai_status, AIError
-from backend.auth import register_user, login_user, get_current_user_token
-from backend.prompts import build_topic_generation_prompt, build_learning_prompt
+from .ai import get_ai_status, AIError, generate_embedding
+from .auth import register_user, login_user, get_current_user_token
+from .engine import (
+    generate_concept_suggestion, complete_session_with_coexplored,
+    get_learning_prompt
+)
+from .prompts import load_prompts
 
-# --- Logging ---
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
 )
-logger = logging.getLogger("curiosity")
+logger = logging.getLogger("curiosity.server")
 
-# --- App ---
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Initialize database on startup."""
     init_db()
-    logger.info("Database initialized.")
+    logger.info("CuriosityEngine database initialized.")
     yield
+
 
 app = FastAPI(title="CuriosityEngine", lifespan=lifespan)
 
 
-# --- Request Models ---
+# ─── Request Models ───
 
 class AuthRequest(BaseModel):
     username: str
     password: str
 
-class TopicGenerateRequest(BaseModel):
-    mode: str = Field(default="connected", pattern="^(connected|random|user_interest|expand)$")
-    user_request: Optional[str] = None
-    current_topic_action: str = "skip"  # skip, reject
+class SuggestRequest(BaseModel):
+    vector: str = Field(default="adjacent", pattern="^(adjacent|deep_dive|spark|cross_domain|mental_fog|user_spark)$")
+    user_input: Optional[str] = None
+    spark_id: Optional[int] = None
+    current_action: str = "skip"
 
-class TopicCompleteRequest(BaseModel):
+class CompleteSessionRequest(BaseModel):
     notes: Optional[str] = None
-    discoveries: Optional[str] = None
-    side_paths: Optional[str] = None
-    difficulty_rating: Optional[int] = Field(default=None, ge=1, le=5)
-    interest_rating: Optional[int] = Field(default=None, ge=1, le=5)
+    co_explored_text: Optional[str] = None
 
-class PreferencesRequest(BaseModel):
-    preferred_subjects: Optional[List[str]] = None
-    disliked_subjects: Optional[List[str]] = None
+class SparkCreateRequest(BaseModel):
+    text: str
+    parent_concept_id: Optional[int] = None
+
+class ProfileUpdateRequest(BaseModel):
     learning_style: Optional[str] = None
-    current_interests: Optional[List[str]] = None
+    grounding_level: Optional[str] = None
+    active_domains: Optional[List[str]] = None
+    custom_instructions: Optional[str] = None
     language: Optional[str] = None
 
-class LearningPromptRequest(BaseModel):
-    topic_title: str
 
-
-# --- Auth Routes ---
+# ─── Auth Routes ───
 
 @app.post("/api/auth/register")
 async def register(req: AuthRequest):
@@ -90,6 +88,7 @@ async def register(req: AuthRequest):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+
 @app.post("/api/auth/login")
 async def login(req: AuthRequest):
     token = login_user(req.username, req.password)
@@ -97,196 +96,193 @@ async def login(req: AuthRequest):
         raise HTTPException(status_code=401, detail="Invalid username or password")
     return {"token": token}
 
-# --- API Routes ---
+
+# ─── Application State Route ───
 
 @app.get("/api/state")
-async def get_state_route(username: str = Depends(get_current_user_token)):
-    """Get the current application state."""
-    active = get_active_topic()
-    suggested = get_suggested_topic()
+async def get_app_state(username: str = Depends(get_current_user_token)):
+    """Return unified state for the Zen Dashboard."""
+    active = get_active_concept()
+    suggested = get_suggested_concept()
     ai_status = get_ai_status()
-    history_count = get_history_count()
+    mastered = get_mastered_concepts(limit=100)
+    sparks = get_sparks(status="inbox", limit=50)
+    profile = get_profile()
 
     if active:
-        session = get_session_for_topic(active["id"])
-        state = "TOPIC_ACTIVE"
-        topic = active
+        state = "CONCEPT_ACTIVE"
+        concept = active
+        prompt = get_learning_prompt(active["id"])
     elif suggested:
-        session = None
-        state = "TOPIC_SUGGESTED"
-        topic = suggested
+        state = "CONCEPT_SUGGESTED"
+        concept = suggested
+        prompt = get_learning_prompt(suggested["id"])
     else:
-        session = None
-        state = "NO_TOPIC"
-        topic = None
+        state = "NO_CONCEPT"
+        concept = None
+        prompt = None
 
     return {
         "state": state,
-        "topic": topic,
-        "session": session,
+        "concept": concept,
+        "prompt": prompt,
+        "sparks_count": len(sparks),
+        "mastered_count": len(mastered),
         "ai": ai_status,
-        "history_count": history_count,
-        "preferences": get_preferences()
+        "profile": profile,
+        "cold_start_active": (len(mastered) == 0 and not active and not suggested)
     }
 
 
-@app.post("/api/topics/generate")
-async def generate_topic_endpoint(req: TopicGenerateRequest, username: str = Depends(get_current_user_token)):
-    """Generate a new topic suggestion using AI."""
+# ─── Topic / Concept Exploration Routes ───
+
+@app.post("/api/topics/suggest")
+async def suggest_topic(req: SuggestRequest, username: str = Depends(get_current_user_token)):
     ai_status = get_ai_status()
     if not ai_status["configured"]:
         raise HTTPException(
             status_code=400,
-            detail="AI is not configured. Please set AI_API_KEY in your .env file and restart the server."
+            detail="AI is not configured. Please set AI_API_KEY in .env and restart."
         )
 
-    # Handle any existing suggestions based on the action parameter
-    reject_all_suggested(new_status=req.current_topic_action)
-
-    # Gather context
-    recent = get_recent_topics(limit=10)
-    all_titles = get_all_topic_titles()
-    prefs = get_preferences()
-
-    # Build prompts
-    system_prompt, user_prompt = build_topic_generation_prompt(
-        mode=req.mode,
-        recent_topics=recent,
-        all_titles=all_titles,
-        preferences=prefs,
-        user_request=req.user_request,
-    )
-
     try:
-        result = await generate_topic(system_prompt, user_prompt)
+        concept = await generate_concept_suggestion(
+            vector=req.vector,
+            user_input=req.user_input,
+            spark_id=req.spark_id,
+            current_action=req.current_action
+        )
+        prompt = get_learning_prompt(concept["id"])
+        return {
+            "concept": concept,
+            "prompt": prompt,
+            "state": "CONCEPT_SUGGESTED"
+        }
     except AIError as e:
         raise HTTPException(status_code=502, detail=str(e))
 
-    # Save the suggestion
-    topic = create_topic(
-        title=result["topic"],
-        description=result.get("short_reason"),
-        short_reason=result.get("short_reason"),
-        connection=result.get("connection"),
-        difficulty=result.get("difficulty"),
-        source_mode=req.mode if req.mode != "user_interest" else "user_requested",
+
+@app.post("/api/topics/{concept_id}/accept")
+async def accept_concept(concept_id: int, username: str = Depends(get_current_user_token)):
+    concept = get_concept(concept_id)
+    if not concept:
+        raise HTTPException(status_code=404, detail="Concept not found")
+
+    update_concept_status(concept_id, "active")
+    updated = get_concept(concept_id)
+    prompt = get_learning_prompt(concept_id)
+    return {
+        "concept": updated,
+        "prompt": prompt,
+        "state": "CONCEPT_ACTIVE"
+    }
+
+
+@app.post("/api/topics/{concept_id}/skip")
+async def skip_concept(concept_id: int, username: str = Depends(get_current_user_token)):
+    concept = get_concept(concept_id)
+    if not concept:
+        raise HTTPException(status_code=404, detail="Concept not found")
+    update_concept_status(concept_id, "skipped")
+    return {"state": "NO_CONCEPT"}
+
+
+@app.post("/api/topics/{concept_id}/complete")
+async def complete_session(
+    concept_id: int,
+    req: CompleteSessionRequest,
+    username: str = Depends(get_current_user_token)
+):
+    try:
+        res = await complete_session_with_coexplored(
+            concept_id=concept_id,
+            co_explored_text=req.co_explored_text,
+            notes=req.notes
+        )
+        return {
+            "result": res,
+            "state": "SAVED"
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        logger.exception("Error completing session")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ─── Sparks (Dygresje) Routes ───
+
+@app.get("/api/sparks")
+async def list_sparks(status: str = "inbox", username: str = Depends(get_current_user_token)):
+    sparks = get_sparks(status=status)
+    return {"sparks": sparks}
+
+
+@app.post("/api/sparks")
+async def add_spark(req: SparkCreateRequest, username: str = Depends(get_current_user_token)):
+    text = req.text.strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="Spark text cannot be empty")
+    emb = await generate_embedding(text)
+    spark = create_spark(
+        raw_text=text,
+        parent_concept_id=req.parent_concept_id,
+        embedding=emb
     )
-
-    logger.info(f"Generated topic: {result['topic']} (mode: {req.mode})")
-
-    return {"topic": topic, "state": "TOPIC_SUGGESTED"}
+    return {"spark": spark}
 
 
-@app.post("/api/topics/{topic_id}/accept")
-async def accept_topic(topic_id: int, username: str = Depends(get_current_user_token)):
-    """Accept a suggested topic and start a learning session."""
-    topic = get_topic(topic_id)
-    if not topic:
-        raise HTTPException(status_code=404, detail="Topic not found.")
-    if topic["status"] != "suggested":
-        raise HTTPException(status_code=400, detail="Topic is not in suggested state.")
-
-    update_topic_status(topic_id, "active")
-    create_session(topic_id)
-
-    topic = get_topic(topic_id)
-    session = get_session_for_topic(topic_id)
-
-    logger.info(f"Accepted topic: {topic['title']}")
-
-    return {"topic": topic, "session": session, "state": "TOPIC_ACTIVE"}
+@app.post("/api/sparks/{spark_id}/dismiss")
+async def dismiss_spark(spark_id: int, username: str = Depends(get_current_user_token)):
+    update_spark_status(spark_id, "dismissed")
+    return {"status": "ok"}
 
 
-@app.post("/api/topics/{topic_id}/reject")
-async def reject_topic(topic_id: int, username: str = Depends(get_current_user_token)):
-    """Reject a suggested topic."""
-    topic = get_topic(topic_id)
-    if not topic:
-        raise HTTPException(status_code=404, detail="Topic not found.")
+# ─── Knowledge Constellation & History ───
 
-    update_topic_status(topic_id, "rejected")
-
-    logger.info(f"Rejected topic: {topic['title']}")
-
-    return {"state": "NO_TOPIC"}
-
-
-@app.post("/api/topics/{topic_id}/complete")
-async def complete_topic(topic_id: int, req: TopicCompleteRequest, username: str = Depends(get_current_user_token)):
-    """Complete a topic and save session notes."""
-    topic = get_topic(topic_id)
-    if not topic:
-        raise HTTPException(status_code=404, detail="Topic not found.")
-    if topic["status"] != "active":
-        raise HTTPException(status_code=400, detail="Topic is not active.")
-
-    complete_session(
-        topic_id=topic_id,
-        notes=req.notes,
-        discoveries=req.discoveries,
-        side_paths=req.side_paths,
-        difficulty_rating=req.difficulty_rating,
-        interest_rating=req.interest_rating,
-    )
-    update_topic_status(topic_id, "completed")
-
-    topic = get_topic(topic_id)
-
-    logger.info(f"Completed topic: {topic['title']}")
-
-    return {"topic": topic, "state": "SAVED"}
+@app.get("/api/graph")
+async def get_constellation_graph(username: str = Depends(get_current_user_token)):
+    return get_graph_data()
 
 
 @app.get("/api/history")
-async def get_history_endpoint(limit: int = 50, offset: int = 0, username: str = Depends(get_current_user_token)):
-    """Get learning history."""
-    limit = min(limit, 100)
-    items = get_history(limit=limit, offset=offset)
-    total = get_history_count()
-    return {"items": items, "total": total}
+async def get_history_archive(limit: int = 50, username: str = Depends(get_current_user_token)):
+    mastered = get_mastered_concepts(limit=limit)
+    return {"items": mastered, "total": len(mastered)}
 
 
-@app.get("/api/topics/{topic_id}")
-async def get_topic_endpoint(topic_id: int, username: str = Depends(get_current_user_token)):
-    """Get a single topic with its session data."""
-    topic = get_topic(topic_id)
-    if not topic:
-        raise HTTPException(status_code=404, detail="Topic not found.")
-    session = get_session_for_topic(topic_id)
-    return {"topic": topic, "session": session}
+# ─── Cognitive Profile ───
+
+@app.get("/api/profile")
+async def get_user_profile(username: str = Depends(get_current_user_token)):
+    return get_profile()
 
 
-@app.get("/api/preferences")
-async def get_preferences_endpoint(username: str = Depends(get_current_user_token)):
-    """Get user preferences."""
-    return get_preferences()
-
-
-@app.post("/api/preferences")
-async def update_preferences_endpoint(req: PreferencesRequest, username: str = Depends(get_current_user_token)):
-    """Update user preferences."""
-    result = update_preferences(
-        preferred_subjects=req.preferred_subjects,
-        disliked_subjects=req.disliked_subjects,
+@app.post("/api/profile")
+async def update_user_profile(req: ProfileUpdateRequest, username: str = Depends(get_current_user_token)):
+    res = update_profile(
         learning_style=req.learning_style,
-        current_interests=req.current_interests,
-        language=req.language,
+        grounding_level=req.grounding_level,
+        active_domains=req.active_domains,
+        custom_instructions=req.custom_instructions,
+        language=req.language
     )
-    logger.info("Preferences updated.")
-    return result
+    return res
 
 
-@app.post("/api/learning-prompt")
-async def generate_learning_prompt(req: LearningPromptRequest, username: str = Depends(get_current_user_token)):
-    """Generate a learning prompt for external LLM use."""
-    prefs = get_preferences()
-    prompt = build_learning_prompt(req.topic_title, prefs)
-    return {"prompt": prompt}
+# ─── Cold Start Spark Cards ───
+
+@app.get("/api/cold-start-cards")
+async def get_starter_cards(username: str = Depends(get_current_user_token)):
+    profile = get_profile()
+    lang = profile.get("language", "en")
+    prompts = load_prompts(lang)
+    cards = prompts.get("cold_start_cards", [])
+    return {"cards": cards}
 
 
 @app.get("/api/languages")
 async def get_languages():
-    """List available languages by scanning i18n subdirectories."""
     i18n_dir = FRONTEND_DIR / "i18n"
     languages = []
     if i18n_dir.exists():
@@ -304,31 +300,28 @@ async def get_languages():
                     "name": meta.get("name", lang_dir.name),
                     "native_name": meta.get("native_name", lang_dir.name),
                 })
-            except (json.JSONDecodeError, Exception) as e:
-                logger.warning(f"Skipping invalid i18n dir {lang_dir.name}: {e}")
+            except Exception as e:
+                logger.warning(f"Skipping i18n {lang_dir.name}: {e}")
     return {"languages": languages}
 
 
-# --- Error Handlers ---
+# ─── Error Handlers ───
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"error": exc.detail},
-    )
+    return JSONResponse(status_code=exc.status_code, content={"error": exc.detail})
+
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
-    logger.exception("Unhandled error")
+    logger.exception("Unhandled server error")
     return JSONResponse(
         status_code=500,
-        content={"error": "Something went wrong. Check the server logs for details."},
+        content={"error": "Something went wrong. Check server logs."}
     )
 
 
-# --- Static Files (serve frontend) ---
-# Mount AFTER API routes so API takes priority
+# ─── Static Frontend Serving ───
 
 FRONTEND_DIR = Path(__file__).parent.parent / "frontend"
 
@@ -336,11 +329,8 @@ FRONTEND_DIR = Path(__file__).parent.parent / "frontend"
 async def serve_index():
     return FileResponse(FRONTEND_DIR / "index.html")
 
-# Serve static assets
 app.mount("/", StaticFiles(directory=str(FRONTEND_DIR)), name="frontend")
 
-
-# --- Entry Point ---
 
 if __name__ == "__main__":
     import uvicorn

@@ -1,17 +1,21 @@
 """
-AI integration layer.
-Supports OpenAI, Anthropic, and Google Gemini APIs via httpx.
+CuriosityEngine — AI Layer.
+Supports OpenAI, Anthropic, and Google Gemini APIs with structured JSON output and embeddings.
+Includes graceful fallback for vector generation.
 """
 
 import os
 import json
+import math
+import hashlib
 import logging
 import httpx
+from typing import List, Dict, Any, Optional
 
 logger = logging.getLogger("curiosity.ai")
 
-PROVIDER = os.getenv("AI_PROVIDER", "openai")
-MODEL = os.getenv("AI_MODEL", "gpt-4o-mini")
+PROVIDER = os.getenv("AI_PROVIDER", "gemini")
+MODEL = os.getenv("AI_MODEL", "gemini-2.0-flash")
 API_KEY = os.getenv("AI_API_KEY", "")
 
 TIMEOUT = 60.0
@@ -22,10 +26,87 @@ class AIError(Exception):
     pass
 
 
-async def generate_topic(system_prompt: str, user_prompt: str) -> dict:
+# ─── Cosine Similarity & Vector Math ───
+
+def cosine_similarity(vec_a: List[float], vec_b: List[float]) -> float:
+    """Calculate cosine similarity between two float vectors."""
+    if not vec_a or not vec_b or len(vec_a) != len(vec_b):
+        return 0.0
+    dot = sum(a * b for a, b in zip(vec_a, vec_b))
+    norm_a = math.sqrt(sum(a * a for a in vec_a))
+    norm_b = math.sqrt(sum(b * b for b in vec_b))
+    if norm_a == 0 or norm_b == 0:
+        return 0.0
+    return dot / (norm_a * norm_b)
+
+
+def fallback_semantic_vector(text: str, dim: int = 64) -> List[float]:
     """
-    Call the configured AI provider and return parsed JSON response.
-    Raises AIError on any failure.
+    Deterministic pseudo-semantic embedding fallback when external embedding API is unavailable.
+    Uses rolling hash buckets over normalized n-grams.
+    """
+    words = text.lower().replace(",", " ").replace(".", " ").split()
+    vec = [0.0] * dim
+    for i, w in enumerate(words):
+        h = int(hashlib.sha256(w.encode("utf-8")).hexdigest(), 16)
+        idx = h % dim
+        vec[idx] += 1.0 / (1.0 + i * 0.1)
+    norm = math.sqrt(sum(x * x for x in vec))
+    if norm > 0:
+        vec = [x / norm for x in vec]
+    return vec
+
+
+# ─── Embedding Generation ───
+
+async def generate_embedding(text: str) -> List[float]:
+    """Generate an embedding vector using the configured provider, or fallback if unavailable."""
+    if not API_KEY or not text.strip():
+        return fallback_semantic_vector(text)
+
+    provider = PROVIDER.lower().strip()
+    try:
+        if provider == "openai":
+            base_url = os.getenv("AI_BASE_URL", "https://api.openai.com/v1")
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                resp = await client.post(
+                    f"{base_url}/embeddings",
+                    headers={
+                        "Authorization": f"Bearer {API_KEY}",
+                        "Content-Type": "application/json"
+                    },
+                    json={
+                        "model": os.getenv("AI_EMBEDDING_MODEL", "text-embedding-3-small"),
+                        "input": text[:1000]
+                    }
+                )
+                if resp.status_code == 200:
+                    return resp.json()["data"][0]["embedding"]
+        elif provider in ("gemini", "google"):
+            base_url = os.getenv("AI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta")
+            model = os.getenv("AI_EMBEDDING_MODEL", "text-embedding-004")
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                resp = await client.post(
+                    f"{base_url}/models/{model}:embedContent",
+                    params={"key": API_KEY},
+                    headers={"Content-Type": "application/json"},
+                    json={
+                        "content": {"parts": [{"text": text[:1000]}]}
+                    }
+                )
+                if resp.status_code == 200:
+                    return resp.json()["embedding"]["values"]
+    except Exception as e:
+        logger.warning(f"Embedding API call failed ({e}), using fallback semantic vector.")
+
+    return fallback_semantic_vector(text)
+
+
+# ─── Chat Completion & JSON Structured Outputs ───
+
+async def generate_ai_json(system_prompt: str, user_prompt: str) -> dict:
+    """
+    Call configured AI provider and return parsed JSON object.
     """
     if not API_KEY:
         raise AIError("AI API key is not configured. Please set AI_API_KEY in your .env file.")
@@ -37,10 +118,10 @@ async def generate_topic(system_prompt: str, user_prompt: str) -> dict:
             return await _call_openai(system_prompt, user_prompt)
         elif provider == "anthropic":
             return await _call_anthropic(system_prompt, user_prompt)
-        elif provider == "gemini" or provider == "google":
+        elif provider in ("gemini", "google"):
             return await _call_gemini(system_prompt, user_prompt)
         else:
-            raise AIError(f"Unsupported AI provider: {provider}. Use 'openai', 'anthropic', or 'gemini'.")
+            raise AIError(f"Unsupported AI provider: {provider}. Use 'gemini', 'openai', or 'anthropic'.")
     except AIError:
         raise
     except httpx.TimeoutException:
@@ -53,10 +134,7 @@ async def generate_topic(system_prompt: str, user_prompt: str) -> dict:
 
 
 async def _call_openai(system_prompt: str, user_prompt: str) -> dict:
-    """Call OpenAI-compatible API."""
-    # Support custom base URLs for OpenAI-compatible providers
     base_url = os.getenv("AI_BASE_URL", "https://api.openai.com/v1")
-
     async with httpx.AsyncClient(timeout=TIMEOUT) as client:
         response = await client.post(
             f"{base_url}/chat/completions",
@@ -65,22 +143,22 @@ async def _call_openai(system_prompt: str, user_prompt: str) -> dict:
                 "Content-Type": "application/json",
             },
             json={
-                "model": MODEL,
+                "model": MODEL or "gpt-4o-mini",
                 "messages": [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
                 ],
-                "temperature": 0.8,
-                "max_tokens": 500,
+                "temperature": 0.7,
+                "response_format": {"type": "json_object"} if "gpt-4" in MODEL or "gpt-3.5" in MODEL else None,
+                "max_tokens": 800,
             },
         )
-
         if response.status_code == 401:
             raise AIError("Invalid API key. Please check your AI_API_KEY.")
         if response.status_code == 429:
-            raise AIError("Rate limited by AI provider. Please wait a moment and try again.")
+            raise AIError("Rate limited by AI provider. Please wait a moment.")
         if response.status_code != 200:
-            logger.error(f"OpenAI API error {response.status_code}: {response.text}")
+            logger.error(f"OpenAI error {response.status_code}: {response.text}")
             raise AIError(f"AI provider returned error {response.status_code}.")
 
         data = response.json()
@@ -89,7 +167,6 @@ async def _call_openai(system_prompt: str, user_prompt: str) -> dict:
 
 
 async def _call_anthropic(system_prompt: str, user_prompt: str) -> dict:
-    """Call Anthropic Claude API."""
     async with httpx.AsyncClient(timeout=TIMEOUT) as client:
         response = await client.post(
             "https://api.anthropic.com/v1/messages",
@@ -99,22 +176,21 @@ async def _call_anthropic(system_prompt: str, user_prompt: str) -> dict:
                 "anthropic-version": "2023-06-01",
             },
             json={
-                "model": MODEL,
-                "max_tokens": 500,
+                "model": MODEL or "claude-3-5-sonnet-20241022",
+                "max_tokens": 800,
                 "system": system_prompt,
                 "messages": [
                     {"role": "user", "content": user_prompt},
                 ],
-                "temperature": 0.8,
+                "temperature": 0.7,
             },
         )
-
         if response.status_code == 401:
             raise AIError("Invalid API key. Please check your AI_API_KEY.")
         if response.status_code == 429:
-            raise AIError("Rate limited by AI provider. Please wait a moment and try again.")
+            raise AIError("Rate limited by AI provider.")
         if response.status_code != 200:
-            logger.error(f"Anthropic API error {response.status_code}: {response.text}")
+            logger.error(f"Anthropic error {response.status_code}: {response.text}")
             raise AIError(f"AI provider returned error {response.status_code}.")
 
         data = response.json()
@@ -123,7 +199,6 @@ async def _call_anthropic(system_prompt: str, user_prompt: str) -> dict:
 
 
 async def _call_gemini(system_prompt: str, user_prompt: str) -> dict:
-    """Call Google Gemini API."""
     base_url = os.getenv("AI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta")
     model = MODEL or "gemini-2.0-flash"
 
@@ -140,71 +215,48 @@ async def _call_gemini(system_prompt: str, user_prompt: str) -> dict:
                     }
                 ],
                 "generationConfig": {
-                    "temperature": 0.8,
-                    "maxOutputTokens": 500,
+                    "temperature": 0.7,
+                    "maxOutputTokens": 800,
                     "responseMimeType": "application/json",
                 },
             },
         )
-
         if response.status_code == 400:
-            error_msg = response.text
-            logger.error(f"Gemini API error 400: {error_msg}")
-            if "API_KEY_INVALID" in error_msg:
+            logger.error(f"Gemini API 400: {response.text}")
+            if "API_KEY_INVALID" in response.text:
                 raise AIError("Invalid API key. Please check your AI_API_KEY.")
-            raise AIError(f"Gemini request error. Check model name '{model}'.")
+            raise AIError(f"Gemini request error. Check model '{model}'.")
         if response.status_code == 429:
-            raise AIError("Rate limited by Google. Please wait a moment and try again.")
+            raise AIError("Rate limited by Google. Please wait a moment.")
         if response.status_code != 200:
-            logger.error(f"Gemini API error {response.status_code}: {response.text}")
+            logger.error(f"Gemini API {response.status_code}: {response.text}")
             raise AIError(f"AI provider returned error {response.status_code}.")
 
         data = response.json()
         try:
             content = data["candidates"][0]["content"]["parts"][0]["text"].strip()
         except (KeyError, IndexError):
-            logger.error(f"Unexpected Gemini response structure: {json.dumps(data)[:500]}")
-            raise AIError("AI returned an unexpected response format. Please try again.")
+            logger.error(f"Gemini format error: {json.dumps(data)[:500]}")
+            raise AIError("AI returned unexpected format.")
 
         return _parse_json_response(content)
 
 
 def _parse_json_response(content: str) -> dict:
-    """Parse and validate the AI JSON response."""
-    # Try to extract JSON from the response
-    # Sometimes models wrap JSON in markdown code blocks
+    """Parse and clean JSON response."""
     if "```json" in content:
         content = content.split("```json")[1].split("```")[0].strip()
     elif "```" in content:
         content = content.split("```")[1].split("```")[0].strip()
 
     try:
-        result = json.loads(content)
+        return json.loads(content)
     except json.JSONDecodeError:
         logger.error(f"AI returned invalid JSON: {content[:500]}")
-        raise AIError("AI returned an invalid response. Please try again.")
-
-    # Validate required fields
-    if not isinstance(result, dict):
-        raise AIError("AI returned unexpected format. Please try again.")
-
-    if "topic" not in result or not result["topic"]:
-        raise AIError("AI did not suggest a topic. Please try again.")
-
-    # Ensure expected fields exist with defaults
-    result.setdefault("short_reason", "")
-    result.setdefault("connection", None)
-    result.setdefault("difficulty", "intermediate")
-
-    # Validate difficulty
-    if result["difficulty"] not in ("beginner", "intermediate", "advanced"):
-        result["difficulty"] = "intermediate"
-
-    return result
+        raise AIError("AI returned an invalid JSON response. Please try again.")
 
 
 def get_ai_status() -> dict:
-    """Return current AI configuration status (without exposing the key)."""
     return {
         "configured": bool(API_KEY),
         "provider": PROVIDER,

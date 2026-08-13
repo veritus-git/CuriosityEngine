@@ -3,301 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="CuriosityEngine — discover one interesting thing at a time.">
-    <meta name="theme-color" content="#0a0a0f">
+    <meta name="description" content="CuriosityEngine — Associative Knowledge & Curiosity Engine">
+    <meta name="theme-color" content="#07070c">
     <title>CuriosityEngine</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="app">
-        <!-- Ambient background -->
+        <!-- Ambient animated background -->
         <div class="ambient-bg" aria-hidden="true">
             <div class="ambient-orb ambient-orb--1"></div>
             <div class="ambient-orb ambient-orb--2"></div>
         </div>
 
-        <!-- Top bar -->
+        <!-- Top Navigation Bar -->
         <header class="topbar" id="topbar">
-            <div class="topbar__date" id="topbar-date"></div>
+            <div class="topbar__left">
+                <a href="#" class="brand" id="nav-brand">
+                    <span class="brand__logo">⚡</span>
+                    <span class="brand__name">CuriosityEngine</span>
+                </a>
+                <span class="topbar__date" id="topbar-date"></span>
+            </div>
+
             <nav class="topbar__nav">
-                <select id="topbar-lang-select" class="input" style="padding: 0.2rem 0.5rem; font-size: var(--fs-xs); width: auto; height: auto; border: 1px solid var(--border); background: var(--bg-elevated); color: var(--text-secondary); cursor: pointer; border-radius: 4px; margin-right: 0.5rem;">
-                </select>
-                <button class="topbar__btn" id="btn-history" aria-label="History">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                    </svg>
+                <button class="topbar__btn" id="btn-nav-sparks" aria-label="Spark Inbox" title="Spark Inbox">
+                    <span class="icon">⚡</span>
+                    <span class="topbar__label" id="nav-sparks-label" data-i18n="nav.sparks"></span>
+                </button>
+                <button class="topbar__btn" id="btn-nav-constellation" aria-label="Constellation" title="Knowledge Constellation">
+                    <span class="icon">🌌</span>
+                    <span class="topbar__label" data-i18n="nav.constellation"></span>
+                </button>
+                <button class="topbar__btn" id="btn-nav-history" aria-label="History" title="History">
+                    <span class="icon">📚</span>
                     <span class="topbar__label" data-i18n="nav.history"></span>
                 </button>
-                <button class="topbar__btn" id="btn-settings" aria-label="Settings">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="3"/>
-                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-                    </svg>
+                <button class="topbar__btn" id="btn-nav-settings" aria-label="Settings" title="Settings">
+                    <span class="icon">⚙️</span>
                     <span class="topbar__label" data-i18n="nav.settings"></span>
                 </button>
+                <select id="topbar-lang-select" class="lang-select" aria-label="Language">
+                </select>
             </nav>
         </header>
 
-        <!-- Main content area -->
+        <!-- Main Workspace -->
         <main class="main" id="main">
-            <!-- NO_TOPIC state -->
-            <section class="view view--no-topic" id="view-no-topic" aria-label="Get a topic">
-                <div class="view__content">
-                    <p class="greeting" id="greeting-text"></p>
-                    <p class="subtitle" data-i18n="no_topic.subtitle"></p>
-
-                    <div class="actions">
-                        <button class="btn btn--primary" id="btn-get-topic">
-                            <span class="btn__text" data-i18n="no_topic.suggest_btn"></span>
+            
+            <!-- 1. AUTH VIEW -->
+            <section class="view view--auth" id="view-auth" hidden aria-label="Authentication">
+                <div class="auth-card">
+                    <div class="auth-hero">
+                        <span class="auth-icon">⚡</span>
+                        <h1 class="auth-title">CuriosityEngine</h1>
+                        <p class="auth-subtitle" data-i18n="auth.subtitle"></p>
+                    </div>
+                    <form id="auth-form" class="auth-form">
+                        <div class="field">
+                            <label class="field__label" for="auth-username" data-i18n="auth.username"></label>
+                            <input type="text" class="input" id="auth-username" required autocomplete="username">
+                        </div>
+                        <div class="field">
+                            <label class="field__label" for="auth-password" data-i18n="auth.password"></label>
+                            <input type="password" class="input" id="auth-password" required autocomplete="current-password">
+                        </div>
+                        <p id="auth-error" class="form-error" style="display: none;"></p>
+                        <button type="submit" class="btn btn--primary btn--full" id="btn-login-submit">
+                            <span class="btn__text" data-i18n="auth.submit"></span>
                             <span class="btn__loader" aria-hidden="true"></span>
                         </button>
-                        <button class="btn btn--ghost" id="btn-random-topic" data-i18n="no_topic.random_btn"></button>
-                    </div>
-
-                    <div class="interest-input" id="interest-input-section">
-                        <button class="interest-toggle" id="btn-toggle-interest" data-i18n="no_topic.interest_toggle"></button>
-                        <div class="interest-form" id="interest-form" hidden>
-                            <input
-                                type="text"
-                                class="input"
-                                id="input-interest"
-                                data-i18n-placeholder="no_topic.interest_placeholder"
-                                aria-label="Your interest"
-                                maxlength="300"
-                            >
-                            <button class="btn btn--secondary" id="btn-submit-interest" data-i18n="no_topic.interest_submit"></button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- AUTH state -->
-            <section class="view view--auth" id="view-auth" aria-label="Authentication">
-                <div class="view__content" style="padding: 0; overflow: hidden; max-width: 800px; width: 100%;">
-                    <div class="landing-layout" style="display: grid; grid-template-columns: 1fr; width: 100%;">
-                        <div class="landing-hero" style="padding: var(--space-2xl); display: flex; flex-direction: column; justify-content: center; align-items: flex-start; text-align: left; background: var(--accent-glow); border-radius: var(--radius-xl) var(--radius-xl) 0 0;">
-                            <h2 class="history-title" style="font-size: var(--fs-3xl); margin-bottom: 0.5rem; color: var(--text-primary); text-shadow: 0 0 20px var(--accent-glow);">CuriosityEngine</h2>
-                            <p class="subtitle" data-i18n="auth.subtitle" style="font-size: var(--fs-lg); margin-top: 0; max-width: 400px; line-height: 1.4; color: var(--text-secondary);"></p>
-                        </div>
-                        <div class="landing-form-container" style="padding: var(--space-2xl); background: var(--bg-surface); border-radius: 0 0 var(--radius-xl) var(--radius-xl);">
-                            <form id="auth-form" class="reflection-form" style="width: 100%; display: flex; flex-direction: column; gap: 1.5rem;">
-                                <div class="field">
-                                    <label class="field__label" for="auth-username" data-i18n="auth.username"></label>
-                                    <input type="text" class="input" id="auth-username" required>
-                                </div>
-                                <div class="field">
-                                    <label class="field__label" for="auth-password" data-i18n="auth.password"></label>
-                                    <input type="password" class="input" id="auth-password" required>
-                                </div>
-                                <p id="auth-error" style="color: var(--error); font-size: var(--fs-sm); display: none;"></p>
-                                <div class="actions" style="margin-top: 0.5rem; max-width: 100%;">
-                                    <button type="submit" class="btn btn--primary" id="btn-login" style="width: 100%;">
-                                        <span class="btn__text" data-i18n="auth.submit"></span>
-                                        <span class="btn__loader" aria-hidden="true"></span>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ONBOARDING state -->
-            <section class="view view--onboarding" id="view-onboarding" hidden aria-label="Welcome">
-                <div class="progress-bar-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 4px; background: var(--border); z-index: 9999;">
-                    <div class="progress-bar" id="onboarding-progress" style="height: 100%; width: 25%; background: var(--accent); box-shadow: 0 0 10px var(--accent); transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);"></div>
-                </div>
-                
-                <div class="view__content" id="onboarding-slides" style="width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh;">
-                    <h2 class="history-title" data-i18n="onboarding.title" style="margin-bottom: 0.5rem; text-align: center;"></h2>
-                    <p class="subtitle" data-i18n="onboarding.subtitle" style="margin-bottom: 3rem; text-align: center;"></p>
-
-                    <div class="reflection-form" style="width: 100%; max-width: 500px;">
-                        
-                        <div class="onboarding-slide active" id="onb-slide-1">
-                            <label class="field__label" data-i18n="onboarding.q1_label" style="font-size: var(--fs-md); margin-bottom: 1rem; display: block; text-align: center; color: var(--text-primary);"></label>
-                            <textarea class="input" id="input-onboarding-interests" data-i18n-placeholder="onboarding.q1_placeholder" style="padding: 1rem; font-size: var(--fs-base); resize: none; min-height: 80px;" rows="2"></textarea>
-                            <div class="actions" style="margin-top: 2rem;">
-                                <button type="button" class="btn btn--primary btn-onb-next" data-i18n="onboarding.next_btn"></button>
-                            </div>
-                        </div>
-
-                        <div class="onboarding-slide" id="onb-slide-2" style="display: none;">
-                            <label class="field__label" data-i18n="onboarding.q2_label" style="font-size: var(--fs-md); margin-bottom: 1rem; display: block; text-align: center; color: var(--text-primary);"></label>
-                            <textarea class="input" id="input-onboarding-current" data-i18n-placeholder="onboarding.q2_placeholder" style="padding: 1rem; font-size: var(--fs-base); resize: none; min-height: 80px;" rows="2"></textarea>
-                            <div class="actions" style="margin-top: 2rem;">
-                                <button type="button" class="btn btn--primary btn-onb-next" data-i18n="onboarding.next_btn"></button>
-                            </div>
-                        </div>
-
-                        <div class="onboarding-slide" id="onb-slide-3" style="display: none;">
-                            <label class="field__label" data-i18n="onboarding.q3_label" style="font-size: var(--fs-md); margin-bottom: 1rem; display: block; text-align: center; color: var(--text-primary);"></label>
-                            <textarea class="input" id="input-onboarding-goal-custom" data-i18n-placeholder="onboarding.q3_placeholder" style="padding: 1rem; font-size: var(--fs-base); resize: none; min-height: 80px;" rows="2"></textarea>
-                            <div class="actions" style="margin-top: 2rem;">
-                                <button type="button" class="btn btn--primary btn-onb-next" data-i18n="onboarding.next_btn"></button>
-                            </div>
-                        </div>
-
-                        <div class="onboarding-slide" id="onb-slide-4" style="display: none;">
-                            <label class="field__label" data-i18n="onboarding.q4_label" style="font-size: var(--fs-md); margin-bottom: 1rem; display: block; text-align: center; color: var(--text-primary);"></label>
-                            <div style="display: flex; gap: 0.5rem; flex-direction: column;">
-                                <select class="input" id="input-onboarding-level" style="padding: 1rem; font-size: var(--fs-base);">
-                                    <option value="szkola_podstawowa" data-i18n="onboarding.level_primary"></option>
-                                    <option value="szkola_srednia" data-i18n="onboarding.level_secondary"></option>
-                                    <option value="studia" data-i18n="onboarding.level_university"></option>
-                                    <option value="samouk" data-i18n="onboarding.level_selftaught"></option>
-                                    <option value="custom" data-i18n="onboarding.level_custom"></option>
-                                </select>
-                                <textarea class="input" id="input-onboarding-level-details" data-i18n-placeholder="onboarding.level_custom_placeholder" style="display: none; padding: 1rem; font-size: var(--fs-base); resize: none; min-height: 80px;" rows="2"></textarea>
-                            </div>
-                            <div class="actions" style="margin-top: 2rem;">
-                                <button type="button" class="btn btn--primary" id="btn-onboarding-save">
-                                    <span class="btn__text" data-i18n="onboarding.save_btn"></span>
-                                    <span class="btn__loader" aria-hidden="true"></span>
-                                </button>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </section>
-
-            <!-- TOPIC_SUGGESTED state -->
-            <section class="view view--suggested" id="view-suggested" hidden aria-label="Topic suggestion">
-                <div class="view__content">
-                    <p class="label label--subtle" data-i18n="suggested.label"></p>
-                    <h1 class="topic-title" id="suggested-title"></h1>
-                    <p class="topic-reason" id="suggested-reason"></p>
-                    <p class="topic-connection" id="suggested-connection"></p>
-
-                    <div class="actions actions--row">
-                        <button class="btn btn--secondary" id="btn-skip">
-                            <span class="btn__text" data-i18n="suggested.skip_btn"></span>
-                            <span class="btn__loader" aria-hidden="true"></span>
-                        </button>
-                        <button class="btn btn--primary" id="btn-accept">
-                            <span class="btn__text" data-i18n="suggested.accept_btn"></span>
-                            <span class="icon" style="margin-left: 0.25rem;">➔</span>
-                            <span class="btn__loader" aria-hidden="true"></span>
-                        </button>
-                        <button class="btn btn--ghost" id="btn-reject" style="width: 100%; margin-top: 1rem; flex: 1 1 100%;">
-                            <span class="btn__text" data-i18n="suggested.reject_btn"></span>
-                            <span class="btn__loader" aria-hidden="true"></span>
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TOPIC_ACTIVE state -->
-            <section class="view view--active" id="view-active" hidden aria-label="Active exploration">
-                <div class="view__content">
-                    <p class="label label--subtle" data-i18n="active.label"></p>
-                    <h1 class="topic-title" id="active-title"></h1>
-                    <p class="topic-reason" id="active-reason"></p>
-                    <p class="topic-meta" id="active-meta"></p>
-
-                    <div class="prompt-container" style="position: relative; background: var(--bg-elevated); padding: var(--space-lg); border-radius: var(--radius-md); border: 1px solid var(--border); width: 100%; text-align: left; margin-top: 1rem;">
-                        <button id="btn-copy-prompt" class="btn btn--ghost btn--small" style="position: absolute; top: var(--space-sm); right: var(--space-sm);" title="Copy">
-                            <span class="icon">📋</span>
-                        </button>
-                        <div id="active-prompt-text" contenteditable="plaintext-only" style="width: 100%; background: transparent; border: none; color: var(--text-secondary); font-family: var(--font-mono); font-size: var(--fs-sm); outline: none; white-space: pre-wrap; word-break: break-word;"></div>
-                    </div>
-
-                    <div class="actions actions--row" style="margin-top: 2rem;">
-                        <button class="btn btn--primary" id="btn-finish">
-                            <span class="icon">✓</span> <span class="btn__text" data-i18n="active.finish_btn"></span>
-                        </button>
-                    </div>
-
-                    <div class="prompt-copied" id="prompt-copied" hidden>
-                        <span data-i18n="active.prompt_copied"></span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- REFLECTION state -->
-            <section class="view view--reflection" id="view-reflection" hidden aria-label="Reflection">
-                <div class="view__content view__content--wide">
-                    <div class="reflection-layout" style="display: grid; grid-template-columns: 1fr; gap: 2rem; width: 100%; text-align: left; align-items: start;">
-                        <div class="reflection-header">
-                            <p class="label label--subtle" data-i18n="reflection.label"></p>
-                            <h1 style="font-size: var(--fs-xl); margin-bottom: 1rem; margin-top: 0.5rem; color: var(--text-secondary);" data-i18n="reflection.title"></h1>
-                            <h2 class="topic-title" id="reflection-topic" style="font-size: var(--fs-2xl); text-align: left; margin: 0; max-width: 100%;"></h2>
-                        </div>
-
-                        <form class="reflection-form" id="reflection-form" style="width: 100%; max-width: 100%; display: flex; flex-direction: column; gap: 2rem;">
-                            <div class="field">
-                                <label class="field__label" for="field-notes" data-i18n="reflection.notes_label"></label>
-                                <textarea class="textarea" id="field-notes" rows="3" data-i18n-placeholder="reflection.notes_placeholder"></textarea>
-                            </div>
-
-                            <div class="field">
-                                <label class="field__label" for="field-discoveries" data-i18n="reflection.discoveries_label"></label>
-                                <textarea class="textarea" id="field-discoveries" rows="3" data-i18n-placeholder="reflection.discoveries_placeholder"></textarea>
-                            </div>
-
-                            <div class="field">
-                                <label class="field__label" for="field-sidepaths" data-i18n="reflection.sidepaths_label"></label>
-                                <textarea class="textarea" id="field-sidepaths" rows="3" data-i18n-placeholder="reflection.sidepaths_placeholder"></textarea>
-                            </div>
-
-                        <div class="ratings">
-                            <div class="rating-group">
-                                <span class="field__label" data-i18n="reflection.interest_label"></span>
-                                <div class="rating" id="rating-interest" role="radiogroup" aria-label="Interest rating">
-                                    <button type="button" class="rating__dot" data-value="1" aria-label="1 of 5">1</button>
-                                    <button type="button" class="rating__dot" data-value="2" aria-label="2 of 5">2</button>
-                                    <button type="button" class="rating__dot" data-value="3" aria-label="3 of 5">3</button>
-                                    <button type="button" class="rating__dot" data-value="4" aria-label="4 of 5">4</button>
-                                    <button type="button" class="rating__dot" data-value="5" aria-label="5 of 5">5</button>
-                                </div>
-                            </div>
-                            <div class="rating-group">
-                                <span class="field__label" data-i18n="reflection.difficulty_label"></span>
-                                <div class="rating" id="rating-difficulty" role="radiogroup" aria-label="Difficulty rating">
-                                    <button type="button" class="rating__dot" data-value="1" aria-label="1 of 5">1</button>
-                                    <button type="button" class="rating__dot" data-value="2" aria-label="2 of 5">2</button>
-                                    <button type="button" class="rating__dot" data-value="3" aria-label="3 of 5">3</button>
-                                    <button type="button" class="rating__dot" data-value="4" aria-label="4 of 5">4</button>
-                                    <button type="button" class="rating__dot" data-value="5" aria-label="5 of 5">5</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn btn--primary" id="btn-save" data-i18n="reflection.save_btn"></button>
                     </form>
                 </div>
             </section>
 
-            <!-- SAVED state -->
-            <section class="view view--saved" id="view-saved" hidden aria-label="Saved">
+            <!-- 2. COLD START (ZERO-INTERROGATION SPARK CARDS) -->
+            <section class="view view--cold-start" id="view-cold-start" hidden aria-label="Cold Start">
                 <div class="view__content">
-                    <p class="saved-check" aria-hidden="true">✓</p>
-                    <h2 class="saved-title" data-i18n="saved.title"></h2>
-                    <p class="saved-topic" id="saved-topic-text"></p>
-                    <p class="saved-hint" data-i18n="saved.hint"></p>
+                    <span class="badge" data-i18n="cold_start.badge"></span>
+                    <h1 class="page-title" data-i18n="cold_start.title"></h1>
+                    <p class="page-subtitle" data-i18n="cold_start.subtitle"></p>
 
-                    <div class="actions">
-                        <button class="btn btn--primary" id="btn-next-topic">
-                            <span class="btn__text" data-i18n="saved.next_btn"></span>
-                            <span class="btn__loader" aria-hidden="true"></span>
-                        </button>
-                        <button class="btn btn--ghost" id="btn-go-home" data-i18n="saved.home_btn"></button>
+                    <div class="spark-grid" id="cold-start-cards-container">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+
+                    <div class="custom-spark-box">
+                        <p class="label label--subtle" data-i18n="cold_start.or_custom"></p>
+                        <div class="input-group">
+                            <input type="text" class="input" id="input-cold-start-custom" data-i18n-placeholder="cold_start.custom_placeholder">
+                            <button class="btn btn--secondary" id="btn-cold-start-custom-submit" data-i18n="cold_start.custom_submit"></button>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- HISTORY view -->
-            <section class="view view--history" id="view-history" hidden aria-label="Learning history">
+            <!-- 3. COMPASS & FOCUS HUB (MAIN ZEN DASHBOARD) -->
+            <section class="view view--dashboard" id="view-dashboard" hidden aria-label="Curiosity Dashboard">
+                <div class="view__content">
+                    
+                    <!-- Greeting & Vector Compass -->
+                    <div class="compass-section" id="compass-section">
+                        <div class="greeting-bar">
+                            <h2 class="greeting-title" id="greeting-title"></h2>
+                            <p class="greeting-subtitle" data-i18n="compass.subtitle"></p>
+                        </div>
+
+                        <div class="compass-grid">
+                            <button class="compass-card compass-card--adjacent" data-vector="adjacent">
+                                <span class="compass-card__icon">🌿</span>
+                                <span class="compass-card__title" data-i18n="compass.adjacent"></span>
+                                <span class="compass-card__desc" data-i18n="compass.adjacent_desc"></span>
+                            </button>
+                            <button class="compass-card compass-card--deep" data-vector="deep_dive">
+                                <span class="compass-card__icon">🔬</span>
+                                <span class="compass-card__title" data-i18n="compass.deep_dive"></span>
+                                <span class="compass-card__desc" data-i18n="compass.deep_dive_desc"></span>
+                            </button>
+                            <button class="compass-card compass-card--spark" data-vector="spark">
+                                <span class="compass-card__icon">⚡</span>
+                                <span class="compass-card__title" data-i18n="compass.spark"></span>
+                                <span class="compass-card__desc" data-i18n="compass.spark_desc"></span>
+                            </button>
+                            <button class="compass-card compass-card--cross" data-vector="cross_domain">
+                                <span class="compass-card__icon">🌌</span>
+                                <span class="compass-card__title" data-i18n="compass.cross_domain"></span>
+                                <span class="compass-card__desc" data-i18n="compass.cross_domain_desc"></span>
+                            </button>
+                            <button class="compass-card compass-card--fog" data-vector="mental_fog">
+                                <span class="compass-card__icon">🌫️</span>
+                                <span class="compass-card__title" data-i18n="compass.mental_fog"></span>
+                                <span class="compass-card__desc" data-i18n="compass.mental_fog_desc"></span>
+                            </button>
+                        </div>
+
+                        <!-- Custom User Spark Input -->
+                        <div class="custom-spark-toggle">
+                            <div class="input-group">
+                                <input type="text" class="input" id="input-custom-vector" data-i18n-placeholder="compass.input_placeholder">
+                                <button class="btn btn--secondary" id="btn-custom-vector-submit" data-i18n="compass.input_submit"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Focus Card (Suggested or Active Concept) -->
+                    <div class="focus-card-wrapper" id="focus-card-wrapper" hidden>
+                        <article class="focus-card">
+                            <div class="focus-card__header">
+                                <span class="badge" id="focus-card-badge"></span>
+                                <span class="domain-tag" id="focus-card-domain"></span>
+                            </div>
+
+                            <h1 class="focus-card__title" id="focus-card-title"></h1>
+
+                            <div class="focus-card__reason-box" id="focus-card-reason-box">
+                                <span class="focus-card__label" data-i18n="focus_card.why_label"></span>
+                                <p class="focus-card__reason" id="focus-card-reason"></p>
+                            </div>
+
+                            <div class="focus-card__model-box" id="focus-card-model-box">
+                                <span class="focus-card__label" data-i18n="focus_card.model_label"></span>
+                                <p class="focus-card__model" id="focus-card-model"></p>
+                            </div>
+
+                            <!-- External Learning Prompt Box -->
+                            <div class="prompt-box" id="prompt-box">
+                                <div class="prompt-box__header">
+                                    <span class="prompt-box__label">Prompt do zewnętrznego LLM</span>
+                                    <button class="btn btn--ghost btn--small btn-copy" id="btn-copy-prompt">
+                                        <span class="icon">📋</span>
+                                        <span class="copy-text" data-i18n="focus_card.copy_prompt_btn"></span>
+                                    </button>
+                                </div>
+                                <pre class="prompt-box__text" id="prompt-box-text"></pre>
+                            </div>
+
+                            <!-- Actions Row -->
+                            <div class="focus-card__actions" id="focus-actions-suggested">
+                                <button class="btn btn--ghost" id="btn-concept-skip" data-i18n="focus_card.skip_btn"></button>
+                                <button class="btn btn--primary" id="btn-concept-accept">
+                                    <span class="btn__text" data-i18n="focus_card.accept_btn"></span>
+                                    <span class="icon">➔</span>
+                                </button>
+                            </div>
+
+                            <div class="focus-card__actions" id="focus-actions-active" hidden>
+                                <button class="btn btn--success btn--lg" id="btn-concept-finish">
+                                    <span class="icon">✓</span>
+                                    <span class="btn__text" data-i18n="focus_card.finish_btn"></span>
+                                </button>
+                            </div>
+                        </article>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- 4. KNOWLEDGE CONSTELLATION VIEW -->
+            <section class="view view--constellation" id="view-constellation" hidden aria-label="Knowledge Constellation">
+                <div class="constellation-header">
+                    <div>
+                        <h1 class="page-title" data-i18n="constellation.title"></h1>
+                        <p class="page-subtitle" id="constellation-subtitle" data-i18n="constellation.subtitle"></p>
+                    </div>
+                    <button class="btn btn--ghost btn--small" id="btn-constellation-back" data-i18n="constellation.back_btn"></button>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="constellation-canvas"></canvas>
+                    <div class="constellation-empty" id="constellation-empty" hidden>
+                        <p data-i18n="constellation.empty"></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. HISTORY ARCHIVE VIEW -->
+            <section class="view view--history" id="view-history" hidden aria-label="History Archive">
                 <div class="view__content view__content--wide">
                     <div class="history-header">
-                        <h2 class="history-title" data-i18n="history.title"></h2>
+                        <h1 class="page-title" data-i18n="history.title"></h1>
                         <button class="btn btn--ghost btn--small" id="btn-history-back" data-i18n="history.back_btn"></button>
                     </div>
                     <div class="history-list" id="history-list"></div>
@@ -305,79 +233,31 @@
                 </div>
             </section>
 
-            <!-- HISTORY DETAIL view -->
-            <section class="view view--detail" id="view-detail" hidden aria-label="Topic detail">
-                <div class="view__content view__content--wide">
-                    <button class="btn btn--ghost btn--small" id="btn-detail-back" data-i18n="detail.back_btn"></button>
-                    <div id="detail-content"></div>
-                </div>
-            </section>
-
-            <!-- SETTINGS view -->
+            <!-- 6. SETTINGS VIEW -->
             <section class="view view--settings" id="view-settings" hidden aria-label="Settings">
                 <div class="view__content view__content--wide">
                     <div class="history-header">
-                        <h2 class="history-title" data-i18n="settings.title"></h2>
+                        <h1 class="page-title" data-i18n="settings.title"></h1>
                         <button class="btn btn--ghost btn--small" id="btn-settings-back" data-i18n="settings.back_btn"></button>
                     </div>
 
                     <div class="settings-section">
-                        <h3 class="settings-heading" data-i18n="settings.ai_heading"></h3>
-                        <div class="settings-info" id="settings-ai-info"></div>
-                        <p class="settings-hint" data-i18n-html="settings.ai_hint"></p>
-                    </div>
-
-                    <div class="settings-section">
-                        <h3 class="settings-heading" data-i18n="settings.theme_heading">Wygląd</h3>
-                        <p class="settings-hint">Wybierz tryb i kolor przewodni.</p>
-                        
-                        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-                            <button type="button" class="btn btn--secondary" id="btn-theme-light" style="flex: 1;">Jasny</button>
-                            <button type="button" class="btn btn--secondary" id="btn-theme-dark" style="flex: 1;">Ciemny</button>
-                        </div>
-                        
-                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;" id="color-picker">
-                            <button type="button" class="color-swatch" data-hue="220" style="width: 32px; height: 32px; border-radius: 50%; border: none; background: hsl(220, 70%, 50%); cursor: pointer;"></button>
-                            <button type="button" class="color-swatch" data-hue="280" style="width: 32px; height: 32px; border-radius: 50%; border: none; background: hsl(280, 70%, 50%); cursor: pointer;"></button>
-                            <button type="button" class="color-swatch" data-hue="340" style="width: 32px; height: 32px; border-radius: 50%; border: none; background: hsl(340, 70%, 50%); cursor: pointer;"></button>
-                            <button type="button" class="color-swatch" data-hue="160" style="width: 32px; height: 32px; border-radius: 50%; border: none; background: hsl(160, 70%, 50%); cursor: pointer;"></button>
-                            <button type="button" class="color-swatch" data-hue="30" style="width: 32px; height: 32px; border-radius: 50%; border: none; background: hsl(30, 70%, 50%); cursor: pointer;"></button>
+                        <h3 class="settings-heading" data-i18n="settings.theme_heading"></h3>
+                        <div class="theme-switch-group">
+                            <button type="button" class="btn btn--secondary" id="btn-theme-dark" data-i18n="settings.theme_dark"></button>
+                            <button type="button" class="btn btn--secondary" id="btn-theme-light" data-i18n="settings.theme_light"></button>
                         </div>
                     </div>
 
                     <div class="settings-section">
                         <h3 class="settings-heading" data-i18n="settings.language_heading"></h3>
                         <p class="settings-hint" data-i18n="settings.language_hint"></p>
-                        <select class="input" id="select-language" aria-label="Language"></select>
+                        <select class="input" id="select-settings-language"></select>
                     </div>
 
                     <div class="settings-section">
-                        <h3 class="settings-heading" data-i18n="settings.preferred_heading"></h3>
-                        <p class="settings-hint" data-i18n="settings.preferred_hint"></p>
-                        <div class="tag-input" id="preferred-tags"></div>
-                        <div class="tag-add">
-                            <input type="text" class="input input--small" id="input-preferred" data-i18n-placeholder="settings.preferred_placeholder" maxlength="100">
-                            <button class="btn btn--secondary btn--small" id="btn-add-preferred" data-i18n="settings.add_btn"></button>
-                        </div>
-                    </div>
-
-                    <div class="settings-section">
-                        <h3 class="settings-heading" data-i18n="settings.disliked_heading"></h3>
-                        <p class="settings-hint" data-i18n="settings.disliked_hint"></p>
-                        <div class="tag-input" id="disliked-tags"></div>
-                        <div class="tag-add">
-                            <input type="text" class="input input--small" id="input-disliked" data-i18n-placeholder="settings.disliked_placeholder" maxlength="100">
-                            <button class="btn btn--secondary btn--small" id="btn-add-disliked" data-i18n="settings.add_btn"></button>
-                        </div>
-                    </div>
-
-                    <div class="settings-section">
-                        <h3 class="settings-heading" data-i18n="settings.style_heading"></h3>
-                        <select class="input" id="select-style" aria-label="Learning style">
-                            <option value="top-down" data-i18n="settings.style_topdown"></option>
-                            <option value="bottom-up" data-i18n="settings.style_bottomup"></option>
-                            <option value="mixed" data-i18n="settings.style_mixed"></option>
-                        </select>
+                        <h3 class="settings-heading" data-i18n="settings.ai_heading"></h3>
+                        <div class="settings-info" id="settings-ai-info"></div>
                     </div>
 
                     <div class="settings-section">
@@ -386,12 +266,63 @@
                     </div>
                 </div>
             </section>
+
         </main>
 
-        <!-- Error toast -->
+        <!-- Quick Spark Modal / Drawer -->
+        <div class="modal-backdrop" id="spark-modal-backdrop" hidden>
+            <div class="modal-drawer">
+                <div class="modal-header">
+                    <h2 class="modal-title" data-i18n="spark_box.title"></h2>
+                    <button class="modal-close" id="btn-close-spark-modal">&times;</button>
+                </div>
+                <p class="modal-subtitle" data-i18n="spark_box.subtitle"></p>
+                <div class="input-group">
+                    <input type="text" class="input" id="input-spark-text" data-i18n-placeholder="spark_box.input_placeholder">
+                    <button class="btn btn--primary" id="btn-submit-spark" data-i18n="spark_box.add_btn"></button>
+                </div>
+                <div class="sparks-list" id="sparks-inbox-list"></div>
+            </div>
+        </div>
+
+        <!-- Multi-Concept Complete Session Modal -->
+        <div class="modal-backdrop" id="complete-modal-backdrop" hidden>
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h2 class="modal-title" data-i18n="complete_modal.title"></h2>
+                    <button class="modal-close" id="btn-close-complete-modal">&times;</button>
+                </div>
+                <p class="modal-subtitle" id="complete-modal-subtitle"></p>
+                <form id="complete-session-form" class="modal-form">
+                    <div class="field">
+                        <label class="field__label" for="input-coexplored" data-i18n="complete_modal.co_explored_label"></label>
+                        <textarea class="textarea" id="input-coexplored" rows="3" data-i18n-placeholder="complete_modal.co_explored_placeholder"></textarea>
+                        <span class="field__hint" data-i18n="complete_modal.co_explored_hint"></span>
+                    </div>
+                    <div class="field">
+                        <label class="field__label" for="input-notes" data-i18n="complete_modal.notes_label"></label>
+                        <input type="text" class="input" id="input-notes" data-i18n-placeholder="complete_modal.notes_placeholder">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn--ghost" id="btn-cancel-complete" data-i18n="complete_modal.cancel_btn"></button>
+                        <button type="submit" class="btn btn--primary" id="btn-confirm-complete">
+                            <span class="btn__text" data-i18n="complete_modal.save_btn"></span>
+                            <span class="btn__loader" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Floating Quick Spark Trigger Button (Mobile & Desktop) -->
+        <button class="floating-spark-btn" id="btn-floating-spark" aria-label="Złap Dygresję" title="Złap dygresję (Spacja)">
+            <span class="icon">⚡</span>
+        </button>
+
+        <!-- Notification Toast -->
         <div class="toast" id="toast" hidden role="alert">
+            <span class="toast__icon">✓</span>
             <p class="toast__text" id="toast-text"></p>
-            <button class="toast__close" id="toast-close" aria-label="Close">&times;</button>
         </div>
     </div>
 

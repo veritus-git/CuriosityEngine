@@ -5,134 +5,116 @@
         "native_name": "Polski"
     },
     "nav": {
+        "compass": "Kompas",
+        "constellation": "Konstelacja",
+        "sparks": "Dygresje ({n})",
         "history": "Historia",
-        "settings": "Ustawienia"
+        "settings": "Ustawienia",
+        "logout": "Wyloguj"
     },
     "greeting": {
-        "late_night": "Nocne przemy\u015blenia.",
-        "morning": "Dzie\u0144 dobry.",
-        "afternoon": "Dzie\u0144 dobry.",
-        "evening": "Dobry wiecz\u00f3r.",
+        "late_night": "Nocne przemyślenia.",
+        "morning": "Dzień dobry.",
+        "afternoon": "Dzień dobry.",
+        "evening": "Dobry wieczór.",
         "night_owl": "Tryb nocnej sowy."
     },
     "auth": {
-        "subtitle": "Zaloguj się lub utwórz konto",
+        "subtitle": "CuriosityEngine — Twój osobisty silnik asocjacyjny.",
+        "description": "Zaloguj się lub utwórz konto, aby budować swój graf wiedzy.",
         "username": "Nazwa użytkownika",
         "password": "Hasło",
-        "submit": "Zaloguj / Zarejestruj"
+        "submit": "Wejdź do systemu"
     },
-    "onboarding": {
+    "cold_start": {
+        "badge": "Zimny Start",
         "title": "Witaj w CuriosityEngine",
-        "subtitle": "Skonfigurujmy Twój profil nauki.",
-        "placeholder": "np. fizyka, historia sztuki, programowanie\u2026",
-        "q1_label": "1. Co Cię interesuje ogólnie?",
-        "q1_placeholder": "np. historia sztuki, programowanie, biologia...",
-        "q2_label": "2. Od czego chcesz zacząć dzisiaj?",
-        "q2_placeholder": "np. sztuczna inteligencja",
-        "q3_label": "3. Jaki jest Twój główny cel?",
-        "q3_placeholder": "Wpisz swój cel...",
-        "q4_label": "4. Jaki jest Twój poziom edukacji / co już wiesz?",
-        "level_primary": "Szkoła podstawowa",
-        "level_secondary": "Szkoła średnia",
-        "level_university": "Studia wyższe",
-        "level_selftaught": "Samouk / Poza systemem edukacji",
-        "level_custom": "Inny poziom (wpisz poniżej)",
-        "level_custom_placeholder": "Wpisz profil, kierunek, lub szczegóły...",
-        "next_btn": "Dalej",
-        "save_btn": "Rozpocznij przygodę",
-        "skip_btn": "Pomiń na razie"
+        "subtitle": "Wybierz jedną myśl, która przyciąga Twój wzrok — bez stresu, bez pytań o poziom:",
+        "or_custom": "Albo wpisz cokolwiek, co chodzi Ci po głowie:",
+        "custom_placeholder": "np. jak komputery generują dźwięk...",
+        "custom_submit": "Zbadaj to"
     },
-    "no_topic": {
-        "subtitle": "Czego dzi\u015b b\u0119dziemy szuka\u0107?",
-        "suggest_btn": "Zasugeruj temat",
-        "random_btn": "Co\u015b zupe\u0142nie innego",
-        "interest_toggle": "Albo powiedz, co Ci\u0119 ciekawi\u2026",
-        "interest_placeholder": "np. jak komputery rozumiej\u0105 obrazy\u2026",
-        "interest_submit": "Zbadaj to"
+    "compass": {
+        "title": "Kompas Eksploracji",
+        "subtitle": "Wybierz wektor na dzisiejszą sesję:",
+        "adjacent": "Most Asocjacyjny",
+        "adjacent_desc": "Pojęcie zazębiające się z Twoją ostatnią wiedzą",
+        "deep_dive": "Nurkowanie Top-Down",
+        "deep_dive_desc": "Zasady działania pod maską",
+        "spark": "Rozwiń Dygresję",
+        "spark_desc": "Sięgnij po zapisaną myśl z przeszłości",
+        "cross_domain": "Inna Galaktyka",
+        "cross_domain_desc": "Skok w zupełnie nową dziedzinę",
+        "mental_fog": "Tryb Mental Fog",
+        "mental_fog_desc": "Proste, fascynujące pojęcie (zero presji)",
+        "custom_spark": "Własny Impuls",
+        "custom_spark_desc": "Wpisz dowolne pytanie lub hasło",
+        "input_placeholder": "Co Cię intryguje?",
+        "input_submit": "Generuj temat"
     },
-    "suggested": {
-        "label": "Dzisiejsza sugestia",
+    "focus_card": {
+        "suggested_label": "Dzisiejsza Propozycja",
+        "active_label": "Trwająca Eksploracja",
+        "why_label": "Most Logiczny",
+        "model_label": "Intuicja & Model Mentalny",
         "accept_btn": "Zbadaj ten temat",
-        "skip_btn": "Nie dzisiaj",
-        "reject_btn": "Nigdy tego nie sugeruj"
+        "skip_btn": "Inna propozycja",
+        "reject_btn": "Nie interesuje mnie to",
+        "copy_prompt_btn": "Kopiuj Prompt do ChatGPT / Claude",
+        "prompt_copied": "Prompt skopiowany do schowka ✓",
+        "finish_btn": "Oznacz jako Opanowane ✓",
+        "loading": "Generowanie propozycji..."
     },
-    "active": {
-        "label": "Dzisiejsza eksploracja",
-        "fallback_reason": "Zbadaj go, jak tylko chcesz.",
-        "started": "Rozpocz\u0119to {date}",
-        "copy_prompt_btn": "Kopiuj prompt do nauki",
-        "finish_btn": "Sko\u0144czy\u0142em",
-        "prompt_copied": "Prompt skopiowany do schowka \u2713"
+    "complete_modal": {
+        "title": "Domknięcie Sesji",
+        "subtitle": "Pojęcie {topic} zostaje zapisane w Twoim grafie wiedzy.",
+        "co_explored_label": "Czy w trakcie zgłębiłeś coś jeszcze pobocznego?",
+        "co_explored_placeholder": "np. czytając o macierzach ogarnąłem też wektory i przekształcenia afiniczne...",
+        "co_explored_hint": "AI automatycznie wyciągnie te pojęcia i połączy je w grafie mostami asocjacyjnymi.",
+        "notes_label": "Krótka notatka dla siebie (opcjonalnie):",
+        "notes_placeholder": "Główny wniosek...",
+        "save_btn": "Zapisz do Grafu Wiedzy",
+        "cancel_btn": "Anuluj"
     },
-    "reflection": {
-        "label": "Refleksja",
-        "title": "Jak posz\u0142o?",
-        "notes_label": "Czego si\u0119 nauczy\u0142e\u015b?",
-        "notes_placeholder": "G\u0142\u00f3wne wnioski\u2026",
-        "discoveries_label": "Co przyku\u0142o Twoj\u0105 uwag\u0119?",
-        "discoveries_placeholder": "Ciekawe rzeczy, kt\u00f3re zauwa\u017cy\u0142e\u015b\u2026",
-        "sidepaths_label": "Czy zboczy\u0142e\u015b na inny temat?",
-        "sidepaths_placeholder": "np. zacz\u0105\u0142em od macierzy, sko\u0144czy\u0142em czytaj\u0105c o tensorach\u2026",
-        "interest_label": "Zainteresowanie",
-        "difficulty_label": "Trudno\u015b\u0107",
-        "save_btn": "Zapisz eksploracj\u0119"
+    "spark_box": {
+        "title": "Spark Inbox (Pudełko na Dygresje)",
+        "subtitle": "Zapisuj luźne myśli, które mignęły Ci w trakcie nauki — silnik zachowa je na później.",
+        "input_placeholder": "Wpisz dygresję i wciśnij Enter...",
+        "add_btn": "Zapisz Iskrę",
+        "empty": "Brak oczekujących dygresji. Możesz je dodawać w każdej chwili.",
+        "explore_btn": "Zbadaj teraz",
+        "dismiss_btn": "Usuń",
+        "quick_tip": "Skrót klawiszowy: wciśnij Spację na pulpicie, aby szybko zapisać dygresję."
     },
-    "saved": {
-        "title": "Zapisano.",
-        "topic_saved": "{topic} jest teraz cz\u0119\u015bci\u0105 Twojej historii nauki.",
-        "hint": "Nast\u0119pnym razem mo\u017cemy to rozwin\u0105\u0107 \u2014 albo uda\u0107 si\u0119 w zupe\u0142nie innym kierunku.",
-        "next_btn": "Zbadaj co\u015b nowego",
-        "home_btn": "Powr\u00f3t na start"
+    "constellation": {
+        "title": "Konstelacja Wiedzy",
+        "subtitle": "Interaktywny graf Twoich opanowanych pojęć i mostów asocjacyjnych.",
+        "nodes_count": "{n} opanowanych pojęć",
+        "empty": "Twój ogród wiedzy czeka na pierwsze pojęcie. Rozpocznij od Kompasu!",
+        "back_btn": "← Wróć do Kompasu"
     },
     "history": {
-        "title": "Archiwum nauki",
-        "back_btn": "\u2190 Wr\u00f3\u0107",
-        "empty": "\u017badnych eksploracji. Twoja podr\u00f3\u017c zaczyna si\u0119 od pierwszej.",
-        "interest": "zainteresowanie",
-        "difficulty": "trudno\u015b\u0107"
-    },
-    "detail": {
-        "back_btn": "\u2190 Wr\u00f3\u0107 do archiwum",
-        "difficulty_label": "Trudno\u015b\u0107",
-        "mode_label": "Tryb",
-        "why_label": "Dlaczego ten temat",
-        "connection_label": "Po\u0142\u0105czenie",
-        "notes_label": "Notatki",
-        "discoveries_label": "Odkrycia",
-        "sidepaths_label": "Boczne \u015bcie\u017cki",
-        "interest_label": "Zainteresowanie",
-        "difficulty_detail_label": "Trudno\u015b\u0107"
+        "title": "Archiwum Poznanych Pojęć",
+        "back_btn": "← Wróć",
+        "empty": "Brak historii. Twoja podróż zaczyna się od pierwszego tematu."
     },
     "settings": {
-        "title": "Ustawienia",
-        "back_btn": "\u2190 Wr\u00f3\u0107",
-        "ai_heading": "Konfiguracja AI",
-        "ai_hint": "Skonfiguruj AI w pliku <code>.env</code> i uruchom serwer ponownie.",
-        "ai_provider": "Dostawca",
-        "ai_model": "Model",
-        "ai_status": "Status",
-        "ai_configured": "Skonfigurowano \u2713",
-        "ai_not_configured": "Nie skonfigurowano \u2717",
-        "ai_set_key": "Ustaw <code>AI_API_KEY</code> w pliku <code>.env</code>.",
-        "preferred_heading": "Preferowane tematy",
-        "preferred_hint": "Tematy, w kierunku kt\u00f3rych AI powinno sk\u0142ania\u0107.",
-        "preferred_placeholder": "Dodaj temat\u2026",
-        "disliked_heading": "Tematy do unikania",
-        "disliked_hint": "Tematy, od kt\u00f3rych AI powinno stroni\u0107.",
-        "disliked_placeholder": "Dodaj temat\u2026",
-        "add_btn": "Dodaj",
-        "style_heading": "Styl nauki",
-        "style_topdown": "Od og\u00f3\u0142u do szczeg\u00f3\u0142u",
-        "style_bottomup": "Od przyk\u0142ad\u00f3w do teorii",
-        "style_mixed": "Mieszany",
-        "language_heading": "J\u0119zyk",
-        "language_hint": "Wybierz j\u0119zyk interfejsu.",
-        "privacy_heading": "Prywatno\u015b\u0107",
-        "privacy_text": "Wszystkie dane s\u0105 przechowywane lokalnie w SQLite. Nic nie jest wysy\u0142ane nigdzie poza skonfigurowanego dostawc\u0119 AI podczas generowania temat\u00f3w. Tw\u00f3j klucz API nigdy nie trafia do przegl\u0105darki."
+        "title": "Ustawienia i Profil",
+        "back_btn": "← Wróć",
+        "theme_heading": "Wygląd",
+        "theme_light": "Jasny",
+        "theme_dark": "Ciemny",
+        "language_heading": "Język Interfejsu",
+        "language_hint": "Wybierz język aplikacji.",
+        "ai_heading": "Status AI",
+        "ai_configured": "Skonfigurowano ✓",
+        "ai_not_configured": "Brak klucza API ✗",
+        "privacy_heading": "Prywatność & Baza Lokalna",
+        "privacy_text": "Wszystkie Twoje dane, embeddingi i historia są przechowywane w lokalnej bazie SQLite. Twój klucz API nigdy nie opuszcza Twojego serwera."
     },
     "errors": {
-        "server_down": "Nie uda\u0142o si\u0119 po\u0142\u0105czy\u0107 z serwerem. Upewnij si\u0119, \u017ce backend dzia\u0142a.",
-        "copy_failed": "Nie uda\u0142o si\u0119 skopiowa\u0107 promptu."
+        "server_down": "Błąd połączenia z serwerem. Upewnij się, że backend działa.",
+        "copy_failed": "Nie udało się skopiować promptu."
     },
     "dates": {
         "today": "dzisiaj",

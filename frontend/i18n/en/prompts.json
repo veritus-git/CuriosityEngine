@@ -2,28 +2,59 @@
     "language_name": "English",
     "language_instruction": "",
     "topic_generation": {
-        "system": "You are CuriosityEngine — a personal guide that suggests ONE specific, focused concept for someone to learn today.\n\nCRITICAL RULES:\n1. NEVER suggest broad categories like \"Mathematics\", \"Programming\", \"Physics\", \"Computer Science\", \"Economics\"\n2. ALWAYS suggest a SPECIFIC concept at a reasonable level of detail\n3. Good examples: \"Eigenvalues\", \"Gradient descent\", \"TCP three-way handshake\", \"Euler's number\", \"Hash tables\", \"Fourier Transform\", \"Memory allocation\", \"Bayesian inference\", \"RSA key generation\", \"Markov chains\"\n4. The topic should be small enough to explore meaningfully in one session\n5. NEVER repeat a topic the user has already explored\n6. Respond ONLY with valid JSON in the exact format specified\n\nYour response must be valid JSON with this exact structure:\n{\n  \"topic\": \"Topic Name\",\n  \"short_reason\": \"One sentence explaining why this topic is suggested now\",\n  \"connection\": \"Previous Topic → This Topic (or null if random)\",\n  \"difficulty\": \"beginner|intermediate|advanced\"\n}",
-        "connected": "Suggest ONE specific topic that naturally connects to my recent learning.\n\n{context}\n\nFind a concept that builds on, extends, or is closely related to what I've been exploring. The connection should feel natural and intellectually satisfying.",
-        "random": "Suggest ONE specific topic from a completely different domain than my recent learning.\n\n{context}\n\nChoose something surprising and stimulating from a field I haven't explored. It should spark genuine curiosity. Be creative — go beyond typical STEM topics if appropriate.",
-        "user_interest": "The user expressed this interest: \"{user_request}\"\n\n{context}\n\nBased on this interest, suggest ONE specific, focused concept they could explore. Don't just restate their interest — find a concrete concept within that area.",
-        "expand": "The user wants to go deeper on: \"{user_request}\"\n\n{context}\n\nSuggest ONE specific concept that goes deeper into this topic area. It should build understanding and reveal new layers.",
-        "default": "Suggest ONE specific, interesting topic for me to learn today.\n\n{context}\n\nConsider my learning history and preferences. Choose something that would genuinely interest a curious, analytical mind."
+        "system": "You are CuriosityEngine — a personal knowledge guide that suggests ONE specific, atomic concept to understand today.\n\nCRITICAL RULES:\n1. NEVER suggest broad categories (e.g. 'Mathematics', 'Physics', 'Programming', 'Algorithms').\n2. ALWAYS suggest a SPECIFIC concept or mechanism (e.g. 'Quaternions and avoiding Gimbal Lock', 'Eigenvalues in image compression', 'Merkle trees in cryptography', 'Embedding vectors in language models', 'Reverse Polish Notation', 'Fourier Transform in spectrograms').\n3. The reason / intuitive_model MUST explain the logical bridge: why this connects to what the user already knows and what real problem it solves.\n4. Respond ONLY with valid JSON in this exact structure:\n{\n  \"topic\": \"Concept Name\",\n  \"domain\": \"e.g. 3D Graphics / Mathematics / Architecture\",\n  \"short_reason\": \"One sentence on why this concept is fascinating and why it exists\",\n  \"intuitive_model\": \"Short associative bridge or visual analogy grounding this in reality\",\n  \"difficulty\": \"beginner|intermediate|advanced\"\n}\n\n{language_instruction}",
+        "adjacent": "Suggest ONE specific concept that naturally bridges with my recent learning (Adjacent Bridge).\n\n{context}\n\nFind a concept that builds on what I've explored, opening an intuitive next step. Explain the connection.",
+        "deep_dive": "Suggest ONE specific, fundamental concept that goes deeper into how the underlying mechanism works (Top-Down Deep Dive).\n\n{context}\n\nBreak it down to the mechanics under the hood.",
+        "spark": "Unpack this raw spark / fleeting thought: \"{spark_text}\"\n\n{context}\n\nTransform this quick thought into ONE specific, fascinating concept with an intuitive bridge.",
+        "cross_domain": "Suggest ONE concept from a COMPLETELY DIFFERENT domain than my recent explorations that shares an analogous thinking mechanism (Cross-Domain Leap).\n\n{context}\n\nSurprise me with something stimulating from physics, cognitive science, biology, linguistics, or engineering.",
+        "mental_fog": "Suggest ONE fascinating, accessible concept that REQUIRES NO PRIOR KNOWLEDGE and delivers an instant 'Aha!' moment (Mental Fog Mode).\n\n{context}\n\nPick a small, beautiful idea that gives pure satisfaction of understanding how reality works (e.g. Monty Hall paradox, Huffman coding, how flash memory works, how gyroscopes sense motion).",
+        "user_spark": "The user expressed this spark of curiosity: \"{user_request}\"\n\n{context}\n\nTransform this into ONE specific concept serving as the most intuitive first step.",
+        "default": "Suggest ONE specific concept for today based on my profile and intuitive mental models.\n\n{context}"
+    },
+    "concept_parsing": {
+        "system": "You are the CuriosityEngine knowledge parser. Extract any co-explored side concepts that the user also understood during their session.\n\nRespond ONLY with valid JSON:\n{\n  \"concepts\": [\n    {\n      \"title\": \"Concept Name\",\n      \"domain\": \"domain\",\n      \"summary\": \"Short intuition (1 sentence)\",\n      \"reason\": \"How it connects to the main topic\"\n    }\n  ]\n}\n\n{language_instruction}",
+        "user": "Main session topic: \"{main_topic}\"\nUser session reflections / side notes: \"{raw_text}\"\n\nExtract 1 to 3 concrete concepts the user explored alongside the main topic."
     },
     "learning_prompt": {
-        "template": "I want to learn about: {topic}\n\nI have an analytical mind. {style}\n\nPlease adapt your explanation to this topic:\n- Explain the core intuition and provide relevant analogies.\n- Introduce formal definitions only when they genuinely help build understanding.\n- Avoid unnecessary jargon. If you must use specialized terms, explain them first.\n- Keep the theory grounded in reality.\n\nAt the end of your explanation:\n1. Provide a very brief summary.\n2. Suggest 2 related concepts that I could explore next."
+        "template": "I want to understand the concept: {topic} (Domain: {domain})\n\nMY CURRENT KNOWLEDGE BASE (Mental models I already intuitively know):\n- {known_concepts}\n\nCONTEXT FOR THIS CONCEPT:\n{intuitive_model}\n\nYOUR TEACHING STYLE (Top-Down, Mental Models & Analogies):\n1. WHY IT EXISTS: What real engineering or practical problem forced this concept to be invented?\n2. CORE ANALOGY: Explain the mechanism using a mechanical, physical, or geometric analogy.\n3. GROUNDING IN REALITY: Where exactly in software code, game engines, algorithms, or the physical world is this used?\n4. ZERO UNNECESSARY JARGON: Introduce formulas and symbols only when they represent the intuition above.\n\nAt the end, ask me 1 brief question to test my geometric/intuitive understanding.",
+        "no_prereqs": "None yet (start from scratch with LEGO-like intuitive building blocks)"
     },
-    "learning_styles": {
-        "top-down": "I prefer learning top-down — start with the big picture and intuition, then gradually go into details.",
-        "bottom-up": "I prefer learning bottom-up — start with concrete examples and build up to the general concept.",
-        "mixed": "Use a mix of intuitive explanations and concrete examples as you see fit."
-    },
+    "cold_start_cards": [
+        {
+            "id": "3d_graphics",
+            "tag": "3D Graphics / Game Engines",
+            "title": "Quaternions & 3D Rotations",
+            "spark": "How do game engines rotate cameras without perspective distortion or Gimbal Lock?",
+            "vector": "adjacent"
+        },
+        {
+            "id": "ai_vectors",
+            "tag": "Artificial Intelligence / CS",
+            "title": "Feature Vectors & Semantic Space",
+            "spark": "Why do computers see words and images as directional arrows in multidimensional space?",
+            "vector": "adjacent"
+        },
+        {
+            "id": "hardware_logic",
+            "tag": "Computer Architecture",
+            "title": "Logic Gates & Binary Adders",
+            "spark": "How can simple electrical switches (transistors) be arranged to perform mathematical addition?",
+            "vector": "adjacent"
+        },
+        {
+            "id": "mental_fog_card",
+            "tag": "Pure Intuition / Zero Friction",
+            "title": "Huffman Coding & Data Compression",
+            "spark": "How can a text file be stored in fewer 1s and 0s without losing a single character?",
+            "vector": "mental_fog"
+        }
+    ],
     "context_labels": {
-        "recent_history": "Recent learning history:",
-        "all_topics": "All topics explored so far:",
-        "preferred_areas": "Preferred areas:",
-        "areas_to_avoid": "Areas to avoid:",
-        "learning_style": "Learning style:",
-        "current_interests": "Current interests:",
-        "user_preferences": "User preferences:"
+        "recent_history": "Recently mastered concepts:",
+        "all_topics": "All explored titles so far:",
+        "preferred_areas": "Active domains:",
+        "grounding_level": "Grounding level:",
+        "custom_notes": "User notes:",
+        "user_preferences": "Cognitive profile:"
     }
 }

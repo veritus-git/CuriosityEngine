@@ -1,50 +1,30 @@
 /**
- * CuriosityEngine — Frontend Application
- * State machine: NO_TOPIC → TOPIC_SUGGESTED → TOPIC_ACTIVE → REFLECTION → SAVED
- * i18n: loads language JSON files from /i18n/{code}.json
+ * CuriosityEngine — Zen Dashboard Frontend Application
+ * Fully associative, vector-backed knowledge interface with Zero-Interrogation start.
+ * Adheres strictly to i18n — zero hardcoded UI strings.
  */
 
 (function () {
     'use strict';
 
-    // ─── State ───
+    // ─── Unified State ───
     let state = {
-        view: 'NO_TOPIC',
-        topic: null,
-        session: null,
+        view: 'DASHBOARD',
+        concept: null,
+        prompt: null,
+        sparksCount: 0,
+        masteredCount: 0,
         ai: { configured: false },
-        historyCount: 0,
-        interestRating: null,
-        difficultyRating: null,
+        profile: {},
+        coldStartActive: false,
+        coldStartCards: []
     };
 
-    // ─── i18n ───
-    let lang = {};       // current language strings
-    let langCode = 'en'; // current language code
-    let languages = [];  // available languages
+    // ─── i18n Engine ───
+    let lang = {};
+    let langCode = 'en';
+    let languages = [];
 
-    // ─── Theme & Color ───
-    const root = document.documentElement;
-    function applyTheme(theme) {
-        if (theme === 'dark') {
-            root.setAttribute('data-theme', 'dark');
-        } else {
-            root.removeAttribute('data-theme');
-        }
-        localStorage.setItem('curiosity_theme', theme);
-    }
-
-    function applyColor(hue) {
-        root.style.setProperty('--hue-primary', hue);
-        localStorage.setItem('curiosity_hue', hue);
-    }
-
-    const savedTheme = localStorage.getItem('curiosity_theme') || 'light';
-    const savedHue = localStorage.getItem('curiosity_hue') || '220';
-    applyTheme(savedTheme);
-    applyColor(savedHue);
-
-    /** Resolve a dotted key like "nav.history" from the lang object */
     function t(key, vars) {
         const parts = key.split('.');
         let val = lang;
@@ -59,7 +39,6 @@
         return val;
     }
 
-    /** Apply translations to all elements with data-i18n attributes */
     function applyTranslations() {
         document.querySelectorAll('[data-i18n]').forEach(el => {
             el.textContent = t(el.dataset.i18n);
@@ -70,11 +49,9 @@
         document.querySelectorAll('[data-i18n-html]').forEach(el => {
             el.innerHTML = t(el.dataset.i18nHtml);
         });
-        // Update html lang attribute
         document.documentElement.lang = langCode;
     }
 
-    /** Load a language file */
     async function loadLanguage(code) {
         try {
             const res = await fetch(`/i18n/${code}/ui.json`);
@@ -83,14 +60,11 @@
             langCode = code;
             applyTranslations();
         } catch (err) {
-            console.warn(`Failed to load language ${code}, falling back to en`, err);
-            if (code !== 'en') {
-                await loadLanguage('en');
-            }
+            console.warn(`Failed to load language ${code}, fallback to en`, err);
+            if (code !== 'en') await loadLanguage('en');
         }
     }
 
-    /** Load available languages list */
     async function loadLanguageList() {
         try {
             const data = await api('GET', '/api/languages');
@@ -98,48 +72,72 @@
         } catch (err) {
             languages = [{ code: 'en', name: 'English', native_name: 'English' }];
         }
-        
-        const topbarLangSelect = $('#topbar-lang-select');
-        if (topbarLangSelect) {
-            topbarLangSelect.innerHTML = '';
+
+        const sel = $('#topbar-lang-select');
+        const settingsSel = $('#select-settings-language');
+
+        [sel, settingsSel].forEach(selectEl => {
+            if (!selectEl) return;
+            selectEl.innerHTML = '';
             languages.forEach(l => {
                 const opt = document.createElement('option');
                 opt.value = l.code;
-                opt.textContent = `${l.code.toUpperCase()}`;
-                topbarLangSelect.appendChild(opt);
+                opt.textContent = `${l.name} (${l.code.toUpperCase()})`;
+                selectEl.appendChild(opt);
             });
-            topbarLangSelect.value = langCode;
-            
-            topbarLangSelect.addEventListener('change', async (e) => {
-                const newLang = e.target.value;
-                await loadLanguage(newLang);
-                if (localStorage.getItem('curiosity_token')) {
-                    api('POST', '/api/preferences', { language: newLang }).catch(() => {});
-                }
-                $('#topbar-date').textContent = formatDate();
-                $('#greeting-text').textContent = getGreeting();
+            selectEl.value = langCode;
+        });
+
+        if (sel) {
+            sel.addEventListener('change', async (e) => {
+                await switchLanguage(e.target.value);
+            });
+        }
+        if (settingsSel) {
+            settingsSel.addEventListener('change', async (e) => {
+                await switchLanguage(e.target.value);
             });
         }
     }
 
-    // ─── DOM refs ───
+    async function switchLanguage(code) {
+        await loadLanguage(code);
+        if (localStorage.getItem('curiosity_token')) {
+            await api('POST', '/api/profile', { language: code }).catch(() => {});
+        }
+        updateGreetingAndDates();
+        if (state.coldStartActive) {
+            await loadColdStartCards();
+        }
+    }
+
+    // ─── Theme Management ───
+    const root = document.documentElement;
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            root.setAttribute('data-theme', 'dark');
+        } else {
+            root.setAttribute('data-theme', 'light');
+        }
+        localStorage.setItem('curiosity_theme', theme);
+    }
+    const savedTheme = localStorage.getItem('curiosity_theme') || 'dark';
+    applyTheme(savedTheme);
+
+    // ─── DOM References ───
     const $ = (sel) => document.querySelector(sel);
     const $$ = (sel) => document.querySelectorAll(sel);
 
     const views = {
-        NO_TOPIC: $('#view-no-topic'),
-        TOPIC_SUGGESTED: $('#view-suggested'),
-        TOPIC_ACTIVE: $('#view-active'),
-        REFLECTION: $('#view-reflection'),
-        SAVED: $('#view-saved'),
-        HISTORY: $('#view-history'),
-        DETAIL: $('#view-detail'),
-        SETTINGS: $('#view-settings'),
-        ONBOARDING: $('#view-onboarding'),
         AUTH: $('#view-auth'),
+        COLD_START: $('#view-cold-start'),
+        DASHBOARD: $('#view-dashboard'),
+        CONSTELLATION: $('#view-constellation'),
+        HISTORY: $('#view-history'),
+        SETTINGS: $('#view-settings'),
     };
 
-    // ─── API helpers ───
+    // ─── API Helper ───
     async function api(method, url, body = null) {
         const opts = {
             method,
@@ -149,7 +147,6 @@
         if (token) {
             opts.headers['Authorization'] = `Bearer ${token}`;
         }
-
         if (body) opts.body = JSON.stringify(body);
 
         const res = await fetch(url, opts);
@@ -160,751 +157,616 @@
             showView('AUTH');
             throw new Error('Unauthorized');
         }
-
         if (!res.ok) {
             throw new Error(data.error || `Request failed (${res.status})`);
         }
         return data;
     }
 
-    // ─── View Management ───
-    let previousView = null;
-
+    // ─── View Routing ───
     function showView(viewName) {
-        previousView = state.view;
         state.view = viewName;
-
         Object.entries(views).forEach(([name, el]) => {
-            if (name === viewName) {
-                el.hidden = false;
-                el.style.animation = 'none';
-                el.offsetHeight;
-                el.style.animation = '';
-            } else {
-                el.hidden = true;
+            if (!el) return;
+            el.hidden = (name !== viewName);
+        });
+    }
+
+    function showToast(message) {
+        const toast = $('#toast');
+        const text = $('#toast-text');
+        if (!toast || !text) return;
+        text.textContent = message;
+        toast.hidden = false;
+        setTimeout(() => {
+            toast.hidden = true;
+        }, 3000);
+    }
+
+    function updateGreetingAndDates() {
+        const dateEl = $('#topbar-date');
+        const greetingEl = $('#greeting-title');
+        const locale = t('dates.locale') || 'en-US';
+
+        if (dateEl) {
+            dateEl.textContent = new Date().toLocaleDateString(locale, {
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric',
+            });
+        }
+
+        if (greetingEl) {
+            const h = new Date().getHours();
+            let greetingKey = 'greeting.morning';
+            if (h < 6) greetingKey = 'greeting.late_night';
+            else if (h < 12) greetingKey = 'greeting.morning';
+            else if (h < 17) greetingKey = 'greeting.afternoon';
+            else if (h < 21) greetingKey = 'greeting.evening';
+            else greetingKey = 'greeting.night_owl';
+            greetingEl.textContent = t(greetingKey);
+        }
+    }
+
+    // ─── Cold Start & Starter Cards ───
+    async function loadColdStartCards() {
+        try {
+            const data = await api('GET', '/api/cold-start-cards');
+            state.coldStartCards = data.cards || [];
+            renderColdStartCards();
+        } catch (err) {
+            console.error('Failed to load cold start cards:', err);
+        }
+    }
+
+    function renderColdStartCards() {
+        const container = $('#cold-start-cards-container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        state.coldStartCards.forEach(card => {
+            const cardEl = document.createElement('div');
+            cardEl.className = 'spark-card';
+            cardEl.innerHTML = `
+                <span class="spark-card__tag">${escapeHtml(card.tag)}</span>
+                <h3 class="spark-card__title">${escapeHtml(card.title)}</h3>
+                <p class="spark-card__desc">${escapeHtml(card.spark)}</p>
+            `;
+            cardEl.addEventListener('click', () => {
+                triggerSuggestion(card.vector || 'adjacent', card.spark);
+            });
+            container.appendChild(cardEl);
+        });
+    }
+
+    // ─── Topic Suggestion Trigger ───
+    async function triggerSuggestion(vector, userInput = null, sparkId = null) {
+        const btn = document.querySelector(`[data-vector="${vector}"]`);
+        if (btn) btn.classList.add('loading');
+
+        try {
+            const res = await api('POST', '/api/topics/suggest', {
+                vector: vector,
+                user_input: userInput,
+                spark_id: sparkId,
+                current_action: 'skip'
+            });
+
+            state.concept = res.concept;
+            state.prompt = res.prompt;
+            renderFocusCard('suggested');
+            showView('DASHBOARD');
+        } catch (err) {
+            showToast(err.message || t('errors.server_down'));
+        } finally {
+            if (btn) btn.classList.remove('loading');
+        }
+    }
+
+    // ─── Focus Card Rendering ───
+    function renderFocusCard(mode = 'suggested') {
+        const wrapper = $('#focus-card-wrapper');
+        const compass = $('#compass-section');
+        const titleEl = $('#focus-card-title');
+        const badgeEl = $('#focus-card-badge');
+        const domainEl = $('#focus-card-domain');
+        const reasonEl = $('#focus-card-reason');
+        const modelEl = $('#focus-card-model');
+        const promptEl = $('#prompt-box-text');
+        const actionsSuggested = $('#focus-actions-suggested');
+        const actionsActive = $('#focus-actions-active');
+
+        if (!state.concept) {
+            if (wrapper) wrapper.hidden = true;
+            if (compass) compass.hidden = false;
+            return;
+        }
+
+        if (wrapper) wrapper.hidden = false;
+        if (titleEl) titleEl.textContent = state.concept.title;
+        if (domainEl) domainEl.textContent = state.concept.domain || 'General';
+        if (reasonEl) reasonEl.textContent = state.concept.summary || '';
+        if (modelEl) modelEl.textContent = state.concept.intuitive_model || '';
+        if (promptEl) promptEl.textContent = state.prompt || '';
+
+        if (mode === 'active' || state.concept.status === 'active') {
+            if (badgeEl) badgeEl.textContent = t('focus_card.active_label');
+            if (actionsSuggested) actionsSuggested.hidden = true;
+            if (actionsActive) actionsActive.hidden = false;
+        } else {
+            if (badgeEl) badgeEl.textContent = t('focus_card.suggested_label');
+            if (actionsSuggested) actionsSuggested.hidden = false;
+            if (actionsActive) actionsActive.hidden = true;
+        }
+    }
+
+    // ─── Knowledge Constellation Canvas ───
+    let constellationAnimationId = null;
+    async function renderConstellation() {
+        const canvas = $('#constellation-canvas');
+        const emptyEl = $('#constellation-empty');
+        const subtitleEl = $('#constellation-subtitle');
+        if (!canvas) return;
+
+        try {
+            const data = await api('GET', '/api/graph');
+            const nodes = data.nodes || [];
+            const links = data.links || [];
+
+            if (subtitleEl) {
+                subtitleEl.textContent = t('constellation.nodes_count', { n: nodes.length });
             }
+
+            if (nodes.length === 0) {
+                if (emptyEl) emptyEl.hidden = false;
+                canvas.hidden = true;
+                return;
+            }
+
+            if (emptyEl) emptyEl.hidden = true;
+            canvas.hidden = false;
+
+            initConstellationSimulation(canvas, nodes, links);
+        } catch (err) {
+            console.error('Failed to load constellation graph:', err);
+        }
+    }
+
+    function initConstellationSimulation(canvas, nodes, links) {
+        const ctx = canvas.getContext('2d');
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width * window.devicePixelRatio;
+        canvas.height = rect.height * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+        const width = rect.width;
+        const height = rect.height;
+
+        // Position nodes randomly / circular
+        nodes.forEach((node, i) => {
+            const angle = (i / nodes.length) * 2 * Math.PI;
+            const radius = Math.min(width, height) * 0.35;
+            node.x = width / 2 + Math.cos(angle) * radius + (Math.random() - 0.5) * 40;
+            node.y = height / 2 + Math.sin(angle) * radius + (Math.random() - 0.5) * 40;
+            node.vx = (Math.random() - 0.5) * 0.4;
+            node.vy = (Math.random() - 0.5) * 0.4;
+            node.radius = node.status === 'active' ? 7 : 5;
         });
+
+        const nodeMap = new Map(nodes.map(n => [n.id, n]));
+
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Draw links
+            ctx.strokeStyle = 'rgba(99, 102, 241, 0.25)';
+            ctx.lineWidth = 1.2;
+            links.forEach(l => {
+                const src = nodeMap.get(l.source);
+                const tgt = nodeMap.get(l.target);
+                if (src && tgt) {
+                    ctx.beginPath();
+                    ctx.moveTo(src.x, src.y);
+                    ctx.lineTo(tgt.x, tgt.y);
+                    ctx.stroke();
+                }
+            });
+
+            // Draw & update nodes
+            nodes.forEach(node => {
+                node.x += node.vx;
+                node.y += node.vy;
+
+                if (node.x < 30 || node.x > width - 30) node.vx *= -1;
+                if (node.y < 30 || node.y > height - 30) node.vy *= -1;
+
+                // Node circle
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, node.radius, 0, 2 * Math.PI);
+                ctx.fillStyle = node.status === 'active' ? '#10b981' : '#6366f1';
+                ctx.shadowColor = node.status === 'active' ? '#10b981' : '#6366f1';
+                ctx.shadowBlur = 12;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // Label
+                ctx.fillStyle = '#f1f0f7';
+                ctx.font = '11px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(node.title, node.x, node.y + node.radius + 14);
+            });
+
+            constellationAnimationId = requestAnimationFrame(draw);
+        }
+
+        if (constellationAnimationId) cancelAnimationFrame(constellationAnimationId);
+        draw();
     }
 
-    // ─── Greeting ───
-    function getGreeting() {
-        const h = new Date().getHours();
-        if (h < 6) return t('greeting.late_night');
-        if (h < 12) return t('greeting.morning');
-        if (h < 17) return t('greeting.afternoon');
-        if (h < 21) return t('greeting.evening');
-        return t('greeting.night_owl');
+    // ─── History Archive ───
+    async function loadHistoryArchive() {
+        const listEl = $('#history-list');
+        const emptyEl = $('#history-empty');
+        if (!listEl) return;
+        listEl.innerHTML = '';
+
+        try {
+            const data = await api('GET', '/api/history?limit=100');
+            const items = data.items || [];
+
+            if (items.length === 0) {
+                if (emptyEl) emptyEl.hidden = false;
+                return;
+            }
+            if (emptyEl) emptyEl.hidden = true;
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'history-card';
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h4 class="history-card__title">${escapeHtml(item.title)}</h4>
+                        <span class="domain-tag">${escapeHtml(item.domain || 'General')}</span>
+                    </div>
+                    <p style="font-size: var(--fs-sm); color: var(--text-secondary);">${escapeHtml(item.summary || '')}</p>
+                    <span class="history-card__date">${item.mastered_at ? new Date(item.mastered_at).toLocaleDateString() : ''}</span>
+                `;
+                listEl.appendChild(card);
+            });
+        } catch (err) {
+            console.error('Failed to load history:', err);
+        }
     }
 
-    function formatDate() {
-        const locale = t('dates.locale') || 'en-US';
-        return new Date().toLocaleDateString(locale, {
-            weekday: 'long',
-            month: 'long',
-            day: 'numeric',
-        });
+    // ─── Sparks Inbox Modal ───
+    async function loadSparksList() {
+        const container = $('#sparks-inbox-list');
+        if (!container) return;
+        container.innerHTML = '';
+
+        try {
+            const data = await api('GET', '/api/sparks');
+            const sparks = data.sparks || [];
+
+            const sparksBadge = $('#nav-sparks-label');
+            if (sparksBadge) {
+                sparksBadge.textContent = t('nav.sparks', { n: sparks.length });
+            }
+
+            if (sparks.length === 0) {
+                container.innerHTML = `<p style="color: var(--text-tertiary); font-size: var(--fs-sm);">${t('spark_box.empty')}</p>`;
+                return;
+            }
+
+            sparks.forEach(sp => {
+                const row = document.createElement('div');
+                row.className = 'spark-item';
+                row.innerHTML = `
+                    <span class="spark-item__text">${escapeHtml(sp.raw_text)}</span>
+                    <div style="display: flex; gap: var(--space-xs);">
+                        <button class="btn btn--secondary btn--small btn-explore-spark" data-id="${sp.id}">
+                            ${t('spark_box.explore_btn')}
+                        </button>
+                        <button class="btn btn--ghost btn--small btn-dismiss-spark" data-id="${sp.id}">
+                            ${t('spark_box.dismiss_btn')}
+                        </button>
+                    </div>
+                `;
+                row.querySelector('.btn-explore-spark').addEventListener('click', () => {
+                    $('#spark-modal-backdrop').hidden = true;
+                    triggerSuggestion('spark', null, sp.id);
+                });
+                row.querySelector('.btn-dismiss-spark').addEventListener('click', async () => {
+                    await api('POST', `/api/sparks/${sp.id}/dismiss`);
+                    loadSparksList();
+                });
+                container.appendChild(row);
+            });
+        } catch (err) {
+            console.error('Failed to load sparks:', err);
+        }
     }
 
-    function relativeDate(dateStr) {
-        if (!dateStr) return '';
-        const d = new Date(dateStr + 'Z');
-        const now = new Date();
-        const diffMs = now - d;
-        const diffDays = Math.floor(diffMs / 86400000);
-        if (diffDays === 0) return t('dates.today');
-        if (diffDays === 1) return t('dates.yesterday');
-        if (diffDays < 7) return t('dates.days_ago', { n: diffDays });
-        const locale = t('dates.locale') || 'en-US';
-        return d.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
-    }
-
-    // ─── Initialize ───
+    // ─── Main State Initialization ───
     async function init() {
         let savedLang = navigator.language.startsWith('pl') ? 'pl' : 'en';
         try {
             if (localStorage.getItem('curiosity_token')) {
-                const prefs = await api('GET', '/api/preferences');
-                savedLang = prefs.language || 'en';
+                const prof = await api('GET', '/api/profile');
+                savedLang = prof.language || savedLang;
             }
-        } catch (e) { 
+        } catch (e) {
             if (e.message === 'Unauthorized') {
                 await loadLanguage(savedLang);
+                showView('AUTH');
                 return;
             }
         }
 
         await loadLanguage(savedLang);
         await loadLanguageList();
-
-        $('#topbar-date').textContent = formatDate();
-        $('#greeting-text').textContent = getGreeting();
-
+        updateGreetingAndDates();
         bindEvents();
 
         try {
             const data = await api('GET', '/api/state');
-            state.topic = data.topic;
-            state.session = data.session;
-            state.ai = data.ai;
-            state.historyCount = data.history_count;
+            state.concept = data.concept;
+            state.prompt = data.prompt;
+            state.sparksCount = data.sparks_count || 0;
+            state.masteredCount = data.mastered_count || 0;
+            state.ai = data.ai || {};
+            state.profile = data.profile || {};
+            state.coldStartActive = data.cold_start_active;
 
-            if (data.state === 'TOPIC_ACTIVE') {
-                renderActive();
-                showView('TOPIC_ACTIVE');
-            } else if (data.state === 'TOPIC_SUGGESTED') {
-                renderSuggested();
-                showView('TOPIC_SUGGESTED');
+            const sparksBadge = $('#nav-sparks-label');
+            if (sparksBadge) {
+                sparksBadge.textContent = t('nav.sparks', { n: state.sparksCount });
+            }
+
+            if (state.coldStartActive) {
+                await loadColdStartCards();
+                showView('COLD_START');
             } else {
-                if (data.history_count === 0 && (!data.preferences || !data.preferences.preferred_subjects || data.preferences.preferred_subjects.length === 0)) {
-                    showView('ONBOARDING');
+                if (data.state === 'CONCEPT_ACTIVE') {
+                    renderFocusCard('active');
+                } else if (data.state === 'CONCEPT_SUGGESTED') {
+                    renderFocusCard('suggested');
                 } else {
-                    showView('NO_TOPIC');
+                    renderFocusCard(null);
                 }
+                showView('DASHBOARD');
             }
         } catch (err) {
             if (err.message === 'Unauthorized') return;
-            showView('NO_TOPIC');
-            showError(t('errors.server_down'));
+            showView('DASHBOARD');
         }
     }
 
-    // ─── Event Binding ───
+    // ─── Event Bindings ───
     function bindEvents() {
-        // NO_TOPIC
-        $('#btn-get-topic').addEventListener('click', () => generateTopic('connected'));
-        $('#btn-random-topic').addEventListener('click', () => generateTopic('random'));
-        $('#btn-toggle-interest').addEventListener('click', toggleInterest);
-        $('#btn-submit-interest').addEventListener('click', submitInterest);
-        $('#input-interest').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') submitInterest();
-        });
-
-        // AUTH
+        // Auth Form
         $('#auth-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = $('#auth-username').value.trim();
             const password = $('#auth-password').value.trim();
-            const btn = $('#btn-login');
+            const btn = $('#btn-login-submit');
             const err = $('#auth-error');
-            
-            setLoading(btn, true);
+
+            btn.classList.add('loading');
             err.style.display = 'none';
 
             try {
-                // Try login first
                 let data;
                 try {
                     data = await api('POST', '/api/auth/login', { username, password });
                 } catch (loginErr) {
                     if (loginErr.message.includes('Invalid') || loginErr.message.includes('Unauthorized')) {
-                        // If login fails, try register
                         data = await api('POST', '/api/auth/register', { username, password });
                     } else {
                         throw loginErr;
                     }
                 }
-                
                 localStorage.setItem('curiosity_token', data.token);
                 init();
             } catch (error) {
                 err.textContent = error.message;
                 err.style.display = 'block';
             } finally {
-                setLoading(btn, false);
+                btn.classList.remove('loading');
             }
         });
 
-        // SUGGESTED
-        $('#btn-accept').addEventListener('click', acceptTopic);
-        $('#btn-skip').addEventListener('click', () => rejectTopic('skip'));
-        $('#btn-reject').addEventListener('click', () => rejectTopic('reject'));
-
-        // ACTIVE
-        $('#btn-copy-prompt').addEventListener('click', copyPrompt);
-        $('#btn-finish').addEventListener('click', () => {
-            renderReflection();
-            showView('REFLECTION');
+        // Navigation
+        $('#nav-brand').addEventListener('click', (e) => {
+            e.preventDefault();
+            showView(state.coldStartActive ? 'COLD_START' : 'DASHBOARD');
+        });
+        $('#btn-nav-sparks').addEventListener('click', () => {
+            loadSparksList();
+            $('#spark-modal-backdrop').hidden = false;
+        });
+        $('#btn-nav-constellation').addEventListener('click', () => {
+            showView('CONSTELLATION');
+            renderConstellation();
+        });
+        $('#btn-nav-history').addEventListener('click', () => {
+            showView('HISTORY');
+            loadHistoryArchive();
+        });
+        $('#btn-nav-settings').addEventListener('click', () => {
+            showView('SETTINGS');
+            const info = $('#settings-ai-info');
+            if (info) {
+                info.innerHTML = state.ai.configured
+                    ? `<span style="color: var(--success);">${t('settings.ai_configured')} (${state.ai.provider} - ${state.ai.model})</span>`
+                    : `<span style="color: var(--error);">${t('settings.ai_not_configured')}</span>`;
+            }
         });
 
-        // REFLECTION
-        $('#reflection-form').addEventListener('submit', saveReflection);
-        setupRatings();
+        $('#btn-constellation-back').addEventListener('click', () => showView('DASHBOARD'));
+        $('#btn-history-back').addEventListener('click', () => showView('DASHBOARD'));
+        $('#btn-settings-back').addEventListener('click', () => showView('DASHBOARD'));
 
-        // SAVED
-        $('#btn-next-topic').addEventListener('click', () => generateTopic('connected'));
-        $('#btn-go-home').addEventListener('click', () => {
-            state.topic = null;
-            showView('NO_TOPIC');
+        // Compass Cards Vector Clicks
+        $$('.compass-card').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const vector = btn.dataset.vector;
+                triggerSuggestion(vector);
+            });
         });
 
-        // NAV
-        $('#btn-history').addEventListener('click', loadHistory);
-        $('#btn-settings').addEventListener('click', loadSettings);
-        $('#btn-history-back').addEventListener('click', goBack);
-        $('#btn-settings-back').addEventListener('click', goBack);
-        $('#btn-detail-back').addEventListener('click', () => loadHistory());
-
-        // ONBOARDING
-        const saveOnb = $('#btn-onboarding-save');
-        if (saveOnb) {
-            let currentOnbSlide = 1;
-            const totalOnbSlides = 4;
-            
-            function updateOnbProgress() {
-                const progress = $('#onboarding-progress');
-                if (progress) {
-                    progress.style.width = ((currentOnbSlide) / totalOnbSlides * 100) + '%';
-                }
+        // Custom Vector Input
+        $('#btn-custom-vector-submit').addEventListener('click', () => {
+            const val = $('#input-custom-vector').value.trim();
+            if (val) triggerSuggestion('user_spark', val);
+        });
+        $('#input-custom-vector').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const val = e.target.value.trim();
+                if (val) triggerSuggestion('user_spark', val);
             }
+        });
 
-            function showOnbSlide(slide) {
-                document.querySelectorAll('.onboarding-slide').forEach(el => el.style.display = 'none');
-                const target = $(`#onb-slide-${slide}`);
-                if (target) {
-                    target.style.display = 'block';
-                    const input = target.querySelector('input');
-                    if (input) input.focus();
-                }
-                updateOnbProgress();
+        // Cold Start Custom Input
+        $('#btn-cold-start-custom-submit').addEventListener('click', () => {
+            const val = $('#input-cold-start-custom').value.trim();
+            if (val) triggerSuggestion('user_spark', val);
+        });
+
+        // Focus Card Actions
+        $('#btn-concept-accept').addEventListener('click', async () => {
+            if (!state.concept) return;
+            try {
+                const res = await api('POST', `/api/topics/${state.concept.id}/accept`);
+                state.concept = res.concept;
+                state.prompt = res.prompt;
+                renderFocusCard('active');
+            } catch (err) {
+                showToast(err.message);
             }
+        });
 
-            document.querySelectorAll('.btn-onb-next').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    if (currentOnbSlide < totalOnbSlides) {
-                        currentOnbSlide++;
-                        showOnbSlide(currentOnbSlide);
-                    }
+        $('#btn-concept-skip').addEventListener('click', async () => {
+            if (!state.concept) return;
+            await api('POST', `/api/topics/${state.concept.id}/skip`).catch(() => {});
+            state.concept = null;
+            state.prompt = null;
+            renderFocusCard(null);
+        });
+
+        $('#btn-copy-prompt').addEventListener('click', async () => {
+            const text = $('#prompt-box-text').textContent;
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast(t('focus_card.prompt_copied'));
+            } catch (err) {
+                showToast(t('errors.copy_failed'));
+            }
+        });
+
+        // Complete Session Modal Trigger
+        $('#btn-concept-finish').addEventListener('click', () => {
+            if (!state.concept) return;
+            const subtitle = $('#complete-modal-subtitle');
+            if (subtitle) {
+                subtitle.textContent = t('complete_modal.subtitle', { topic: state.concept.title });
+            }
+            $('#complete-modal-backdrop').hidden = false;
+        });
+
+        $('#btn-close-complete-modal').addEventListener('click', () => {
+            $('#complete-modal-backdrop').hidden = true;
+        });
+        $('#btn-cancel-complete').addEventListener('click', () => {
+            $('#complete-modal-backdrop').hidden = true;
+        });
+
+        $('#complete-session-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const coexplored = $('#input-coexplored').value.trim();
+            const notes = $('#input-notes').value.trim();
+            const btn = $('#btn-confirm-complete');
+
+            btn.classList.add('loading');
+            try {
+                await api('POST', `/api/topics/${state.concept.id}/complete`, {
+                    co_explored_text: coexplored,
+                    notes: notes
                 });
-            });
-
-            saveOnb.addEventListener('click', async () => {
-                const interestsVal = $('#input-onboarding-interests').value.trim();
-                const currentVal = $('#input-onboarding-current').value.trim();
-                const goalCustom = $('#input-onboarding-goal-custom').value.trim();
-                const levelVal = $('#input-onboarding-level').value;
-                const levelDetails = $('#input-onboarding-level-details').value.trim();
-
-                let subjects = [];
-                if (interestsVal) {
-                    subjects = interestsVal.split(',').map(s => s.trim()).filter(s => s);
-                }
-
-                let currentInterests = [];
-                if (currentVal) currentInterests.push(`Chcę się dowiedzieć: ${currentVal}`);
-                if (goalCustom) currentInterests.push(`Cel: ${goalCustom}`);
-
-                if (levelVal) {
-                    let levelStr = levelVal;
-                    if (levelVal === 'custom' && levelDetails) levelStr = levelDetails;
-                    else if (levelDetails) levelStr += ` (${levelDetails})`;
-                    currentInterests.push(`Obecny poziom wiedzy: ${levelStr}`);
-                }
-
-                setLoading(saveOnb, true);
-                try {
-                    const prefs = await api('GET', '/api/preferences');
-                    prefs.preferred_subjects = subjects;
-                    prefs.current_interests = currentInterests;
-                    await api('POST', '/api/preferences', prefs);
-                    
-                    showView('NO_TOPIC');
-                } catch (err) {
-                    showError(err.message);
-                }
-                setLoading(saveOnb, false);
-            });
-            
-            $('#input-onboarding-interests').addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') document.querySelectorAll('.btn-onb-next')[0].click();
-            });
-            $('#input-onboarding-current').addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') document.querySelectorAll('.btn-onb-next')[1].click();
-            });
-            $('#input-onboarding-goal-custom').addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') document.querySelectorAll('.btn-onb-next')[2].click();
-            });
-            $('#input-onboarding-level').addEventListener('change', (e) => {
-                const detailsInput = $('#input-onboarding-level-details');
-                if (e.target.value === 'szkola_srednia' || e.target.value === 'studia' || e.target.value === 'custom') {
-                    detailsInput.style.display = 'block';
-                    detailsInput.focus();
-                } else {
-                    detailsInput.style.display = 'none';
-                }
-            });
-            $('#input-onboarding-level').addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && $('#input-onboarding-level-details').style.display === 'none') saveOnb.click();
-            });
-            $('#input-onboarding-level-details').addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') saveOnb.click();
-            });
-        }
-
-        // TOAST
-        $('#toast-close').addEventListener('click', hideError);
-    }
-
-    function goBack() {
-        if (state.topic && state.topic.status === 'active') {
-            renderActive();
-            showView('TOPIC_ACTIVE');
-        } else if (state.topic && state.topic.status === 'suggested') {
-            renderSuggested();
-            showView('TOPIC_SUGGESTED');
-        } else {
-            showView('NO_TOPIC');
-        }
-    }
-
-    // ─── Interest Toggle ───
-    function toggleInterest() {
-        const form = $('#interest-form');
-        const toggle = $('#btn-toggle-interest');
-        if (form.hidden) {
-            form.hidden = false;
-            toggle.hidden = true;
-            $('#input-interest').focus();
-        } else {
-            form.hidden = true;
-            toggle.hidden = false;
-        }
-    }
-
-    function submitInterest() {
-        const input = $('#input-interest');
-        const val = input.value.trim();
-        if (!val) return;
-        generateTopic('user_interest', val);
-    }
-
-    // ─── Generate Topic ───
-    async function generateTopic(mode, userRequest = null, action = 'skip') {
-        const btn = mode === 'random' ? $('#btn-random-topic') :
-                    mode === 'connected' && state.view === 'SAVED' ? $('#btn-next-topic') :
-                    state.view === 'TOPIC_SUGGESTED' ? (action === 'reject' ? $('#btn-reject') : $('#btn-skip')) : $('#btn-get-topic');
-
-        setLoading(btn, true);
-
-        try {
-            const body = { mode, current_topic_action: action };
-            if (userRequest) body.user_request = userRequest;
-            const data = await api('POST', '/api/topics/generate', body);
-
-            state.topic = data.topic;
-            renderSuggested();
-            showView('TOPIC_SUGGESTED');
-        } catch (err) {
-            showError(err.message);
-        } finally {
-            setLoading(btn, false);
-        }
-    }
-
-    // ─── Accept / Reject ───
-    async function acceptTopic() {
-        if (!state.topic) return;
-        const btn = $('#btn-accept');
-        setLoading(btn, true);
-
-        try {
-            const data = await api('POST', `/api/topics/${state.topic.id}/accept`);
-            state.topic = data.topic;
-            state.session = data.session;
-            renderActive();
-            showView('TOPIC_ACTIVE');
-        } catch (err) {
-            showError(err.message);
-        } finally {
-            setLoading(btn, false);
-        }
-    }
-
-    async function rejectTopic(action) {
-        if (!state.topic) return;
-        generateTopic('connected', null, action);
-    }
-
-    // ─── Copy Prompt ───
-    async function copyPrompt() {
-        if (!state.topic) return;
-        try {
-            const promptText = $('#active-prompt-text').textContent;
-            
-            if (navigator.clipboard && window.isSecureContext) {
-                await navigator.clipboard.writeText(promptText);
-            } else {
-                const textArea = document.createElement("textarea");
-                textArea.value = promptText;
-                textArea.style.top = "0";
-                textArea.style.left = "0";
-                textArea.style.position = "fixed";
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                } catch (err) {
-                    throw new Error('Fallback copy failed');
-                }
-                document.body.removeChild(textArea);
+                $('#complete-modal-backdrop').hidden = true;
+                $('#input-coexplored').value = '';
+                $('#input-notes').value = '';
+                state.concept = null;
+                state.prompt = null;
+                state.coldStartActive = false;
+                renderFocusCard(null);
+                showToast(t('saved.title'));
+            } catch (err) {
+                showToast(err.message);
+            } finally {
+                btn.classList.remove('loading');
             }
-            
-            const btn = $('#btn-copy-prompt');
-            btn.innerHTML = '<span class="icon">✓</span>';
-            setTimeout(() => { btn.innerHTML = '<span class="icon">📋</span>'; }, 2000);
-
-            const el = $('#prompt-copied');
-            el.hidden = false;
-            setTimeout(() => { el.hidden = true; }, 3000);
-        } catch (err) {
-            showError(t('errors.copy_failed') + ' ' + err.message);
-        }
-    }
-
-    // ─── Ratings ───
-    function setupRatings() {
-        ['interest', 'difficulty'].forEach((type) => {
-            const container = $(`#rating-${type}`);
-            container.querySelectorAll('.rating__dot').forEach((dot) => {
-                dot.addEventListener('click', () => {
-                    const val = parseInt(dot.dataset.value);
-                    if (type === 'interest') state.interestRating = val;
-                    else state.difficultyRating = val;
-
-                    container.querySelectorAll('.rating__dot').forEach((d) => {
-                        d.classList.toggle('is-active', parseInt(d.dataset.value) <= val);
-                    });
-                });
-            });
         });
-    }
 
-    function resetRatings() {
-        state.interestRating = null;
-        state.difficultyRating = null;
-        $$('.rating__dot').forEach((d) => d.classList.remove('is-active'));
-    }
-
-    // ─── Save Reflection ───
-    async function saveReflection(e) {
-        e.preventDefault();
-        if (!state.topic) return;
-
-        const btn = $('#btn-save');
-        setLoading(btn, true);
-
-        try {
-            const body = {
-                notes: $('#field-notes').value.trim() || null,
-                discoveries: $('#field-discoveries').value.trim() || null,
-                side_paths: $('#field-sidepaths').value.trim() || null,
-                interest_rating: state.interestRating,
-                difficulty_rating: state.difficultyRating,
-            };
-
-            const data = await api('POST', `/api/topics/${state.topic.id}/complete`, body);
-            state.topic = data.topic;
-
-            // Clear form
-            $('#field-notes').value = '';
-            $('#field-discoveries').value = '';
-            $('#field-sidepaths').value = '';
-            resetRatings();
-
-            renderSaved();
-            showView('SAVED');
-        } catch (err) {
-            showError(err.message);
-        } finally {
-            setLoading(btn, false);
-        }
-    }
-
-    // ─── Render Helpers ───
-    function renderSuggested() {
-        if (!state.topic) return;
-        $('#suggested-title').textContent = state.topic.title;
-        $('#suggested-reason').textContent = state.topic.short_reason || '';
-        const connEl = $('#suggested-connection');
-        if (state.topic.connection && state.historyCount > 0) {
-            connEl.textContent = state.topic.connection;
-            connEl.hidden = false;
-        } else {
-            connEl.hidden = true;
-        }
-    }
-
-    async function renderActive() {
-        if (!state.topic) return;
-        $('#active-title').textContent = state.topic.title;
-        $('#active-reason').textContent = state.topic.short_reason || t('active.fallback_reason');
-        const started = relativeDate(state.topic.created_at);
-        $('#active-meta').textContent = started ? t('active.started', { date: started }) : '';
-        if ($('#active-prompt-text')) {
-            if (state.topic.prompt) {
-                $('#active-prompt-text').textContent = state.topic.prompt;
-            } else {
-                $('#active-prompt-text').textContent = 'Loading prompt...';
-                try {
-                    const data = await api('POST', '/api/learning-prompt', {
-                        topic_title: state.topic.title,
-                    });
-                    state.topic.prompt = data.prompt;
-                    $('#active-prompt-text').textContent = data.prompt;
-                } catch (err) {
-                    $('#active-prompt-text').textContent = 'Failed to load prompt.';
-                }
-            }
-        }
-    }
-
-    function renderReflection() {
-        if (!state.topic) return;
-        $('#reflection-topic').textContent = state.topic.title;
-    }
-
-    function renderSaved() {
-        if (!state.topic) return;
-        const topicText = $('#saved-topic-text');
-        topicText.innerHTML = t('saved.topic_saved', { topic: `<span style="font-family:var(--font-mono);color:var(--text-accent)">${esc(state.topic.title)}</span>` });
-    }
-
-    // ─── History ───
-    async function loadHistory() {
-        showView('HISTORY');
-        const list = $('#history-list');
-        list.innerHTML = '';
-
-        try {
-            const data = await api('GET', '/api/history?limit=50');
-
-            if (data.items.length === 0) {
-                $('#history-empty').hidden = false;
-                return;
-            }
-
-            $('#history-empty').hidden = true;
-
-            data.items.forEach((item) => {
-                const el = document.createElement('div');
-                el.className = 'history-item';
-                el.tabIndex = 0;
-                el.setAttribute('role', 'button');
-                el.setAttribute('aria-label', item.title);
-
-                const notesPreview = item.notes ? item.notes.substring(0, 100) : '';
-                const date = relativeDate(item.session_completed || item.created_at);
-
-                el.innerHTML = `
-                    <div class="history-item__top">
-                        <span class="history-item__title">${esc(item.title)}</span>
-                        <span class="history-item__date">${esc(date)}</span>
-                    </div>
-                    ${notesPreview ? `<p class="history-item__notes">${esc(notesPreview)}</p>` : ''}
-                    <div class="history-item__ratings">
-                        ${item.interest_rating ? `<span>${t('history.interest')}: ${item.interest_rating}/5</span>` : ''}
-                        ${item.difficulty_rating ? `<span>${t('history.difficulty')}: ${item.difficulty_rating}/5</span>` : ''}
-                    </div>
-                `;
-
-                el.addEventListener('click', () => loadDetail(item.id));
-                el.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        loadDetail(item.id);
-                    }
-                });
-
-                list.appendChild(el);
-            });
-        } catch (err) {
-            showError(err.message);
-        }
-    }
-
-    async function loadDetail(topicId) {
-        showView('DETAIL');
-        const container = $('#detail-content');
-        container.innerHTML = '';
-
-        try {
-            const data = await api('GET', `/api/topics/${topicId}`);
-            const tp = data.topic;
-            const s = data.session;
-
-            let html = `<h2 class="detail-title">${esc(tp.title)}</h2>`;
-            html += `<div class="detail-meta">`;
-            if (tp.difficulty) html += `<span>${t('detail.difficulty_label')}: ${esc(tp.difficulty)}</span>`;
-            if (tp.created_at) html += `<span>${relativeDate(tp.created_at)}</span>`;
-            if (tp.source_mode) html += `<span>${t('detail.mode_label')}: ${esc(tp.source_mode)}</span>`;
-            html += `</div>`;
-
-            if (tp.short_reason) {
-                html += `<div class="detail-section"><div class="detail-section__label">${t('detail.why_label')}</div><p class="detail-section__text">${esc(tp.short_reason)}</p></div>`;
-            }
-            if (tp.connection) {
-                html += `<div class="detail-section"><div class="detail-section__label">${t('detail.connection_label')}</div><p class="detail-section__text">${esc(tp.connection)}</p></div>`;
-            }
-
-            if (s) {
-                if (s.notes) html += `<div class="detail-section"><div class="detail-section__label">${t('detail.notes_label')}</div><p class="detail-section__text">${esc(s.notes)}</p></div>`;
-                if (s.discoveries) html += `<div class="detail-section"><div class="detail-section__label">${t('detail.discoveries_label')}</div><p class="detail-section__text">${esc(s.discoveries)}</p></div>`;
-                if (s.side_paths) html += `<div class="detail-section"><div class="detail-section__label">${t('detail.sidepaths_label')}</div><p class="detail-section__text">${esc(s.side_paths)}</p></div>`;
-                if (s.interest_rating) html += `<div class="detail-section"><div class="detail-section__label">${t('detail.interest_label')}</div><p class="detail-section__text">${s.interest_rating}/5</p></div>`;
-                if (s.difficulty_rating) html += `<div class="detail-section"><div class="detail-section__label">${t('detail.difficulty_detail_label')}</div><p class="detail-section__text">${s.difficulty_rating}/5</p></div>`;
-            }
-
-            container.innerHTML = html;
-        } catch (err) {
-            showError(err.message);
-        }
-    }
-
-    // ─── Settings ───
-    async function loadSettings() {
-        showView('SETTINGS');
-
-        try {
-            const stateData = await api('GET', '/api/state');
-            const ai = stateData.ai;
-
-            const aiInfo = $('#settings-ai-info');
-            if (ai.configured) {
-                aiInfo.innerHTML = `${t('settings.ai_provider')}: <span class="status-ok">${esc(ai.provider)}</span><br>${t('settings.ai_model')}: ${esc(ai.model)}<br>${t('settings.ai_status')}: <span class="status-ok">${t('settings.ai_configured')}</span>`;
-            } else {
-                aiInfo.innerHTML = `${t('settings.ai_status')}: <span class="status-err">${t('settings.ai_not_configured')}</span><br>${t('settings.ai_set_key')}`;
-            }
-
-            const prefs = await api('GET', '/api/preferences');
-            renderTags('preferred', prefs.preferred_subjects || []);
-            renderTags('disliked', prefs.disliked_subjects || []);
-
-            const styleSelect = $('#select-style');
-            styleSelect.value = prefs.learning_style || 'top-down';
-
-            // Language selector — populate from discovered languages
-            const langSelect = $('#select-language');
-            langSelect.innerHTML = '';
-            languages.forEach(l => {
-                const opt = document.createElement('option');
-                opt.value = l.code;
-                opt.textContent = `${l.native_name} (${l.name})`;
-                langSelect.appendChild(opt);
-            });
-            langSelect.value = prefs.language || 'en';
-
-            // Bind settings events
-            $('#btn-add-preferred').onclick = () => addTag('preferred');
-            $('#input-preferred').onkeydown = (e) => { if (e.key === 'Enter') addTag('preferred'); };
-            $('#btn-add-disliked').onclick = () => addTag('disliked');
-            $('#input-disliked').onkeydown = (e) => { if (e.key === 'Enter') addTag('disliked'); };
-            styleSelect.onchange = () => savePrefs();
-            langSelect.onchange = async () => {
-                const newLang = langSelect.value;
-                await api('POST', '/api/preferences', { language: newLang });
-                await loadLanguage(newLang);
-                // Re-render dynamic content
-                $('#topbar-date').textContent = formatDate();
-                $('#greeting-text').textContent = getGreeting();
-            };
-        } catch (err) {
-            showError(err.message);
-        }
-    }
-
-    function renderTags(type, items) {
-        const container = $(`#${type}-tags`);
-        container.innerHTML = '';
-        items.forEach((item) => {
-            const tag = document.createElement('span');
-            tag.className = 'tag';
-            tag.innerHTML = `${esc(item)} <button class="tag__remove" aria-label="Remove ${esc(item)}">&times;</button>`;
-            tag.querySelector('.tag__remove').addEventListener('click', () => {
-                items.splice(items.indexOf(item), 1);
-                renderTags(type, items);
-                savePrefs();
-            });
-            container.appendChild(tag);
+        // Spark Inbox Floating Button & Modal
+        $('#btn-floating-spark').addEventListener('click', () => {
+            loadSparksList();
+            $('#spark-modal-backdrop').hidden = false;
+            $('#input-spark-text').focus();
         });
-    }
+        $('#btn-close-spark-modal').addEventListener('click', () => {
+            $('#spark-modal-backdrop').hidden = true;
+        });
 
-    async function addTag(type) {
-        const input = $(`#input-${type}`);
-        const val = input.value.trim();
-        if (!val) return;
-        input.value = '';
+        $('#btn-submit-spark').addEventListener('click', submitSpark);
+        $('#input-spark-text').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') submitSpark();
+        });
 
-        try {
-            const prefs = await api('GET', '/api/preferences');
-            const key = type === 'preferred' ? 'preferred_subjects' : 'disliked_subjects';
-            const list = prefs[key] || [];
-            if (!list.includes(val)) {
-                list.push(val);
-                const body = {};
-                body[key] = list;
-                await api('POST', '/api/preferences', body);
-                renderTags(type, list);
+        // Keyboard Shortcut: Space on Dashboard (when not in an input) opens Spark Inbox
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+                e.preventDefault();
+                loadSparksList();
+                $('#spark-modal-backdrop').hidden = false;
+                setTimeout(() => $('#input-spark-text').focus(), 50);
             }
-        } catch (err) {
-            showError(err.message);
-        }
-    }
+            if (e.key === 'Escape') {
+                $('#spark-modal-backdrop').hidden = true;
+                $('#complete-modal-backdrop').hidden = true;
+            }
+        });
 
-    async function savePrefs() {
-        try {
-            const body = { learning_style: $('#select-style').value };
-            await api('POST', '/api/preferences', body);
-        } catch (err) {
-            showError(err.message);
-        }
-    }
-
-    // ─── Utils ───
-    function setLoading(btn, loading) {
-        if (!btn) return;
-        btn.classList.toggle('is-loading', loading);
-        btn.disabled = loading;
-    }
-
-    // Theme bindings
-    if ($('#btn-theme-light')) {
+        // Settings Themes
+        $('#btn-theme-dark').addEventListener('click', () => applyTheme('dark'));
         $('#btn-theme-light').addEventListener('click', () => applyTheme('light'));
     }
-    if ($('#btn-theme-dark')) {
-        $('#btn-theme-dark').addEventListener('click', () => applyTheme('dark'));
-    }
-    document.querySelectorAll('.color-swatch').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            applyColor(e.target.dataset.hue);
-        });
-    });
 
-    function esc(str) {
+    async function submitSpark() {
+        const input = $('#input-spark-text');
+        const text = input.value.trim();
+        if (!text) return;
+
+        try {
+            await api('POST', '/api/sparks', {
+                text: text,
+                parent_concept_id: state.concept ? state.concept.id : null
+            });
+            input.value = '';
+            showToast(t('spark_box.saved_toast'));
+            loadSparksList();
+        } catch (err) {
+            showToast(err.message);
+        }
+    }
+
+    function escapeHtml(str) {
         if (!str) return '';
-        const div = document.createElement('div');
-        div.textContent = str;
-        return div.innerHTML;
+        const p = document.createElement('p');
+        p.textContent = str;
+        return p.innerHTML;
     }
 
-    let toastTimer = null;
-    function showError(msg) {
-        const toast = $('#toast');
-        const text = $('#toast-text');
-        text.textContent = msg;
-        toast.hidden = false;
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(hideError, 8000);
-    }
-
-    function hideError() {
-        $('#toast').hidden = true;
-        clearTimeout(toastTimer);
-    }
-
-    // ─── Start ───
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
+    // Start App
+    init();
 })();
