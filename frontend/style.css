@@ -310,6 +310,11 @@ body {
     margin: 0 auto;
 }
 
+.reflection-form .actions,
+.onboarding-slide .actions {
+    max-width: 100%;
+}
+
 .btn {
     display: inline-flex;
     align-items: center;

@@ -77,6 +77,28 @@
         } catch (err) {
             languages = [{ code: 'en', name: 'English', native_name: 'English' }];
         }
+        
+        const topbarLangSelect = $('#topbar-lang-select');
+        if (topbarLangSelect) {
+            topbarLangSelect.innerHTML = '';
+            languages.forEach(l => {
+                const opt = document.createElement('option');
+                opt.value = l.code;
+                opt.textContent = `${l.code.toUpperCase()}`;
+                topbarLangSelect.appendChild(opt);
+            });
+            topbarLangSelect.value = langCode;
+            
+            topbarLangSelect.addEventListener('change', async (e) => {
+                const newLang = e.target.value;
+                await loadLanguage(newLang);
+                if (localStorage.getItem('curiosity_token')) {
+                    api('POST', '/api/preferences', { language: newLang }).catch(() => {});
+                }
+                $('#topbar-date').textContent = formatDate();
+                $('#greeting-text').textContent = getGreeting();
+            });
+        }
     }
 
     // ─── DOM refs ───
@@ -365,9 +387,6 @@
                     await api('POST', '/api/preferences', prefs);
                     
                     showView('NO_TOPIC');
-                    if (currentVal) {
-                        generateTopic('user_interest', currentVal);
-                    }
                 } catch (err) {
                     showError(err.message);
                 }
