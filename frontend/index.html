@@ -60,12 +60,30 @@
                     </button>
                 </div>
 
-                <!-- Unauthenticated Auth Links (Shown on Landing Page) -->
+                <!-- Unauthenticated Auth Links (Shown on Landing Page when logged out) -->
                 <div class="topbar__auth-links" id="topbar-auth-links">
                     <button class="topbar__btn topbar__btn--auth-login" id="btn-topbar-login" data-i18n="nav.login_btn"></button>
                     <button class="topbar__btn topbar__btn--auth-register" id="btn-topbar-register" data-i18n="nav.register_btn"></button>
                 </div>
 
+                <!-- Authenticated User Avatar & Dropdown Menu -->
+                <div class="topbar__user-profile" id="topbar-user-profile" hidden>
+                    <button type="button" class="user-avatar-btn" id="btn-user-avatar" aria-label="User Menu" aria-expanded="false">
+                        <span class="user-avatar-initial" id="user-avatar-initial">U</span>
+                    </button>
+                    <div class="user-dropdown-menu" id="user-dropdown-menu" hidden>
+                        <div class="user-dropdown-header">
+                            <span class="user-dropdown-name" id="user-dropdown-name">User</span>
+                        </div>
+                        <div class="user-dropdown-divider"></div>
+                        <button type="button" class="user-dropdown-item" id="btn-user-menu-dashboard" data-i18n="nav.user_dashboard"></button>
+                        <button type="button" class="user-dropdown-item" id="btn-user-menu-settings" data-i18n="nav.user_settings"></button>
+                        <div class="user-dropdown-divider"></div>
+                        <button type="button" class="user-dropdown-item user-dropdown-item--danger" id="btn-user-menu-logout" data-i18n="nav.user_logout"></button>
+                    </div>
+                </div>
+
+                <!-- Language Selector (ONLY visible on Landing Page) -->
                 <select id="topbar-lang-select" class="lang-select" aria-label="Language">
                 </select>
             </nav>
@@ -102,25 +120,21 @@
 
                     <div class="landing-features-grid">
                         <div class="feature-card">
-                            <div class="feature-card__icon-wrap">🌿</div>
                             <span class="feature-card__tag" data-i18n="landing.f1_tag"></span>
                             <h3 class="feature-card__title" data-i18n="landing.f1_title"></h3>
                             <p class="feature-card__desc" data-i18n="landing.f1_desc"></p>
                         </div>
                         <div class="feature-card">
-                            <div class="feature-card__icon-wrap">🔬</div>
                             <span class="feature-card__tag" data-i18n="landing.f2_tag"></span>
                             <h3 class="feature-card__title" data-i18n="landing.f2_title"></h3>
                             <p class="feature-card__desc" data-i18n="landing.f2_desc"></p>
                         </div>
                         <div class="feature-card">
-                            <div class="feature-card__icon-wrap">🌫️</div>
                             <span class="feature-card__tag" data-i18n="landing.f3_tag"></span>
                             <h3 class="feature-card__title" data-i18n="landing.f3_title"></h3>
                             <p class="feature-card__desc" data-i18n="landing.f3_desc"></p>
                         </div>
                         <div class="feature-card">
-                            <div class="feature-card__icon-wrap">⚡</div>
                             <span class="feature-card__tag" data-i18n="landing.f4_tag"></span>
                             <h3 class="feature-card__title" data-i18n="landing.f4_title"></h3>
                             <p class="feature-card__desc" data-i18n="landing.f4_desc"></p>
@@ -207,10 +221,10 @@
                                     data-i18n="onboarding.add_chip_btn"></button>
                             </div>
 
-                            <div class="wizard-actions">
+                            <div class="wizard-actions wizard-actions--step1">
                                 <span id="onboarding-step1-error" class="onboarding-inline-error" style="display: none;"
                                     data-i18n="onboarding.step1_required_error"></span>
-                                <button type="button" class="btn btn--primary" id="btn-wizard-step1-next"
+                                <button type="button" class="btn btn--primary btn--step-next" id="btn-wizard-step1-next"
                                     data-i18n="onboarding.btn_next"></button>
                             </div>
                         </div>
@@ -224,45 +238,55 @@
 
                             <div class="level-cards-vertical">
                                 <div class="level-card-v" data-level="ground_zero">
-                                    <div class="level-bolts" aria-label="Level 1 of 3">
-                                        <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                                        <svg class="bolt-svg empty" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                                        <svg class="bolt-svg empty" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                    <div class="level-card-v__top">
+                                        <div class="level-bolts" aria-label="Level 1 of 3">
+                                            <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                            <svg class="bolt-svg empty" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                            <svg class="bolt-svg empty" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                        </div>
+                                        <span class="level-card-v__tag" data-i18n="onboarding.level_ground_zero_tag"></span>
                                     </div>
                                     <div class="level-card-v__body">
-                                        <span class="level-card-v__tag"
-                                            data-i18n="onboarding.level_ground_zero_tag"></span>
-                                        <h3 class="level-card-v__title" data-i18n="onboarding.level_ground_zero_title">
-                                        </h3>
+                                        <h3 class="level-card-v__title" data-i18n="onboarding.level_ground_zero_title"></h3>
                                         <p class="level-card-v__desc" data-i18n="onboarding.level_ground_zero_desc"></p>
                                     </div>
-                                    <div class="level-card-v__check" aria-hidden="true"></div>
+                                    <div class="level-card-v__footer">
+                                        <div class="level-card-v__check" aria-hidden="true"></div>
+                                    </div>
                                 </div>
                                 <div class="level-card-v active" data-level="builder">
-                                    <div class="level-bolts" aria-label="Level 2 of 3">
-                                        <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                                        <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                                        <svg class="bolt-svg empty" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                    <div class="level-card-v__top">
+                                        <div class="level-bolts" aria-label="Level 2 of 3">
+                                            <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                            <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                            <svg class="bolt-svg empty" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                        </div>
+                                        <span class="level-card-v__tag" data-i18n="onboarding.level_builder_tag"></span>
                                     </div>
                                     <div class="level-card-v__body">
-                                        <span class="level-card-v__tag" data-i18n="onboarding.level_builder_tag"></span>
                                         <h3 class="level-card-v__title" data-i18n="onboarding.level_builder_title"></h3>
                                         <p class="level-card-v__desc" data-i18n="onboarding.level_builder_desc"></p>
                                     </div>
-                                    <div class="level-card-v__check" aria-hidden="true"></div>
+                                    <div class="level-card-v__footer">
+                                        <div class="level-card-v__check" aria-hidden="true"></div>
+                                    </div>
                                 </div>
                                 <div class="level-card-v" data-level="deep">
-                                    <div class="level-bolts" aria-label="Level 3 of 3">
-                                        <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                                        <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                                        <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                    <div class="level-card-v__top">
+                                        <div class="level-bolts" aria-label="Level 3 of 3">
+                                            <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                            <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                            <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                        </div>
+                                        <span class="level-card-v__tag" data-i18n="onboarding.level_deep_tag"></span>
                                     </div>
                                     <div class="level-card-v__body">
-                                        <span class="level-card-v__tag" data-i18n="onboarding.level_deep_tag"></span>
                                         <h3 class="level-card-v__title" data-i18n="onboarding.level_deep_title"></h3>
                                         <p class="level-card-v__desc" data-i18n="onboarding.level_deep_desc"></p>
                                     </div>
-                                    <div class="level-card-v__check" aria-hidden="true"></div>
+                                    <div class="level-card-v__footer">
+                                        <div class="level-card-v__check" aria-hidden="true"></div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -332,12 +356,12 @@
                             <h2 class="cold-start-custom-title" data-i18n="cold_start.custom_view_title"></h2>
                             <p class="cold-start-custom-subtitle" data-i18n="cold_start.custom_view_subtitle"></p>
 
-                            <form id="form-cold-start-thought" class="google-search-bar-wrap">
-                                <div class="google-search-bar">
+                            <form id="form-cold-start-thought" class="thought-search-bar-wrap">
+                                <div class="thought-search-bar">
                                     <span class="search-bar-icon" aria-hidden="true">✦</span>
-                                    <input type="text" class="search-bar-input" id="input-cold-start-thought"
+                                    <input type="text" class="thought-search-input" id="input-cold-start-thought"
                                         data-i18n-placeholder="cold_start.custom_placeholder" autocomplete="off">
-                                    <button type="submit" class="btn btn--primary btn--search-submit" id="btn-submit-cold-start-thought">
+                                    <button type="submit" class="btn btn--primary btn--thought-submit" id="btn-submit-cold-start-thought">
                                         <span class="btn__text" data-i18n="cold_start.custom_submit"></span>
                                         <span class="btn__loader" aria-hidden="true"></span>
                                     </button>

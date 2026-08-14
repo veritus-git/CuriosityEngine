@@ -13,17 +13,20 @@
         "settings": "Ustawienia",
         "logout": "Wyloguj",
         "login_btn": "Zaloguj się",
-        "register_btn": "Zarejestruj się"
+        "register_btn": "Zarejestruj się",
+        "user_dashboard": "Panel wiedzy",
+        "user_settings": "Ustawienia",
+        "user_logout": "Wyloguj się"
     },
     "landing": {
         "badge": "Nowy Wymiar Ciekawości & Nauki",
         "title_static": "Ucz się przez",
         "dynamic_phrases": [
-            "intuicyjne skojarzenia.",
-            "modele mentalne i analogie.",
-            "schodzenie głęboko pod maskę.",
-            "gotowe prompty do Claude i ChatGPT.",
-            "fascynujące mosty logiczne."
+            "modele mentalne.",
+            "proste analogie.",
+            "pierwsze zasady.",
+            "zrozumienie od zera.",
+            "połączenia idei."
         ],
         "subtitle": "CuriosityEngine zdejmuje z Ciebie ciężar wyboru i pisania promptów. Łączy pojęcia w asocjacyjną sieć wiedzy, dostarczając zwięzłe modele mentalne i precyzyjne prompty do natychmiastowej eksploracji.",
         "cta_start": "Rozpocznij Eksplorację ➔",
@@ -43,7 +46,7 @@
         "f3_desc": "Gdy jesteś zmęczony i przytłoczony: proste, genialne analogie fizyczne dające natychmiastowe poczucie zrozumienia.",
         "f4_title": "Spark Inbox",
         "f4_tag": "Łapanie Dygresji",
-        "f4_desc": "Zapisuj przelotne myśli jednym klawiszem (Spacja). Silnik połączy je w grafie i przypomni o nich we właściwym momencie."
+        "f4_desc": "Zapisuj przelotne myśli, by ich nie zapomnieć."
     },
     "greeting": {
         "late_night": "Nocne przemyślenia.",
@@ -92,15 +95,15 @@
         "step1_required_error": "Wybierz przynajmniej jedną dziedzinę",
         "step2_title": "Twój punkt wyjścia",
         "step2_subtitle": "Wybierz preferowany styl modeli mentalnych i głębię tłumaczeń:",
-        "level_ground_zero_title": "Intuicja & Proste Analogie",
-        "level_ground_zero_tag": "Od Zera / Klocki LEGO",
-        "level_ground_zero_desc": "Tłumacz od zera prostym językiem i obrazowymi metaforami z życia codziennego. Zero zbędnego żargonu, maksimum intuicji 'jak dla 5-latka'.",
-        "level_builder_title": "Systemy & Łączenie Kropek",
-        "level_builder_tag": "Średniozaawansowany / Builder",
-        "level_builder_desc": "Znam ogólne podstawy. Chcę rozumieć dlaczego rzeczy działają, łączyć odległe idee i budować całościowe modele mentalne.",
-        "level_deep_title": "Zasada Działania & Pod Maską",
-        "level_deep_tag": "Głęboka Analiza / Ekspert",
-        "level_deep_desc": "Ścisłość logiczna, dekonstrukcja mechanizmów do elementarnych części składowych i badanie nietrywialnych zależności.",
+        "level_ground_zero_title": "Od Zera / Intuicja",
+        "level_ground_zero_tag": "KROK PO KROKU",
+        "level_ground_zero_desc": "Zero zbędnego żargonu. Obrazowe analogie z życia codziennego i proste, namacalne modele mentalne.",
+        "level_builder_title": "Builder / Systemy",
+        "level_builder_tag": "ŁĄCZENIE KROPEK",
+        "level_builder_desc": "Znam podstawy techniczne. Chcę rozumieć dlaczego rzeczy działają i łączyć odległe idee w całość.",
+        "level_deep_title": "Pod Maską / Ekspert",
+        "level_deep_tag": "PIERWSZE ZASADY",
+        "level_deep_desc": "Ścisłość techniczna, dekonstrukcja mechanizmów do elementarnych części i analiza nietrywialnych zależności.",
         "step3_title": "O czym ostatnio myślałeś?",
         "step3_subtitle": "Wpisz dowolne pytanie lub myśl z ostatnich dni (lub zostaw puste):",
         "recent_placeholder": "np. jak działają GPU, dlaczego kompresja wideo gubi jakość, jak silnik szachowy ocenia pozycję...",
@@ -118,8 +121,8 @@
         "custom_view_title": "Wpisz swoją myśl lub pytanie:",
         "custom_view_subtitle": "Silnik wygeneruje 4 bezpośrednie odnogi do Twojego pomysłu.",
         "custom_view_back": "← Wróć do propozycji",
-        "custom_placeholder": "np. jak komputery generują dźwięk, dlaczego gwiazdy migoczą...",
-        "custom_submit": "Zbadaj odnogi ➔"
+        "custom_placeholder": "Wpisz dowolne pytanie lub myśl...",
+        "custom_submit": "Zbadaj ➔"
     },
     "loading": {
         "generating": "CuriosityEngine syntezuje propozycję...",

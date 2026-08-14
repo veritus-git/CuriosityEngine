@@ -110,7 +110,7 @@ async def register(req: AuthRequest):
     try:
         register_user(req.username, req.password)
         token = login_user(req.username, req.password)
-        return {"token": token}
+        return {"token": token, "username": req.username}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -120,7 +120,7 @@ async def login(req: AuthRequest):
     token = login_user(req.username, req.password)
     if not token:
         raise HTTPException(status_code=401, detail="Invalid username or password")
-    return {"token": token}
+    return {"token": token, "username": req.username}
 
 
 # ─── Application State Route ───
@@ -150,6 +150,7 @@ async def get_app_state(username: str = Depends(get_current_user_token)):
 
     return {
         "state": state,
+        "username": username,
         "concept": concept,
         "prompt": prompt,
         "sparks_count": len(sparks),

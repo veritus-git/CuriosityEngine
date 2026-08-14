@@ -20,17 +20,20 @@
             "settings": "Ustawienia",
             "logout": "Wyloguj",
             "login_btn": "Zaloguj się",
-            "register_btn": "Zarejestruj się"
+            "register_btn": "Zarejestruj się",
+            "user_dashboard": "Panel wiedzy",
+            "user_settings": "Ustawienia",
+            "user_logout": "Wyloguj się"
         },
         "landing": {
             "badge": "Nowy Wymiar Ciekawości & Nauki",
             "title_static": "Ucz się przez",
             "dynamic_phrases": [
-                "intuicyjne skojarzenia.",
-                "modele mentalne i analogie.",
-                "schodzenie głęboko pod maskę.",
-                "gotowe prompty do Claude i ChatGPT.",
-                "fascynujące mosty logiczne."
+                "modele mentalne.",
+                "proste analogie.",
+                "pierwsze zasady.",
+                "zrozumienie od zera.",
+                "połączenia idei."
             ],
             "subtitle": "CuriosityEngine zdejmuje z Ciebie ciężar wyboru i pisania promptów. Łączy pojęcia w asocjacyjną sieć wiedzy, dostarczając zwięzłe modele mentalne i precyzyjne prompty do natychmiastowej eksploracji.",
             "cta_start": "Rozpocznij Eksplorację ➔",
@@ -50,7 +53,7 @@
             "f3_desc": "Gdy jesteś zmęczony i przytłoczony: proste, genialne analogie fizyczne dające natychmiastowe poczucie zrozumienia.",
             "f4_title": "Spark Inbox",
             "f4_tag": "Łapanie Dygresji",
-            "f4_desc": "Zapisuj przelotne myśli jednym klawiszem (Spacja). Silnik połączy je w grafie i przypomni o nich we właściwym momencie."
+            "f4_desc": "Zapisuj przelotne myśli, by ich nie zapomnieć."
         },
         "greeting": {
             "late_night": "Nocne przemyślenia.",
@@ -99,15 +102,15 @@
             "step1_required_error": "Wybierz przynajmniej jedną dziedzinę",
             "step2_title": "Twój punkt wyjścia",
             "step2_subtitle": "Wybierz preferowany styl modeli mentalnych i głębię tłumaczeń:",
-            "level_ground_zero_title": "Intuicja & Proste Analogie",
-            "level_ground_zero_tag": "Od Zera / Klocki LEGO",
-            "level_ground_zero_desc": "Tłumacz od zera prostym językiem i obrazowymi metaforami z życia codziennego. Zero zbędnego żargonu, maksimum intuicji 'jak dla 5-latka'.",
-            "level_builder_title": "Systemy & Łączenie Kropek",
-            "level_builder_tag": "Średniozaawansowany / Builder",
-            "level_builder_desc": "Znam ogólne podstawy. Chcę rozumieć dlaczego rzeczy działają, łączyć odległe idee i budować całościowe modele mentalne.",
-            "level_deep_title": "Zasada Działania & Pod Maską",
-            "level_deep_tag": "Głęboka Analiza / Ekspert",
-            "level_deep_desc": "Ścisłość logiczna, dekonstrukcja mechanizmów do elementarnych części składowych i badanie nietrywialnych zależności.",
+            "level_ground_zero_title": "Od Zera / Intuicja",
+            "level_ground_zero_tag": "KROK PO KROKU",
+            "level_ground_zero_desc": "Zero zbędnego żargonu. Obrazowe analogie z życia codziennego i proste, namacalne modele mentalne.",
+            "level_builder_title": "Builder / Systemy",
+            "level_builder_tag": "ŁĄCZENIE KROPEK",
+            "level_builder_desc": "Znam podstawy techniczne. Chcę rozumieć dlaczego rzeczy działają i łączyć odległe idee w całość.",
+            "level_deep_title": "Pod Maską / Ekspert",
+            "level_deep_tag": "PIERWSZE ZASADY",
+            "level_deep_desc": "Ścisłość techniczna, dekonstrukcja mechanizmów do elementarnych części i analiza nietrywialnych zależności.",
             "step3_title": "O czym ostatnio myślałeś?",
             "step3_subtitle": "Wpisz dowolne pytanie lub myśl z ostatnich dni (lub zostaw puste):",
             "recent_placeholder": "np. jak działają GPU, dlaczego kompresja wideo gubi jakość, jak silnik szachowy ocenia pozycję...",
@@ -125,8 +128,8 @@
             "custom_view_title": "Wpisz swoją myśl lub pytanie:",
             "custom_view_subtitle": "Silnik wygeneruje 4 bezpośrednie odnogi do Twojego pomysłu.",
             "custom_view_back": "← Wróć do propozycji",
-            "custom_placeholder": "np. jak komputery generują dźwięk, dlaczego gwiazdy migoczą...",
-            "custom_submit": "Zbadaj odnogi ➔"
+            "custom_placeholder": "Wpisz dowolne pytanie lub myśl...",
+            "custom_submit": "Zbadaj ➔"
         },
         "loading": {
             "generating": "CuriosityEngine syntezuje propozycję...",
@@ -226,6 +229,7 @@
     // ─── Unified State ───
     let state = {
         view: 'LANDING',
+        username: null,
         concept: null,
         prompt: null,
         sparksCount: 0,
@@ -241,7 +245,7 @@
     let selectedLevel = 'builder';
     let authMode = 'LOGIN'; // 'LOGIN' | 'REGISTER' | 'FIRST_SETUP'
 
-    // ─── i18n Engine (Starts with Polish pre-bundled) ───
+    // ─── i18n Engine ───
     let lang = JSON.parse(JSON.stringify(DEFAULT_LANG_PL));
     let langCode = 'pl';
     let languages = [];
@@ -409,13 +413,40 @@
 
         if (res.status === 401 || res.status === 403) {
             localStorage.removeItem('curiosity_token');
+            localStorage.removeItem('curiosity_username');
             showView('LANDING');
+            updateTopbarAuthState();
             throw new Error('Unauthorized');
         }
         if (!res.ok) {
             throw new Error(data.error || `Request failed (${res.status})`);
         }
         return data;
+    }
+
+    // ─── Topbar User Profile & Auth State ───
+    function updateTopbarAuthState(username = null) {
+        const token = localStorage.getItem('curiosity_token');
+        const authLinks = $('#topbar-auth-links');
+        const userProfile = $('#topbar-user-profile');
+        const avatarInitial = $('#user-avatar-initial');
+        const dropdownName = $('#user-dropdown-name');
+        const langSelect = $('#topbar-lang-select');
+
+        const resolvedUser = username || localStorage.getItem('curiosity_username') || state.username || 'User';
+
+        if (token) {
+            if (authLinks) authLinks.hidden = true;
+            if (userProfile) userProfile.hidden = false;
+            if (avatarInitial) avatarInitial.textContent = resolvedUser.charAt(0).toUpperCase();
+            if (dropdownName) dropdownName.textContent = resolvedUser;
+            // Hide topbar language select when logged in, unless on Landing page
+            if (langSelect) langSelect.hidden = (state.view !== 'LANDING');
+        } else {
+            if (authLinks) authLinks.hidden = false;
+            if (userProfile) userProfile.hidden = true;
+            if (langSelect) langSelect.hidden = false;
+        }
     }
 
     // ─── View Routing ───
@@ -428,33 +459,40 @@
         });
 
         const navLinks = $('#topbar-nav-links');
-        const authLinks = $('#topbar-auth-links');
         const floatingBtn = $('#btn-floating-spark');
         const globalProgress = $('#onboarding-global-progress');
+        const langSelect = $('#topbar-lang-select');
+        const token = localStorage.getItem('curiosity_token');
+
+        // Close user dropdown if open
+        const userMenu = $('#user-dropdown-menu');
+        if (userMenu) userMenu.hidden = true;
 
         if (viewName === 'LANDING') {
             if (navLinks) navLinks.hidden = true;
             if (floatingBtn) floatingBtn.hidden = true;
-            if (authLinks) authLinks.hidden = false;
             if (globalProgress) globalProgress.hidden = true;
+            if (langSelect) langSelect.hidden = false;
             restartHeroTypewriter();
         } else if (viewName === 'ONBOARDING') {
             if (navLinks) navLinks.hidden = true;
             if (floatingBtn) floatingBtn.hidden = true;
-            if (authLinks) authLinks.hidden = true;
             if (globalProgress) globalProgress.hidden = false;
+            if (langSelect) langSelect.hidden = true;
             setWizardStep(1);
         } else if (viewName === 'COLD_START') {
             if (navLinks) navLinks.hidden = true;
             if (floatingBtn) floatingBtn.hidden = true;
-            if (authLinks) authLinks.hidden = true;
             if (globalProgress) globalProgress.hidden = true;
+            if (langSelect) langSelect.hidden = true;
         } else {
             if (navLinks) navLinks.hidden = false;
             if (floatingBtn) floatingBtn.hidden = false;
-            if (authLinks) authLinks.hidden = true;
             if (globalProgress) globalProgress.hidden = true;
+            if (langSelect) langSelect.hidden = true;
         }
+
+        updateTopbarAuthState();
     }
 
     function showToast(message) {
@@ -512,11 +550,11 @@
         if (!textEl) return;
 
         const phrases = (lang.landing && lang.landing.dynamic_phrases) || [
-            "intuicyjne skojarzenia.",
-            "modele mentalne i analogie.",
-            "schodzenie głęboko pod maskę.",
-            "gotowe prompty do Claude i ChatGPT.",
-            "fascynujące mosty logiczne."
+            "modele mentalne.",
+            "proste analogie.",
+            "pierwsze zasady.",
+            "zrozumienie od zera.",
+            "połączenia idei."
         ];
 
         const currentPhrase = phrases[phraseIndex % phrases.length];
@@ -529,15 +567,15 @@
             textEl.textContent = currentPhrase.substring(0, charIndex);
         }
 
-        let typeSpeed = isDeleting ? 40 : 80;
+        let typeSpeed = isDeleting ? 35 : 75;
 
         if (!isDeleting && charIndex === currentPhrase.length) {
-            typeSpeed = 2200;
+            typeSpeed = 2000;
             isDeleting = true;
         } else if (isDeleting && charIndex === 0) {
             isDeleting = false;
             phraseIndex++;
-            typeSpeed = 400;
+            typeSpeed = 350;
         }
 
         typewriterTimeout = setTimeout(typeHeroText, typeSpeed);
@@ -933,11 +971,14 @@
 
         if (!token) {
             showView('LANDING');
+            updateTopbarAuthState();
             return;
         }
 
         try {
             const data = await api('GET', '/api/state');
+            state.username = data.username || localStorage.getItem('curiosity_username') || 'User';
+            if (data.username) localStorage.setItem('curiosity_username', data.username);
             state.concept = data.concept;
             state.prompt = data.prompt;
             state.sparksCount = data.sparks_count || 0;
@@ -945,6 +986,8 @@
             state.ai = data.ai || {};
             state.profile = data.profile || {};
             state.coldStartActive = data.cold_start_active;
+
+            updateTopbarAuthState(state.username);
 
             const sparksBadge = $('#nav-sparks-label');
             if (sparksBadge) {
@@ -1015,6 +1058,53 @@
             updateAuthModalUI();
         });
 
+        // User Avatar Dropdown Toggle & Actions
+        const btnUserAvatar = $('#btn-user-avatar');
+        const userDropdownMenu = $('#user-dropdown-menu');
+
+        btnUserAvatar?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (userDropdownMenu) {
+                userDropdownMenu.hidden = !userDropdownMenu.hidden;
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (userDropdownMenu && !userDropdownMenu.hidden) {
+                if (!e.target.closest('#topbar-user-profile')) {
+                    userDropdownMenu.hidden = true;
+                }
+            }
+        });
+
+        $('#btn-user-menu-dashboard')?.addEventListener('click', () => {
+            if (userDropdownMenu) userDropdownMenu.hidden = true;
+            showView(state.coldStartActive ? (state.profile.onboarded ? 'COLD_START' : 'ONBOARDING') : 'DASHBOARD');
+        });
+
+        $('#btn-user-menu-settings')?.addEventListener('click', () => {
+            if (userDropdownMenu) userDropdownMenu.hidden = true;
+            showView('SETTINGS');
+            const info = $('#settings-ai-info');
+            if (info) {
+                info.innerHTML = state.ai.configured
+                    ? `<span style="color: var(--success);">${t('settings.ai_configured')} (${state.ai.provider} - ${state.ai.model})</span>`
+                    : `<span style="color: var(--error);">${t('settings.ai_not_configured')}</span>`;
+            }
+        });
+
+        $('#btn-user-menu-logout')?.addEventListener('click', () => {
+            if (userDropdownMenu) userDropdownMenu.hidden = true;
+            localStorage.removeItem('curiosity_token');
+            localStorage.removeItem('curiosity_username');
+            state.username = null;
+            state.concept = null;
+            state.prompt = null;
+            showView('LANDING');
+            updateTopbarAuthState();
+            showToast(t('nav.user_logout'));
+        });
+
         // Auth Form Submission
         $('#auth-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1036,6 +1126,10 @@
                 }
 
                 localStorage.setItem('curiosity_token', data.token);
+                if (data.username) {
+                    localStorage.setItem('curiosity_username', data.username);
+                    state.username = data.username;
+                }
                 await api('POST', '/api/profile', { language: langCode }).catch(() => {});
                 closeAuthModal();
                 init();
@@ -1197,7 +1291,7 @@
             });
         }
 
-        // Cold Start Custom Thought Slide-Up Search Bar
+        // Cold Start Custom Thought Slide-Up Search Bar & Symmetrical Slide-Down
         const btnOpenCustomThought = $('#btn-cold-start-open-custom');
         const cardsView = $('#cold-start-cards-view');
         const customThoughtView = $('#cold-start-custom-view');
@@ -1206,24 +1300,37 @@
 
         if (btnOpenCustomThought) {
             btnOpenCustomThought.addEventListener('click', () => {
-                if (cardsView) cardsView.classList.add('fade-out');
+                if (cardsView) {
+                    cardsView.classList.remove('fade-in');
+                    cardsView.classList.add('fade-out');
+                }
                 setTimeout(() => {
                     if (cardsView) cardsView.hidden = true;
                     if (customThoughtView) {
+                        customThoughtView.classList.remove('slide-down');
                         customThoughtView.hidden = false;
                         if (inputThought) inputThought.focus();
                     }
-                }, 180);
+                }, 160);
             });
         }
 
         if (btnCustomBack) {
             btnCustomBack.addEventListener('click', () => {
-                if (customThoughtView) customThoughtView.hidden = true;
-                if (cardsView) {
-                    cardsView.hidden = false;
-                    cardsView.classList.remove('fade-out');
+                if (customThoughtView) {
+                    customThoughtView.classList.add('slide-down');
                 }
+                setTimeout(() => {
+                    if (customThoughtView) {
+                        customThoughtView.hidden = true;
+                        customThoughtView.classList.remove('slide-down');
+                    }
+                    if (cardsView) {
+                        cardsView.hidden = false;
+                        cardsView.classList.remove('fade-out');
+                        cardsView.classList.add('fade-in');
+                    }
+                }, 180);
             });
         }
 
@@ -1249,6 +1356,7 @@
                     if (cardsView) {
                         cardsView.hidden = false;
                         cardsView.classList.remove('fade-out');
+                        cardsView.classList.add('fade-in');
                     }
                     if (inputThought) inputThought.value = '';
                 } catch (err) {
@@ -1259,15 +1367,10 @@
             });
         }
 
-        // Brand Click Navigation
+        // Brand Click ALWAYS navigates back to Landing Page
         $('#nav-brand')?.addEventListener('click', (e) => {
             e.preventDefault();
-            const token = localStorage.getItem('curiosity_token');
-            if (!token) {
-                showView('LANDING');
-            } else {
-                showView(state.coldStartActive ? (state.profile.onboarded ? 'COLD_START' : 'ONBOARDING') : 'DASHBOARD');
-            }
+            showView('LANDING');
         });
 
         // Topbar Nav Buttons

@@ -13,17 +13,20 @@
         "settings": "Settings",
         "logout": "Logout",
         "login_btn": "Log In",
-        "register_btn": "Sign Up"
+        "register_btn": "Sign Up",
+        "user_dashboard": "Dashboard",
+        "user_settings": "Settings",
+        "user_logout": "Log Out"
     },
     "landing": {
         "badge": "A New Dimension of Curiosity & Learning",
         "title_static": "Learn through",
         "dynamic_phrases": [
-            "intuitive associations.",
-            "tangible mental models.",
-            "diving deep under the hood.",
-            "tailored prompts for Claude & ChatGPT.",
-            "fascinating logical bridges."
+            "mental models.",
+            "simple analogies.",
+            "first principles.",
+            "intuition from zero.",
+            "connecting ideas."
         ],
         "subtitle": "CuriosityEngine removes the cognitive friction of choice and prompt crafting. It connects ideas into an associative web of knowledge, delivering concise mental models and copy-ready prompts for instant exploration.",
         "cta_start": "Start Exploring ➔",
@@ -43,7 +46,7 @@
         "f3_desc": "When tired or overwhelmed: zero-friction physical analogies delivering instant 'Aha!' moments.",
         "f4_title": "Spark Inbox",
         "f4_tag": "Capturing Digressions",
-        "f4_desc": "Capture fleeting thoughts with a single keypress (Space). The engine links them in your knowledge graph."
+        "f4_desc": "Capture fleeting thoughts so you never lose them."
     },
     "greeting": {
         "late_night": "Late night thoughts.",
@@ -92,15 +95,15 @@
         "step1_required_error": "Please select at least one domain",
         "step2_title": "Your baseline intuition",
         "step2_subtitle": "Choose the intuition style and cognitive depth for your mental models:",
-        "level_ground_zero_title": "Intuition & Everyday Analogies",
-        "level_ground_zero_tag": "Ground Zero / LEGO Blocks",
-        "level_ground_zero_desc": "Explain from scratch with tangible analogies and visual metaphors from everyday life. Zero jargon, maximum intuitive clarity.",
-        "level_builder_title": "Systems & Connecting Dots",
-        "level_builder_tag": "Intermediate / Builder",
-        "level_builder_desc": "I know basic engineering. I want to connect dots, understand why things work, and construct practical mental models.",
-        "level_deep_title": "First Principles & Under the Hood",
-        "level_deep_tag": "Deep Dive / Expert",
-        "level_deep_desc": "Logical rigor, mechanical deconstruction down to fundamental parts, and non-trivial relationships under the hood.",
+        "level_ground_zero_title": "From Scratch / Intuition",
+        "level_ground_zero_tag": "STEP BY STEP",
+        "level_ground_zero_desc": "Zero jargon. Tangible everyday analogies and crystal-clear mental models.",
+        "level_builder_title": "Builder / Systems",
+        "level_builder_tag": "CONNECTING DOTS",
+        "level_builder_desc": "I understand the basics. I want to bridge distant concepts and understand the underlying systems.",
+        "level_deep_title": "Under the Hood / Deep Dive",
+        "level_deep_tag": "FIRST PRINCIPLES",
+        "level_deep_desc": "Mathematical rigor, mechanism deconstruction, and low-level architectural deep dives.",
         "step3_title": "What's on your mind lately?",
         "step3_subtitle": "Type any recent question, rabbit hole, or spark (or leave empty):",
         "recent_placeholder": "e.g. how do GPUs work, why video compression loses quality, how chess engines evaluate positions...",
@@ -118,8 +121,8 @@
         "custom_view_title": "Enter your thought or question:",
         "custom_view_subtitle": "The engine will generate 4 direct branches rooted in your idea.",
         "custom_view_back": "← Back to suggestions",
-        "custom_placeholder": "e.g. how computers synthesize audio, why stars twinkle...",
-        "custom_submit": "Explore branches ➔"
+        "custom_placeholder": "Type any thought or question...",
+        "custom_submit": "Explore ➔"
     },
     "loading": {
         "generating": "CuriosityEngine is synthesizing your concept...",
