@@ -437,9 +437,26 @@ async def general_exception_handler(request: Request, exc: Exception):
 
 FRONTEND_DIR = Path(__file__).parent.parent / "frontend"
 
+@app.middleware("http")
+async def add_no_cache_header(request: Request, call_next):
+    response = await call_next(request)
+    # Ensure fresh assets during development & interactive usage
+    if not request.url.path.startswith("/api"):
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    return response
+
 @app.get("/")
 async def serve_index():
-    return FileResponse(FRONTEND_DIR / "index.html")
+    return FileResponse(
+        FRONTEND_DIR / "index.html",
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        }
+    )
 
 app.mount("/", StaticFiles(directory=str(FRONTEND_DIR)), name="frontend")
 

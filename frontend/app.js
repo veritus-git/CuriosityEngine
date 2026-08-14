@@ -8,6 +8,221 @@
 (function () {
     'use strict';
 
+    // ─── Default Bundled Polish Dictionary (Zero-Latency Fallback) ───
+    const DEFAULT_LANG_PL = {
+        "meta": { "code": "pl", "name": "Polish", "native_name": "Polski" },
+        "nav": {
+            "brand": "CuriosityEngine",
+            "compass": "Kompas",
+            "constellation": "Konstelacja",
+            "sparks": "Dygresje ({n})",
+            "history": "Historia",
+            "settings": "Ustawienia",
+            "logout": "Wyloguj",
+            "login_btn": "Zaloguj się",
+            "register_btn": "Zarejestruj się"
+        },
+        "landing": {
+            "badge": "Nowy Wymiar Ciekawości & Nauki",
+            "title_static": "Ucz się przez",
+            "dynamic_phrases": [
+                "intuicyjne skojarzenia.",
+                "modele mentalne i analogie.",
+                "schodzenie głęboko pod maskę.",
+                "gotowe prompty do Claude i ChatGPT.",
+                "fascynujące mosty logiczne."
+            ],
+            "subtitle": "CuriosityEngine zdejmuje z Ciebie ciężar wyboru i pisania promptów. Łączy pojęcia w asocjacyjną sieć wiedzy, dostarczając zwięzłe modele mentalne i precyzyjne prompty do natychmiastowej eksploracji.",
+            "cta_start": "Rozpocznij Eksplorację ➔",
+            "cta_login": "Zaloguj się",
+            "cta_how": "Zobacz jak to działa ↓",
+            "features_badge": "Architektura Poznawcza",
+            "features_title": "Cztery Wektory Twojego Umysłu",
+            "features_subtitle": "Tradycyjne kursy i liniowe checklisty zawodzą. CuriosityEngine prowadzi Cię przez naturalne zazębianie się wiedzy:",
+            "f1_title": "Most Asocjacyjny",
+            "f1_tag": "Zazębianie Pojęć",
+            "f1_desc": "Odkrywaj idee krzyżujące się z tym, co już wiesz. Koniec ze sztucznym podziałem na sztywne rozdziały.",
+            "f2_title": "Nurkowanie Top-Down",
+            "f2_tag": "Pierwsze Zasady",
+            "f2_desc": "Schodź od ogólnego zjawiska do elementarnych mechanizmów działających pod maską świata technologii i nauki.",
+            "f3_title": "Tryb Mental Fog",
+            "f3_tag": "Czysta Intuicja",
+            "f3_desc": "Gdy jesteś zmęczony i przytłoczony: proste, genialne analogie fizyczne dające natychmiastowe poczucie zrozumienia.",
+            "f4_title": "Spark Inbox",
+            "f4_tag": "Łapanie Dygresji",
+            "f4_desc": "Zapisuj przelotne myśli jednym klawiszem (Spacja). Silnik połączy je w grafie i przypomni o nich we właściwym momencie."
+        },
+        "greeting": {
+            "late_night": "Nocne przemyślenia.",
+            "morning": "Dzień dobry.",
+            "afternoon": "Dzień dobry.",
+            "evening": "Dobry wieczór.",
+            "night_owl": "Tryb nocnej sowy."
+        },
+        "auth": {
+            "title": "CuriosityEngine",
+            "subtitle": "Osobisty silnik asocjacyjny i mapa ciekawości.",
+            "username": "Nazwa użytkownika",
+            "password": "Hasło",
+            "submit": "Wejdź do systemu",
+            "close_modal": "Zamknij",
+            "login_title": "Zaloguj się",
+            "login_subtitle": "Wróć do swojej osobistej konstelacji wiedzy.",
+            "login_submit": "Zaloguj się",
+            "switch_to_register": "Nie masz jeszcze konta? Zarejestruj się",
+            "register_title": "Utwórz konto",
+            "register_subtitle": "Rozpocznij swoją asocjacyjną podróż z CuriosityEngine.",
+            "register_submit": "Zarejestruj się",
+            "switch_to_login": "Masz już konto? Zaloguj się",
+            "first_setup_title": "Witaj w CuriosityEngine!",
+            "first_setup_subtitle": "Baza danych jest pusta. Utwórz pierwsze konto, aby rozpocząć korzystanie.",
+            "first_setup_submit": "Utwórz konto i rozpocznij"
+        },
+        "onboarding": {
+            "badge": "Personalizacja",
+            "step1_title": "Co Cię najbardziej pociąga?",
+            "step1_subtitle": "Wybierz dziedziny lub dodaj własne pasje. Silnik użyje ich do asocjacji:",
+            "custom_chip_placeholder": "Wpisz własną pasję (np. teoria gier, kryptografia)...",
+            "add_chip_btn": "+ Dodaj",
+            "domains": {
+                "math": "📐 Matematyka",
+                "cs": "💻 Informatyka & Programowanie",
+                "physics": "🌌 Fizyka & Kosmologia",
+                "biology": "🧬 Biologia & Neuronauka",
+                "hardware": "⚡ Elektronika & Sprzęt",
+                "gamedev": "🎮 Tworzenie Gier & Grafika 3D",
+                "ai": "🧠 Sztuczna Inteligencja",
+                "philosophy": "🏛️ Filozofia & Teoria Poznania",
+                "economics": "📈 Ekonomia & Teoria Gier",
+                "linguistics": "🗣️ Językoznawstwo & Komunikacja"
+            },
+            "step1_required_error": "Wybierz przynajmniej jedną dziedzinę",
+            "step2_title": "Twój punkt wyjścia",
+            "step2_subtitle": "Wybierz preferowany styl modeli mentalnych i głębię tłumaczeń:",
+            "level_ground_zero_title": "Intuicja & Proste Analogie",
+            "level_ground_zero_tag": "Od Zera / Klocki LEGO",
+            "level_ground_zero_desc": "Tłumacz od zera prostym językiem i obrazowymi metaforami z życia codziennego. Zero zbędnego żargonu, maksimum intuicji 'jak dla 5-latka'.",
+            "level_builder_title": "Systemy & Łączenie Kropek",
+            "level_builder_tag": "Średniozaawansowany / Builder",
+            "level_builder_desc": "Znam ogólne podstawy. Chcę rozumieć dlaczego rzeczy działają, łączyć odległe idee i budować całościowe modele mentalne.",
+            "level_deep_title": "Zasada Działania & Pod Maską",
+            "level_deep_tag": "Głęboka Analiza / Ekspert",
+            "level_deep_desc": "Ścisłość logiczna, dekonstrukcja mechanizmów do elementarnych części składowych i badanie nietrywialnych zależności.",
+            "step3_title": "O czym ostatnio myślałeś?",
+            "step3_subtitle": "Wpisz dowolne pytanie lub myśl z ostatnich dni (lub zostaw puste):",
+            "recent_placeholder": "np. jak działają GPU, dlaczego kompresja wideo gubi jakość, jak silnik szachowy ocenia pozycję...",
+            "step3_hint": "💡 Możesz zostawić to pole puste - silnik zaproponuje tematy na podstawie Twoich zainteresowań z kroku 1.",
+            "btn_next": "Dalej ➔",
+            "btn_prev": "← Wstecz",
+            "btn_submit": "Wygeneruj moje tematy startowe ✨"
+        },
+        "cold_start": {
+            "badge": "Zimny Start",
+            "title": "Wybierz Swój Pierwszy Temat",
+            "subtitle": "Oto 4 tematy wygenerowane specjalnie pod Twoje zainteresowania. Wybierz jeden, by zacząć:",
+            "reroll_btn": "Zaproponuj inne 4 tematy",
+            "custom_thought_btn": "Własna myśl? Pomysł? Pytanie?",
+            "custom_view_title": "Wpisz swoją myśl lub pytanie:",
+            "custom_view_subtitle": "Silnik wygeneruje 4 bezpośrednie odnogi do Twojego pomysłu.",
+            "custom_view_back": "← Wróć do propozycji",
+            "custom_placeholder": "np. jak komputery generują dźwięk, dlaczego gwiazdy migoczą...",
+            "custom_submit": "Zbadaj odnogi ➔"
+        },
+        "loading": {
+            "generating": "CuriosityEngine syntezuje propozycję...",
+            "connecting": "Łączenie mostów asocjacyjnych...",
+            "onboarding": "Generowanie Twoich 4 unikalnych tematów startowych..."
+        },
+        "compass": {
+            "title": "Kompas Eksploracji",
+            "subtitle": "Wybierz wektor na dzisiejszą sesję:",
+            "adjacent": "Most Asocjacyjny",
+            "adjacent_desc": "Pojęcie zazębiające się z Twoją ostatnią wiedzą",
+            "deep_dive": "Nurkowanie Top-Down",
+            "deep_dive_desc": "Zasady działania pod maską",
+            "spark": "Rozwiń Dygresję",
+            "spark_desc": "Sięgnij po zapisaną myśl z przeszłości",
+            "cross_domain": "Inna Galaktyka",
+            "cross_domain_desc": "Skok w zupełnie nową dziedzinę",
+            "mental_fog": "Tryb Mental Fog",
+            "mental_fog_desc": "Proste, fascynujące pojęcie (zero presji)",
+            "custom_spark": "Własny Impuls",
+            "custom_spark_desc": "Wpisz dowolne pytanie lub hasło",
+            "input_placeholder": "Co Cię intryguje?",
+            "input_submit": "Generuj temat"
+        },
+        "focus_card": {
+            "suggested_label": "Dzisiejsza Propozycja",
+            "active_label": "Trwająca Eksploracja",
+            "why_label": "Most Logiczny",
+            "model_label": "Intuicja & Model Mentalny",
+            "accept_btn": "Zbadaj ten temat",
+            "skip_btn": "Inna propozycja",
+            "reject_btn": "Nie interesuje mnie to",
+            "copy_prompt_btn": "Kopiuj Prompt do ChatGPT / Claude",
+            "prompt_copied": "Prompt skopiowany do schowka ✓",
+            "finish_btn": "Oznacz jako Opanowane ✓",
+            "loading": "Generowanie propozycji..."
+        },
+        "complete_modal": {
+            "title": "Domknięcie Sesji",
+            "subtitle": "Pojęcie {topic} zostaje zapisane w Twoim grafie wiedzy.",
+            "co_explored_label": "Czy w trakcie zgłębiłeś coś jeszcze pobocznego?",
+            "co_explored_placeholder": "np. czytając o macierzach ogarnąłem też wektory i przekształcenia afiniczne...",
+            "co_explored_hint": "AI automatycznie wyciągnie te pojęcia i połączy je w grafie mostami asocjacyjnymi.",
+            "notes_label": "Krótka notatka dla siebie (opcjonalnie):",
+            "notes_placeholder": "Główny wniosek...",
+            "save_btn": "Zapisz do Grafu Wiedzy",
+            "cancel_btn": "Anuluj"
+        },
+        "spark_box": {
+            "title": "Spark Inbox (Pudełko na Dygresje)",
+            "subtitle": "Zapisuj luźne myśli, które mignęły Ci w trakcie nauki — silnik zachowa je na później.",
+            "input_placeholder": "Wpisz dygresję i wciśnij Enter...",
+            "add_btn": "Zapisz Iskrę",
+            "empty": "Brak oczekujących dygresji. Możesz je dodawać w każdej chwili.",
+            "explore_btn": "Zbadaj teraz",
+            "dismiss_btn": "Usuń",
+            "quick_tip": "Skrót klawiszowy: wciśnij Spację na pulpicie, aby szybko zapisać dygresję."
+        },
+        "constellation": {
+            "title": "Konstelacja Wiedzy",
+            "subtitle": "Interaktywny graf Twoich opanowanych pojęć i mostów asocjacyjnych.",
+            "nodes_count": "{n} opanowanych pojęć",
+            "empty": "Twój ogród wiedzy czeka na pierwsze pojęcie. Rozpocznij od Kompasu!",
+            "back_btn": "← Wróć do Kompasu"
+        },
+        "history": {
+            "title": "Archiwum Poznanych Pojęć",
+            "back_btn": "← Wróć",
+            "empty": "Brak historii. Twoja podróż zaczyna się od pierwszego tematu."
+        },
+        "settings": {
+            "title": "Ustawienia i Profil",
+            "back_btn": "← Wróć",
+            "theme_heading": "Wygląd",
+            "theme_light": "Jasny",
+            "theme_dark": "Ciemny",
+            "language_heading": "Język Interfejsu",
+            "language_hint": "Wybierz język aplikacji.",
+            "ai_heading": "Status AI",
+            "ai_configured": "Skonfigurowano ✓",
+            "ai_not_configured": "Brak klucza API ✗",
+            "privacy_heading": "Prywatność & Baza Lokalna",
+            "privacy_text": "Wszystkie Twoje dane, embeddingi i historia są przechowywane w lokalnej bazie SQLite. Twój klucz API nigdy nie opuszcza Twojego serwera."
+        },
+        "errors": {
+            "server_down": "Błąd połączenia z serwerem. Upewnij się, że backend działa.",
+            "copy_failed": "Nie udało się skopiować promptu."
+        },
+        "dates": {
+            "today": "dzisiaj",
+            "yesterday": "wczoraj",
+            "days_ago": "{n} dni temu",
+            "locale": "pl-PL"
+        }
+    };
+
     // ─── Unified State ───
     let state = {
         view: 'LANDING',
@@ -26,19 +241,29 @@
     let selectedLevel = 'builder';
     let authMode = 'LOGIN'; // 'LOGIN' | 'REGISTER' | 'FIRST_SETUP'
 
-    // ─── i18n Engine ───
-    let lang = {};
+    // ─── i18n Engine (Starts with Polish pre-bundled) ───
+    let lang = JSON.parse(JSON.stringify(DEFAULT_LANG_PL));
     let langCode = 'pl';
     let languages = [];
 
     function t(key, vars) {
+        if (!key) return '';
         const parts = key.split('.');
         let val = lang;
         for (const p of parts) {
             if (val && typeof val === 'object') val = val[p];
+            else { val = null; break; }
+        }
+        if (typeof val !== 'string') {
+            // Fallback to bundled dictionary
+            let fb = DEFAULT_LANG_PL;
+            for (const p of parts) {
+                if (fb && typeof fb === 'object') fb = fb[p];
+                else { fb = null; break; }
+            }
+            if (typeof fb === 'string') val = fb;
             else return key;
         }
-        if (typeof val !== 'string') return key;
         if (vars) {
             return val.replace(/\{(\w+)\}/g, (_, k) => vars[k] !== undefined ? vars[k] : `{${k}}`);
         }
@@ -63,18 +288,19 @@
 
     async function loadLanguage(code) {
         try {
-            let res = await fetch(`/i18n/${code}/ui.json`).catch(() => null);
+            const cacheBust = `?v=${Date.now()}`;
+            let res = await fetch(`/i18n/${code}/ui.json${cacheBust}`).catch(() => null);
             if (!res || !res.ok) {
-                res = await fetch(`i18n/${code}/ui.json`).catch(() => null);
+                res = await fetch(`i18n/${code}/ui.json${cacheBust}`).catch(() => null);
             }
-            if (!res || !res.ok) throw new Error(`Language file not found: ${code}`);
-            lang = await res.json();
-            langCode = code;
-            applyTranslations();
+            if (res && res.ok) {
+                lang = await res.json();
+                langCode = code;
+            }
         } catch (err) {
-            console.warn(`Failed to load language ${code}, fallback to en`, err);
-            if (code !== 'en') await loadLanguage('en');
+            console.warn(`Failed to load language ${code}, using fallback`, err);
         }
+        applyTranslations();
     }
 
     async function loadLanguageList() {
@@ -82,7 +308,7 @@
             const data = await api('GET', '/api/languages');
             languages = data.languages || [];
         } catch (err) {
-            languages = [{ code: 'pl', name: 'Polish', native_name: 'Polski' }];
+            languages = [{ code: 'pl', name: 'Polish', native_name: 'Polski' }, { code: 'en', name: 'English', native_name: 'English' }];
         }
 
         const sel = $('#topbar-lang-select');
@@ -141,15 +367,17 @@
     const $ = (sel) => document.querySelector(sel);
     const $$ = (sel) => document.querySelectorAll(sel);
 
-    const views = {
-        LANDING: $('#view-landing'),
-        ONBOARDING: $('#view-onboarding'),
-        COLD_START: $('#view-cold-start'),
-        DASHBOARD: $('#view-dashboard'),
-        CONSTELLATION: $('#view-constellation'),
-        HISTORY: $('#view-history'),
-        SETTINGS: $('#view-settings'),
-    };
+    function getViews() {
+        return {
+            LANDING: $('#view-landing'),
+            ONBOARDING: $('#view-onboarding'),
+            COLD_START: $('#view-cold-start'),
+            DASHBOARD: $('#view-dashboard'),
+            CONSTELLATION: $('#view-constellation'),
+            HISTORY: $('#view-history'),
+            SETTINGS: $('#view-settings'),
+        };
+    }
 
     // ─── Global Loading Indicator ───
     function setGlobalLoading(isLoading, textKey = 'loading.generating') {
@@ -193,13 +421,12 @@
     // ─── View Routing ───
     function showView(viewName) {
         state.view = viewName;
-        Object.entries(views).forEach(([name, el]) => {
+        const currentViews = getViews();
+        Object.entries(currentViews).forEach(([name, el]) => {
             if (!el) return;
             el.hidden = (name !== viewName);
         });
 
-        // Topbar navigation visibility rules:
-        // ONLY show nav-links (sparks, constellation, history, settings) and floating spark button on main dashboard / subviews
         const navLinks = $('#topbar-nav-links');
         const authLinks = $('#topbar-auth-links');
         const floatingBtn = $('#btn-floating-spark');
@@ -223,7 +450,6 @@
             if (authLinks) authLinks.hidden = true;
             if (globalProgress) globalProgress.hidden = true;
         } else {
-            // DASHBOARD, CONSTELLATION, HISTORY, SETTINGS
             if (navLinks) navLinks.hidden = false;
             if (floatingBtn) floatingBtn.hidden = false;
             if (authLinks) authLinks.hidden = true;
@@ -289,7 +515,8 @@
             "intuicyjne skojarzenia.",
             "modele mentalne i analogie.",
             "schodzenie głęboko pod maskę.",
-            "gotowe prompty do Claude i ChatGPT."
+            "gotowe prompty do Claude i ChatGPT.",
+            "fascynujące mosty logiczne."
         ];
 
         const currentPhrase = phrases[phraseIndex % phrases.length];
@@ -305,12 +532,12 @@
         let typeSpeed = isDeleting ? 40 : 80;
 
         if (!isDeleting && charIndex === currentPhrase.length) {
-            typeSpeed = 2200; // Pause at end of full phrase
+            typeSpeed = 2200;
             isDeleting = true;
         } else if (isDeleting && charIndex === 0) {
             isDeleting = false;
             phraseIndex++;
-            typeSpeed = 400; // Pause before typing next phrase
+            typeSpeed = 400;
         }
 
         typewriterTimeout = setTimeout(typeHeroText, typeSpeed);
@@ -399,7 +626,7 @@
     // ─── Cold Start & Dynamic Starter Cards ───
     async function loadColdStartCards() {
         try {
-            const data = await api('GET', `/api/cold-start-cards?lang=${langCode}`);
+            const data = await api('GET', `/api/cold-start-cards?lang=${langCode}&v=${Date.now()}`);
             state.coldStartCards = data.cards || [];
             renderColdStartCards();
         } catch (err) {
@@ -427,7 +654,6 @@
         });
     }
 
-    // Direct Starter Selection (Explores THAT exact topic)
     async function triggerStarterSelection(title, domain, summary) {
         setGlobalLoading(true, 'loading.generating');
         try {
@@ -570,7 +796,6 @@
         function draw() {
             ctx.clearRect(0, 0, width, height);
 
-            // Draw links
             ctx.strokeStyle = 'rgba(99, 102, 241, 0.25)';
             ctx.lineWidth = 1.2;
             links.forEach(l => {
@@ -584,7 +809,6 @@
                 }
             });
 
-            // Draw & update nodes
             nodes.forEach(node => {
                 node.x += node.vx;
                 node.y += node.vy;
@@ -695,13 +919,17 @@
 
     // ─── Main Application Initialization ───
     async function init() {
+        // Initial instantaneous translation from bundled dictionary
+        applyTranslations();
+        updateGreetingAndDates();
+        bindGlobalEvents();
+
         const token = localStorage.getItem('curiosity_token');
         const savedLang = localStorage.getItem('curiosity_lang') || 'pl';
 
         await loadLanguage(savedLang);
         await loadLanguageList();
         updateGreetingAndDates();
-        bindGlobalEvents();
 
         if (!token) {
             showView('LANDING');
@@ -756,16 +984,29 @@
         eventsBound = true;
 
         // Topbar Auth Buttons & Landing CTA
-        $('#btn-topbar-login')?.addEventListener('click', () => openAuthModal('LOGIN'));
-        $('#btn-topbar-register')?.addEventListener('click', () => openAuthModal('REGISTER'));
-        $('#btn-landing-cta')?.addEventListener('click', () => openAuthModal('REGISTER'));
-        $('#btn-close-auth-modal')?.addEventListener('click', closeAuthModal);
+        $('#btn-topbar-login')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            openAuthModal('LOGIN');
+        });
+        $('#btn-topbar-register')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            openAuthModal('REGISTER');
+        });
+        $('#btn-landing-cta')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            openAuthModal('REGISTER');
+        });
+        $('#btn-close-auth-modal')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeAuthModal();
+        });
 
         $('#auth-modal-backdrop')?.addEventListener('click', (e) => {
             if (e.target === $('#auth-modal-backdrop')) closeAuthModal();
         });
 
-        $('#btn-auth-switch')?.addEventListener('click', () => {
+        $('#btn-auth-switch')?.addEventListener('click', (e) => {
+            e.preventDefault();
             if (authMode === 'LOGIN') {
                 authMode = 'REGISTER';
             } else {
@@ -880,7 +1121,7 @@
                     if (errBox) errBox.style.display = 'inline';
                     if (chipsEl) {
                         chipsEl.classList.remove('shake-anim');
-                        void chipsEl.offsetWidth; // trigger reflow
+                        void chipsEl.offsetWidth;
                         chipsEl.classList.add('shake-anim');
                     }
                     return;
@@ -1004,7 +1245,6 @@
                     state.coldStartCards = res.cards || [];
                     renderColdStartCards();
 
-                    // Switch smoothly back to cards view
                     if (customThoughtView) customThoughtView.hidden = true;
                     if (cardsView) {
                         cardsView.hidden = false;
@@ -1169,7 +1409,7 @@
             if (e.key === 'Enter') submitSpark();
         });
 
-        // Keyboard Shortcut: Space on Dashboard (when not in an input) opens Spark Inbox
+        // Keyboard Shortcut: Space on Dashboard
         document.addEventListener('keydown', (e) => {
             if (e.code === 'Space' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName) && state.view === 'DASHBOARD') {
                 e.preventDefault();
@@ -1214,6 +1454,10 @@
         return p.innerHTML;
     }
 
-    // Start App
-    init();
+    // Start App immediately or upon DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 })();
