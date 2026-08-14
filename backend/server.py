@@ -25,10 +25,11 @@ from .database import (
     update_profile
 )
 from .ai import get_ai_status, AIError, generate_embedding
-from .auth import register_user, login_user, get_current_user_token
+from .auth import register_user, login_user, get_current_user_token, get_user_count
 from .engine import (
     generate_concept_suggestion, complete_session_with_coexplored,
-    get_learning_prompt, generate_dynamic_starter_cards
+    get_learning_prompt, generate_dynamic_starter_cards,
+    select_starter_topic, generate_starter_cards_from_thought
 )
 from .prompts import load_prompts
 
@@ -61,6 +62,15 @@ class SuggestRequest(BaseModel):
     spark_id: Optional[int] = None
     current_action: str = "skip"
 
+class SelectStarterTopicRequest(BaseModel):
+    title: str
+    domain: Optional[str] = "General"
+    summary: Optional[str] = ""
+
+class CustomThoughtColdStartRequest(BaseModel):
+    thought: str
+    language: Optional[str] = None
+
 class CompleteSessionRequest(BaseModel):
     notes: Optional[str] = None
     co_explored_text: Optional[str] = None
@@ -88,6 +98,12 @@ class ProfileUpdateRequest(BaseModel):
 
 
 # ─── Auth Routes ───
+
+@app.get("/api/auth/status")
+async def auth_status():
+    count = get_user_count()
+    return {"has_users": count > 0, "user_count": count}
+
 
 @app.post("/api/auth/register")
 async def register(req: AuthRequest):
@@ -170,6 +186,31 @@ async def suggest_topic(req: SuggestRequest, username: str = Depends(get_current
         }
     except AIError as e:
         raise HTTPException(status_code=502, detail=str(e))
+
+
+@app.post("/api/topics/select-starter")
+async def select_starter_concept(req: SelectStarterTopicRequest, username: str = Depends(get_current_user_token)):
+    ai_status = get_ai_status()
+    if not ai_status["configured"]:
+        raise HTTPException(
+            status_code=400,
+            detail="AI is not configured. Please set AI_API_KEY in .env and restart."
+        )
+    try:
+        concept = await select_starter_topic(
+            title=req.title,
+            domain=req.domain,
+            summary=req.summary
+        )
+        prompt = get_learning_prompt(concept["id"])
+        return {
+            "concept": concept,
+            "prompt": prompt,
+            "state": "CONCEPT_SUGGESTED"
+        }
+    except Exception as e:
+        logger.exception("Error selecting starter topic")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/api/topics/{concept_id}/accept")
@@ -285,6 +326,10 @@ async def update_user_profile(req: ProfileUpdateRequest, username: str = Depends
 @app.get("/api/cold-start-cards")
 async def get_starter_cards(lang: Optional[str] = None, username: str = Depends(get_current_user_token)):
     profile = get_profile()
+    saved_cards = profile.get("starter_cards", [])
+    if saved_cards and len(saved_cards) >= 4:
+        return {"cards": saved_cards}
+
     target_lang = lang or profile.get("language", "pl")
     prompts = load_prompts(target_lang)
     cards = prompts.get("cold_start_cards", [])
@@ -295,18 +340,19 @@ async def get_starter_cards(lang: Optional[str] = None, username: str = Depends(
 async def complete_onboarding_route(req: OnboardingRequest, username: str = Depends(get_current_user_token)):
     profile = get_profile()
     target_lang = req.language or profile.get("language", "pl")
-    update_profile(
-        active_domains=req.interests,
-        grounding_level=req.level,
-        custom_instructions=req.recent_thought,
-        language=target_lang,
-        onboarded=True
-    )
     cards = await generate_dynamic_starter_cards(
         interests=req.interests,
         level=req.level,
         recent_thought=req.recent_thought,
         language=target_lang
+    )
+    update_profile(
+        active_domains=req.interests,
+        grounding_level=req.level,
+        custom_instructions=req.recent_thought,
+        language=target_lang,
+        onboarded=True,
+        starter_cards=cards
     )
     return {"cards": cards, "profile": get_profile()}
 
@@ -334,6 +380,16 @@ async def regenerate_cold_start_route(req: RegenerateColdStartRequest, username:
         rejected_topics=req.rejected_topics,
         language=target_lang
     )
+    update_profile(starter_cards=cards)
+    return {"cards": cards}
+
+
+@app.post("/api/cold-start/from-thought")
+async def cold_start_from_thought(req: CustomThoughtColdStartRequest, username: str = Depends(get_current_user_token)):
+    profile = get_profile()
+    target_lang = req.language or profile.get("language", "pl")
+    cards = await generate_starter_cards_from_thought(req.thought, language=target_lang)
+    update_profile(starter_cards=cards)
     return {"cards": cards}
 
 

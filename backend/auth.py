@@ -26,6 +26,13 @@ def get_auth_conn():
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
+def get_user_count() -> int:
+    conn = get_auth_conn()
+    row = conn.execute("SELECT COUNT(*) as count FROM users").fetchone()
+    count = row["count"] if row else 0
+    conn.close()
+    return count
+
 def register_user(username, password):
     conn = get_auth_conn()
     try:

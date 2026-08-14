@@ -16,10 +16,91 @@ from .ai import generate_ai_json, generate_embedding, cosine_similarity, AIError
 from .prompts import (
     build_generation_prompts, build_multiconcept_parse_prompts,
     build_external_learning_prompt, build_cold_start_generation_prompts,
+    build_direct_topic_prompts, build_cold_start_from_thought_prompts,
     load_prompts
 )
 
 logger = logging.getLogger("curiosity.engine")
+
+
+async def select_starter_topic(
+    title: str,
+    domain: Optional[str] = None,
+    summary: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Directly adopt the user's chosen starter topic card.
+    Generates an intuitive model and prompt tailored specifically for that exact topic.
+    """
+    reject_all_suggested_concepts(new_status="skipped")
+    profile = get_profile()
+    topic_domain = domain or "General"
+    topic_summary = summary or ""
+
+    # Generate intuitive model using AI tailored to the user's grounding level
+    intuitive_model = ""
+    try:
+        sys_prompt, user_prompt = build_direct_topic_prompts(
+            title=title,
+            domain=topic_domain,
+            summary=topic_summary,
+            profile=profile
+        )
+        parsed = await generate_ai_json(sys_prompt, user_prompt)
+        if parsed.get("short_reason"):
+            topic_summary = parsed["short_reason"]
+        intuitive_model = parsed.get("intuitive_model") or ""
+    except Exception as e:
+        logger.warning(f"Intuitive model generation notice for '{title}': {e}")
+        intuitive_model = topic_summary
+
+    emb = await generate_embedding(f"{title} {topic_domain} {topic_summary}")
+
+    concept = create_concept(
+        title=title,
+        domain=topic_domain,
+        summary=topic_summary,
+        intuitive_model=intuitive_model,
+        difficulty=profile.get("grounding_level", "intermediate"),
+        status="suggested",
+        embedding=emb,
+        source_mode="starter_select"
+    )
+
+    logger.info(f"Directly selected starter topic: {title}")
+    return concept
+
+
+async def generate_starter_cards_from_thought(
+    thought: str,
+    language: Optional[str] = None
+) -> List[Dict[str, Any]]:
+    """
+    Generate 4 direct starter cards / branches rooted specifically in what the user typed.
+    """
+    profile = get_profile()
+    lang = language or profile.get("language", "pl")
+    level = profile.get("grounding_level", "builder")
+
+    try:
+        sys_prompt, user_prompt = build_cold_start_from_thought_prompts(
+            thought=thought,
+            level=level,
+            language=lang
+        )
+        parsed = await generate_ai_json(sys_prompt, user_prompt)
+        cards = parsed.get("cards", [])
+        if len(cards) >= 4:
+            return cards[:4]
+    except Exception as e:
+        logger.warning(f"Thought-based starter cards generation notice ({e}), falling back to dynamic generator.")
+
+    return await generate_dynamic_starter_cards(
+        interests=[thought],
+        level=level,
+        recent_thought=thought,
+        language=lang
+    )
 
 
 async def generate_concept_suggestion(

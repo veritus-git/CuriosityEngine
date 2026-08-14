@@ -66,18 +66,21 @@ def init_db_schema(conn: sqlite3.Connection):
             custom_instructions TEXT DEFAULT '',
             language TEXT DEFAULT 'pl',
             onboarded INTEGER DEFAULT 0,
+            starter_cards_json TEXT DEFAULT '[]',
             updated_at TEXT NOT NULL DEFAULT (datetime('now'))
         );
 
         INSERT OR IGNORE INTO user_cognitive_profile (id) VALUES (1);
     """)
 
-    # Ensure onboarded column exists for existing dbs
+    # Ensure onboarded and starter_cards_json columns exist for existing dbs
     cursor = conn.cursor()
     cursor.execute("PRAGMA table_info(user_cognitive_profile)")
     columns = [row[1] for row in cursor.fetchall()]
     if "onboarded" not in columns:
         cursor.execute("ALTER TABLE user_cognitive_profile ADD COLUMN onboarded INTEGER DEFAULT 0")
+    if "starter_cards_json" not in columns:
+        cursor.execute("ALTER TABLE user_cognitive_profile ADD COLUMN starter_cards_json TEXT DEFAULT '[]'")
 
     # Auto-migration from legacy tables if present
     _migrate_legacy_data(conn)
@@ -471,6 +474,10 @@ def get_profile() -> Dict[str, Any]:
             d["active_domains"] = json.loads(d.get("active_domains") or "[]")
         except Exception:
             d["active_domains"] = []
+        try:
+            d["starter_cards"] = json.loads(d.get("starter_cards_json") or "[]")
+        except Exception:
+            d["starter_cards"] = []
         d["onboarded"] = bool(d.get("onboarded", 0))
         return d
     return {
@@ -479,7 +486,8 @@ def get_profile() -> Dict[str, Any]:
         "active_domains": [],
         "custom_instructions": "",
         "language": "pl",
-        "onboarded": False
+        "onboarded": False,
+        "starter_cards": []
     }
 
 
@@ -489,7 +497,8 @@ def update_profile(
     active_domains: Optional[List[str]] = None,
     custom_instructions: Optional[str] = None,
     language: Optional[str] = None,
-    onboarded: Optional[bool] = None
+    onboarded: Optional[bool] = None,
+    starter_cards: Optional[List[Dict[str, Any]]] = None
 ) -> Dict[str, Any]:
     conn = get_connection()
     current = get_profile()
@@ -500,6 +509,7 @@ def update_profile(
     instructions = custom_instructions if custom_instructions is not None else current.get("custom_instructions", "")
     lang = language if language is not None else current.get("language", "pl")
     is_onboarded = int(onboarded) if onboarded is not None else int(current.get("onboarded", False))
+    cards_json = json.dumps(starter_cards if starter_cards is not None else current.get("starter_cards", []))
 
     conn.execute("""
         UPDATE user_cognitive_profile
@@ -509,9 +519,10 @@ def update_profile(
             custom_instructions = ?,
             language = ?,
             onboarded = ?,
+            starter_cards_json = ?,
             updated_at = datetime('now')
         WHERE id = 1
-    """, (style, grounding, domains, instructions, lang, is_onboarded))
+    """, (style, grounding, domains, instructions, lang, is_onboarded, cards_json))
     conn.commit()
     conn.close()
     return get_profile()

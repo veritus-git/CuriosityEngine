@@ -46,6 +46,24 @@ def _get(data: dict, *keys, default="") -> Any:
     return val if val is not None else default
 
 
+def _get_grounding_instruction(level: str, language: str = "en") -> str:
+    level = level or "builder"
+    if language == "pl":
+        if level == "ground_zero":
+            return "POZIOM INTUICJI (Zupełny Laik / Klocki LEGO): Tłumacz od zera prostym, plastycznym językiem. Używaj wyłącznie intuicyjnych analogii z życia codziennego i fizycznego świata. Całkowicie eliminuj hermetyczny żargon."
+        elif level == "deep":
+            return "POZIOM INTUICJI (Głęboka Woda / Under The Hood): Skup się na ścisłych mechanizmach pod maską, zasadach działania pierwszych zasad i nietrywialnych zależnościach."
+        else:
+            return "POZIOM INTUICJI (Średniozaawansowany / Builder): Skup się na architekturze, łączeniu kropek, modelach mentalnych i powodach dlaczego dane pojęcie istnieje."
+    else:
+        if level == "ground_zero":
+            return "INTUITION LEVEL (Ground Zero / LEGO Blocks): Explain from scratch with everyday tangible analogies and simple language. Avoid academic jargon entirely."
+        elif level == "deep":
+            return "INTUITION LEVEL (Deep Dive / Under The Hood): Focus on rigorous under-the-hood mechanisms, first-principles logic, and technical nuances."
+        else:
+            return "INTUITION LEVEL (Intermediate / Builder): Focus on system architecture, connecting dots, practical mental models, and why it exists."
+
+
 def build_generation_prompts(
     vector: str,
     recent_concepts: List[Dict[str, Any]],
@@ -57,6 +75,7 @@ def build_generation_prompts(
     Build system and user prompts for topic generation based on the chosen vector.
     """
     lang = profile.get("language", "en") if profile else "en"
+    level = profile.get("grounding_level", "builder") if profile else "builder"
     prompts = load_prompts(lang)
 
     # 1. Build Context
@@ -82,6 +101,7 @@ def build_generation_prompts(
         if profile.get("grounding_level"):
             g_label = _get(labels, "grounding_level", default="Grounding level:")
             pref_lines.append(f"{g_label} {profile['grounding_level']}")
+            pref_lines.append(_get_grounding_instruction(level, lang))
         if profile.get("active_domains"):
             d_label = _get(labels, "preferred_areas", default="Active domains:")
             pref_lines.append(f"{d_label} {', '.join(profile['active_domains'])}")
@@ -107,6 +127,45 @@ def build_generation_prompts(
     if extra_context:
         user_msg = user_msg.replace("{user_request}", extra_context)
         user_msg = user_msg.replace("{spark_text}", extra_context)
+
+    return system_prompt, user_msg
+
+
+def build_direct_topic_prompts(
+    title: str,
+    domain: str,
+    summary: str,
+    profile: Optional[Dict[str, Any]] = None
+) -> tuple[str, str]:
+    """
+    Build prompts to generate intuitive analogy and mental model for an explicitly chosen topic.
+    """
+    lang = profile.get("language", "en") if profile else "en"
+    level = profile.get("grounding_level", "builder") if profile else "builder"
+    prompts = load_prompts(lang)
+
+    system_prompt = _get(prompts, "topic_generation", "system", default="")
+    lang_instruction = _get(prompts, "language_instruction", default="")
+    system_prompt = system_prompt.replace("{language_instruction}", lang_instruction)
+
+    grounding = _get_grounding_instruction(level, lang)
+
+    if lang == "pl":
+        user_msg = (
+            f"Użytkownik wybrał konkretny temat: \"{title}\" (Dziedzina: {domain}).\n"
+            f"Krótki opis/pytanie wyjściowe: \"{summary}\"\n\n"
+            f"{grounding}\n\n"
+            f"Sformatuj odpowiedź JSON DOKŁADNIE dla tego wybranego pojęcia \"{title}\" "
+            f"tworząc zwięzłą intuicję (short_reason) i namacalny model mentalny / analogię (intuitive_model)."
+        )
+    else:
+        user_msg = (
+            f"User explicitly selected topic: \"{title}\" (Domain: {domain}).\n"
+            f"Initial spark / description: \"{summary}\"\n\n"
+            f"{grounding}\n\n"
+            f"Format the JSON response specifically for this exact topic \"{title}\" "
+            f"providing a concise short_reason and a tangible intuitive_model / analogy."
+        )
 
     return system_prompt, user_msg
 
@@ -153,6 +212,7 @@ def build_external_learning_prompt(
     prompt = template.replace("{topic}", concept_title)
     prompt = prompt.replace("{domain}", domain)
     prompt = prompt.replace("{known_concepts}", known_str)
+    prompt = prompt.replace("{intuitive_model}", model_str)
     return prompt.strip()
 
 
@@ -183,9 +243,42 @@ def build_cold_start_generation_prompts(
             rejected_context = f"\nTHE USER REJECTED THESE TOPICS (do NOT suggest them or close synonyms): {', '.join(rejected_topics)}."
 
     user_msg = user_template.replace("{interests}", interests_str)
-    user_msg = user_msg.replace("{level}", level or "General")
+    user_msg = user_msg.replace("{level}", level or "builder")
     user_msg = user_msg.replace("{recent_thought}", thought_str)
     user_msg = user_msg.replace("{rejected_context}", rejected_context)
+
+    return system_prompt, user_msg
+
+
+def build_cold_start_from_thought_prompts(
+    thought: str,
+    level: str = "builder",
+    language: str = "en"
+) -> tuple[str, str]:
+    """
+    Build prompts to generate 4 direct associative branches from user's custom thought input.
+    """
+    prompts = load_prompts(language)
+    system_prompt = _get(prompts, "cold_start_generation", "system", default="")
+    lang_instruction = _get(prompts, "language_instruction", default="")
+    system_prompt = system_prompt.replace("{language_instruction}", lang_instruction)
+
+    grounding = _get_grounding_instruction(level, language)
+
+    if language == "pl":
+        user_msg = (
+            f"Użytkownik wpisał swoją własną myśl / pytanie / impuls ciekawości:\n\"{thought}\"\n\n"
+            f"{grounding}\n\n"
+            f"Wygeneruj dokładnie 4 BEZPOŚREDNIE, konkretne odnogi / tematy zgłębiające ten pomysł pod różnymi kątami. "
+            f"Każda karta musi zawierać konkretny mechanizm związany z tą myślą."
+        )
+    else:
+        user_msg = (
+            f"The user entered their own thought / question / spark:\n\"{thought}\"\n\n"
+            f"{grounding}\n\n"
+            f"Generate exactly 4 DIRECT, specific branches / topics exploring this idea from different angles. "
+            f"Each card must feature a specific mechanism directly related to this thought."
+        )
 
     return system_prompt, user_msg
 

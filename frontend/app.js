@@ -1,6 +1,7 @@
 /**
- * CuriosityEngine — Zen Dashboard Frontend Application
- * Fully associative, vector-backed knowledge interface with Slide Wizard Onboarding & Dynamic Starter Sparks.
+ * CuriosityEngine — Zen Knowledge Interface Application
+ * Fully associative, vector-backed knowledge interface with SaaS Landing Page,
+ * Dynamic Starter Sparks, Slide Wizard Onboarding, and Focus Hub.
  * Adheres strictly to i18n — zero hardcoded UI strings.
  */
 
@@ -9,7 +10,7 @@
 
     // ─── Unified State ───
     let state = {
-        view: 'DASHBOARD',
+        view: 'LANDING',
         concept: null,
         prompt: null,
         sparksCount: 0,
@@ -20,9 +21,10 @@
         coldStartCards: []
     };
 
-    // ─── Wizard State ───
+    // ─── Wizard & Auth State ───
     let wizardCurrentStep = 1;
     let selectedLevel = 'builder';
+    let authMode = 'LOGIN'; // 'LOGIN' | 'REGISTER' | 'FIRST_SETUP'
 
     // ─── i18n Engine ───
     let lang = {};
@@ -55,6 +57,8 @@
         });
         document.documentElement.lang = langCode;
         updateWizardProgress();
+        updateAuthModalUI();
+        restartHeroTypewriter();
     }
 
     async function loadLanguage(code) {
@@ -135,7 +139,7 @@
     const $$ = (sel) => document.querySelectorAll(sel);
 
     const views = {
-        AUTH: $('#view-auth'),
+        LANDING: $('#view-landing'),
         ONBOARDING: $('#view-onboarding'),
         COLD_START: $('#view-cold-start'),
         DASHBOARD: $('#view-dashboard'),
@@ -174,7 +178,7 @@
 
         if (res.status === 401 || res.status === 403) {
             localStorage.removeItem('curiosity_token');
-            showView('AUTH');
+            showView('LANDING');
             throw new Error('Unauthorized');
         }
         if (!res.ok) {
@@ -191,23 +195,35 @@
             el.hidden = (name !== viewName);
         });
 
-        // Hide navigation items when unauthenticated or during onboarding
+        // Topbar navigation visibility rules:
+        // ONLY show nav-links (sparks, constellation, history, settings) and floating spark button on main dashboard / subviews
         const navLinks = $('#topbar-nav-links');
+        const authLinks = $('#topbar-auth-links');
         const floatingBtn = $('#btn-floating-spark');
         const globalProgress = $('#onboarding-global-progress');
 
-        if (viewName === 'AUTH' || viewName === 'ONBOARDING') {
+        if (viewName === 'LANDING') {
             if (navLinks) navLinks.hidden = true;
             if (floatingBtn) floatingBtn.hidden = true;
-        } else {
-            if (navLinks) navLinks.hidden = false;
-            if (floatingBtn) floatingBtn.hidden = false;
-        }
-
-        if (viewName === 'ONBOARDING') {
+            if (authLinks) authLinks.hidden = false;
+            if (globalProgress) globalProgress.hidden = true;
+            restartHeroTypewriter();
+        } else if (viewName === 'ONBOARDING') {
+            if (navLinks) navLinks.hidden = true;
+            if (floatingBtn) floatingBtn.hidden = true;
+            if (authLinks) authLinks.hidden = true;
             if (globalProgress) globalProgress.hidden = false;
             setWizardStep(1);
+        } else if (viewName === 'COLD_START') {
+            if (navLinks) navLinks.hidden = true;
+            if (floatingBtn) floatingBtn.hidden = true;
+            if (authLinks) authLinks.hidden = true;
+            if (globalProgress) globalProgress.hidden = true;
         } else {
+            // DASHBOARD, CONSTELLATION, HISTORY, SETTINGS
+            if (navLinks) navLinks.hidden = false;
+            if (floatingBtn) floatingBtn.hidden = false;
+            if (authLinks) authLinks.hidden = true;
             if (globalProgress) globalProgress.hidden = true;
         }
     }
@@ -248,6 +264,114 @@
         }
     }
 
+    // ─── Landing Page Dynamic Typewriter ───
+    let typewriterTimeout = null;
+    let phraseIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+
+    function restartHeroTypewriter() {
+        if (typewriterTimeout) clearTimeout(typewriterTimeout);
+        charIndex = 0;
+        isDeleting = false;
+        phraseIndex = 0;
+        typeHeroText();
+    }
+
+    function typeHeroText() {
+        const textEl = $('#hero-dynamic-text');
+        if (!textEl) return;
+
+        const phrases = (lang.landing && lang.landing.dynamic_phrases) || [
+            "intuicyjne skojarzenia.",
+            "modele mentalne i analogie.",
+            "schodzenie głęboko pod maskę.",
+            "gotowe prompty do Claude i ChatGPT."
+        ];
+
+        const currentPhrase = phrases[phraseIndex % phrases.length];
+
+        if (isDeleting) {
+            charIndex--;
+            textEl.textContent = currentPhrase.substring(0, charIndex);
+        } else {
+            charIndex++;
+            textEl.textContent = currentPhrase.substring(0, charIndex);
+        }
+
+        let typeSpeed = isDeleting ? 40 : 80;
+
+        if (!isDeleting && charIndex === currentPhrase.length) {
+            typeSpeed = 2200; // Pause at end of full phrase
+            isDeleting = true;
+        } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            phraseIndex++;
+            typeSpeed = 400; // Pause before typing next phrase
+        }
+
+        typewriterTimeout = setTimeout(typeHeroText, typeSpeed);
+    }
+
+    // ─── Auth Modal Controller (3 States) ───
+    async function openAuthModal(preferredMode = 'LOGIN') {
+        const modalBackdrop = $('#auth-modal-backdrop');
+        const err = $('#auth-error');
+        if (err) err.style.display = 'none';
+
+        try {
+            const status = await api('GET', '/api/auth/status').catch(() => ({ has_users: false, user_count: 0 }));
+            if (!status.has_users || status.user_count === 0) {
+                authMode = 'FIRST_SETUP';
+            } else {
+                authMode = preferredMode === 'REGISTER' ? 'REGISTER' : 'LOGIN';
+            }
+        } catch (e) {
+            authMode = preferredMode;
+        }
+
+        updateAuthModalUI();
+        if (modalBackdrop) modalBackdrop.hidden = false;
+        const input = $('#auth-username');
+        if (input) setTimeout(() => input.focus(), 60);
+    }
+
+    function closeAuthModal() {
+        const modalBackdrop = $('#auth-modal-backdrop');
+        if (modalBackdrop) modalBackdrop.hidden = true;
+        const err = $('#auth-error');
+        if (err) err.style.display = 'none';
+    }
+
+    function updateAuthModalUI() {
+        const titleEl = $('#auth-card-title');
+        const subtitleEl = $('#auth-card-subtitle');
+        const submitTextEl = $('#auth-submit-text');
+        const switchBtn = $('#btn-auth-switch');
+
+        if (!titleEl || !subtitleEl || !submitTextEl || !switchBtn) return;
+
+        if (authMode === 'FIRST_SETUP') {
+            titleEl.textContent = t('auth.first_setup_title');
+            subtitleEl.textContent = t('auth.first_setup_subtitle');
+            submitTextEl.textContent = t('auth.first_setup_submit');
+            switchBtn.style.display = 'none';
+        } else if (authMode === 'REGISTER') {
+            titleEl.textContent = t('auth.register_title');
+            subtitleEl.textContent = t('auth.register_subtitle');
+            submitTextEl.textContent = t('auth.register_submit');
+            switchBtn.textContent = t('auth.switch_to_login');
+            switchBtn.style.display = 'inline-block';
+        } else {
+            // LOGIN
+            titleEl.textContent = t('auth.login_title');
+            subtitleEl.textContent = t('auth.login_subtitle');
+            submitTextEl.textContent = t('auth.login_submit');
+            switchBtn.textContent = t('auth.switch_to_register');
+            switchBtn.style.display = 'inline-block';
+        }
+    }
+
     // ─── Onboarding Slide Wizard Controller ───
     function setWizardStep(step) {
         wizardCurrentStep = step;
@@ -263,11 +387,7 @@
     }
 
     function updateWizardProgress() {
-        const stepText = $('#wizard-step-text');
         const progressFill = $('#wizard-progress-fill');
-        if (stepText) {
-            stepText.textContent = t('onboarding.step_progress', { current: wizardCurrentStep, total: 3 });
-        }
         if (progressFill) {
             progressFill.style.width = `${(wizardCurrentStep / 3) * 100}%`;
         }
@@ -293,18 +413,40 @@
             const cardEl = document.createElement('div');
             cardEl.className = 'spark-card';
             cardEl.innerHTML = `
-                <span class="spark-card__tag">${escapeHtml(card.tag)}</span>
+                <span class="spark-card__tag">${escapeHtml(card.tag || 'General')}</span>
                 <h3 class="spark-card__title">${escapeHtml(card.title)}</h3>
                 <p class="spark-card__desc">${escapeHtml(card.spark)}</p>
             `;
             cardEl.addEventListener('click', () => {
-                triggerSuggestion(card.vector || 'adjacent', card.spark);
+                triggerStarterSelection(card.title, card.tag, card.spark);
             });
             container.appendChild(cardEl);
         });
     }
 
-    // ─── Topic Suggestion Trigger ───
+    // Direct Starter Selection (Explores THAT exact topic)
+    async function triggerStarterSelection(title, domain, summary) {
+        setGlobalLoading(true, 'loading.generating');
+        try {
+            const res = await api('POST', '/api/topics/select-starter', {
+                title: title,
+                domain: domain || 'General',
+                summary: summary || ''
+            });
+
+            state.concept = res.concept;
+            state.prompt = res.prompt;
+            state.coldStartActive = false;
+            renderFocusCard('suggested');
+            showView('DASHBOARD');
+        } catch (err) {
+            showToast(err.message || t('errors.server_down'));
+        } finally {
+            setGlobalLoading(false);
+        }
+    }
+
+    // ─── Topic Suggestion Trigger (Compass Vectors) ───
     async function triggerSuggestion(vector, userInput = null, sparkId = null) {
         const btn = document.querySelector(`[data-vector="${vector}"]`);
         if (btn) btn.classList.add('loading');
@@ -559,7 +701,7 @@
         bindGlobalEvents();
 
         if (!token) {
-            showView('AUTH');
+            showView('LANDING');
             return;
         }
 
@@ -596,8 +738,11 @@
                 showView('DASHBOARD');
             }
         } catch (err) {
-            if (err.message === 'Unauthorized') return;
-            showView('DASHBOARD');
+            if (err.message === 'Unauthorized') {
+                showView('LANDING');
+                return;
+            }
+            showView('LANDING');
         }
     }
 
@@ -607,8 +752,27 @@
         if (eventsBound) return;
         eventsBound = true;
 
-        // Auth Form
-        $('#auth-form').addEventListener('submit', async (e) => {
+        // Topbar Auth Buttons & Landing CTA
+        $('#btn-topbar-login')?.addEventListener('click', () => openAuthModal('LOGIN'));
+        $('#btn-topbar-register')?.addEventListener('click', () => openAuthModal('REGISTER'));
+        $('#btn-landing-cta')?.addEventListener('click', () => openAuthModal('REGISTER'));
+        $('#btn-close-auth-modal')?.addEventListener('click', closeAuthModal);
+
+        $('#auth-modal-backdrop')?.addEventListener('click', (e) => {
+            if (e.target === $('#auth-modal-backdrop')) closeAuthModal();
+        });
+
+        $('#btn-auth-switch')?.addEventListener('click', () => {
+            if (authMode === 'LOGIN') {
+                authMode = 'REGISTER';
+            } else {
+                authMode = 'LOGIN';
+            }
+            updateAuthModalUI();
+        });
+
+        // Auth Form Submission
+        $('#auth-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = $('#auth-username').value.trim();
             const password = $('#auth-password').value.trim();
@@ -620,17 +784,16 @@
 
             try {
                 let data;
-                try {
+                if (authMode === 'LOGIN') {
                     data = await api('POST', '/api/auth/login', { username, password });
-                } catch (loginErr) {
-                    if (loginErr.message.includes('Invalid') || loginErr.message.includes('Unauthorized') || loginErr.message.includes('not found')) {
-                        data = await api('POST', '/api/auth/register', { username, password });
-                    } else {
-                        throw loginErr;
-                    }
+                } else {
+                    // REGISTER or FIRST_SETUP
+                    data = await api('POST', '/api/auth/register', { username, password });
                 }
+
                 localStorage.setItem('curiosity_token', data.token);
                 await api('POST', '/api/profile', { language: langCode }).catch(() => {});
+                closeAuthModal();
                 init();
             } catch (error) {
                 err.textContent = error.message;
@@ -640,7 +803,7 @@
             }
         });
 
-        // Dynamic Event Delegation for Chips List (Clicking predefined or custom chip-row items)
+        // Dynamic Event Delegation for Chips List
         const chipsContainer = $('#onboarding-domains-chips');
         if (chipsContainer) {
             chipsContainer.addEventListener('click', (e) => {
@@ -667,7 +830,7 @@
             newChip.className = 'chip-row active';
             newChip.dataset.domain = text.toLowerCase().replace(/\s+/g, '_');
             newChip.textContent = `✨ ${text}`;
-            
+
             chipsContainer.appendChild(newChip);
             input.value = '';
             input.focus();
@@ -690,13 +853,13 @@
             });
         }
 
-        // Level Cards Selection (Vertical 3-Columns)
-        const levelContainer = $('.level-cards-vertical, .level-cards-grid');
+        // Level Cards Selection (3 Equal Width Columns)
+        const levelContainer = $('.level-cards-vertical');
         if (levelContainer) {
             levelContainer.addEventListener('click', (e) => {
-                const card = e.target.closest('.level-card-v, .level-tile');
+                const card = e.target.closest('.level-card-v');
                 if (!card) return;
-                $$('.level-card-v, .level-tile').forEach(c => c.classList.remove('active'));
+                $$('.level-card-v').forEach(c => c.classList.remove('active'));
                 card.classList.add('active');
                 selectedLevel = card.dataset.level || 'builder';
             });
@@ -711,7 +874,7 @@
                 const chipsEl = $('#onboarding-domains-chips');
 
                 if (selectedChips.length === 0) {
-                    if (errBox) errBox.style.display = 'block';
+                    if (errBox) errBox.style.display = 'inline';
                     if (chipsEl) {
                         chipsEl.classList.remove('shake-anim');
                         void chipsEl.offsetWidth; // trigger reflow
@@ -721,6 +884,7 @@
                 }
 
                 if (errBox) errBox.style.display = 'none';
+                if (chipsEl) chipsEl.classList.remove('shake-anim');
                 setWizardStep(2);
             });
         }
@@ -744,7 +908,7 @@
         if (btnOnboardingSubmit) {
             btnOnboardingSubmit.addEventListener('click', async (e) => {
                 e.preventDefault();
-                const activeChips = Array.from($$('#onboarding-domains-chips .chip-row.active, #onboarding-domains-chips .chip.active')).map(c => c.textContent.trim().replace(/^✨\s*/, ''));
+                const activeChips = Array.from($$('#onboarding-domains-chips .chip-row.active')).map(c => c.textContent.trim().replace(/^✨\s*/, ''));
                 const recentThought = ($('#onboarding-recent-input')?.value || '').trim();
 
                 setGlobalLoading(true, 'loading.onboarding');
@@ -768,63 +932,11 @@
             });
         }
 
-        // Navigation
-        $('#nav-brand').addEventListener('click', (e) => {
-            e.preventDefault();
-            showView(state.coldStartActive ? (state.profile.onboarded ? 'COLD_START' : 'ONBOARDING') : 'DASHBOARD');
-        });
-        $('#btn-nav-sparks').addEventListener('click', () => {
-            loadSparksList();
-            $('#spark-modal-backdrop').hidden = false;
-        });
-        $('#btn-nav-constellation').addEventListener('click', () => {
-            showView('CONSTELLATION');
-            renderConstellation();
-        });
-        $('#btn-nav-history').addEventListener('click', () => {
-            showView('HISTORY');
-            loadHistoryArchive();
-        });
-        $('#btn-nav-settings').addEventListener('click', () => {
-            showView('SETTINGS');
-            const info = $('#settings-ai-info');
-            if (info) {
-                info.innerHTML = state.ai.configured
-                    ? `<span style="color: var(--success);">${t('settings.ai_configured')} (${state.ai.provider} - ${state.ai.model})</span>`
-                    : `<span style="color: var(--error);">${t('settings.ai_not_configured')}</span>`;
-            }
-        });
-
-        $('#btn-constellation-back').addEventListener('click', () => showView('DASHBOARD'));
-        $('#btn-history-back').addEventListener('click', () => showView('DASHBOARD'));
-        $('#btn-settings-back').addEventListener('click', () => showView('DASHBOARD'));
-
-        // Compass Cards Vector Clicks
-        $$('.compass-card').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const vector = btn.dataset.vector;
-                triggerSuggestion(vector);
-            });
-        });
-
-        // Custom Vector Input
-        $('#btn-custom-vector-submit').addEventListener('click', () => {
-            const val = $('#input-custom-vector').value.trim();
-            if (val) triggerSuggestion('user_spark', val);
-        });
-        $('#input-custom-vector').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const val = e.target.value.trim();
-                if (val) triggerSuggestion('user_spark', val);
-            }
-        });
-
-        // Cold Start Custom Input & Reroll
+        // Cold Start Actions
         const btnColdStartReroll = $('#btn-cold-start-reroll');
         if (btnColdStartReroll) {
             btnColdStartReroll.addEventListener('click', async () => {
                 const rejected = (state.coldStartCards || []).map(c => c.title);
-                btnColdStartReroll.classList.add('loading');
                 setGlobalLoading(true, 'loading.generating');
                 try {
                     const res = await api('POST', '/api/cold-start/regenerate', {
@@ -836,19 +948,134 @@
                 } catch (err) {
                     showToast(err.message || t('errors.server_down'));
                 } finally {
-                    btnColdStartReroll.classList.remove('loading');
                     setGlobalLoading(false);
                 }
             });
         }
 
-        $('#btn-cold-start-custom-submit').addEventListener('click', () => {
-            const val = $('#input-cold-start-custom').value.trim();
+        // Cold Start Custom Thought Slide-Up Search Bar
+        const btnOpenCustomThought = $('#btn-cold-start-open-custom');
+        const cardsView = $('#cold-start-cards-view');
+        const customThoughtView = $('#cold-start-custom-view');
+        const btnCustomBack = $('#btn-cold-start-custom-back');
+        const inputThought = $('#input-cold-start-thought');
+
+        if (btnOpenCustomThought) {
+            btnOpenCustomThought.addEventListener('click', () => {
+                if (cardsView) cardsView.classList.add('fade-out');
+                setTimeout(() => {
+                    if (cardsView) cardsView.hidden = true;
+                    if (customThoughtView) {
+                        customThoughtView.hidden = false;
+                        if (inputThought) inputThought.focus();
+                    }
+                }, 180);
+            });
+        }
+
+        if (btnCustomBack) {
+            btnCustomBack.addEventListener('click', () => {
+                if (customThoughtView) customThoughtView.hidden = true;
+                if (cardsView) {
+                    cardsView.hidden = false;
+                    cardsView.classList.remove('fade-out');
+                }
+            });
+        }
+
+        // Submit Custom Thought in Cold Start
+        const formColdStartThought = $('#form-cold-start-thought');
+        if (formColdStartThought) {
+            formColdStartThought.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const thought = (inputThought?.value || '').trim();
+                if (!thought) return;
+
+                setGlobalLoading(true, 'loading.generating');
+                try {
+                    const res = await api('POST', '/api/cold-start/from-thought', {
+                        thought: thought,
+                        language: langCode
+                    });
+
+                    state.coldStartCards = res.cards || [];
+                    renderColdStartCards();
+
+                    // Switch smoothly back to cards view
+                    if (customThoughtView) customThoughtView.hidden = true;
+                    if (cardsView) {
+                        cardsView.hidden = false;
+                        cardsView.classList.remove('fade-out');
+                    }
+                    if (inputThought) inputThought.value = '';
+                } catch (err) {
+                    showToast(err.message || t('errors.server_down'));
+                } finally {
+                    setGlobalLoading(false);
+                }
+            });
+        }
+
+        // Brand Click Navigation
+        $('#nav-brand')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            const token = localStorage.getItem('curiosity_token');
+            if (!token) {
+                showView('LANDING');
+            } else {
+                showView(state.coldStartActive ? (state.profile.onboarded ? 'COLD_START' : 'ONBOARDING') : 'DASHBOARD');
+            }
+        });
+
+        // Topbar Nav Buttons
+        $('#btn-nav-sparks')?.addEventListener('click', () => {
+            loadSparksList();
+            $('#spark-modal-backdrop').hidden = false;
+        });
+        $('#btn-nav-constellation')?.addEventListener('click', () => {
+            showView('CONSTELLATION');
+            renderConstellation();
+        });
+        $('#btn-nav-history')?.addEventListener('click', () => {
+            showView('HISTORY');
+            loadHistoryArchive();
+        });
+        $('#btn-nav-settings')?.addEventListener('click', () => {
+            showView('SETTINGS');
+            const info = $('#settings-ai-info');
+            if (info) {
+                info.innerHTML = state.ai.configured
+                    ? `<span style="color: var(--success);">${t('settings.ai_configured')} (${state.ai.provider} - ${state.ai.model})</span>`
+                    : `<span style="color: var(--error);">${t('settings.ai_not_configured')}</span>`;
+            }
+        });
+
+        $('#btn-constellation-back')?.addEventListener('click', () => showView('DASHBOARD'));
+        $('#btn-history-back')?.addEventListener('click', () => showView('DASHBOARD'));
+        $('#btn-settings-back')?.addEventListener('click', () => showView('DASHBOARD'));
+
+        // Compass Cards Vector Clicks
+        $$('.compass-card').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const vector = btn.dataset.vector;
+                triggerSuggestion(vector);
+            });
+        });
+
+        // Custom Vector Input in Compass Hub
+        $('#btn-custom-vector-submit')?.addEventListener('click', () => {
+            const val = $('#input-custom-vector').value.trim();
             if (val) triggerSuggestion('user_spark', val);
+        });
+        $('#input-custom-vector')?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const val = e.target.value.trim();
+                if (val) triggerSuggestion('user_spark', val);
+            }
         });
 
         // Focus Card Actions
-        $('#btn-concept-accept').addEventListener('click', async () => {
+        $('#btn-concept-accept')?.addEventListener('click', async () => {
             if (!state.concept) return;
             try {
                 const res = await api('POST', `/api/topics/${state.concept.id}/accept`);
@@ -860,7 +1087,7 @@
             }
         });
 
-        $('#btn-concept-skip').addEventListener('click', async () => {
+        $('#btn-concept-skip')?.addEventListener('click', async () => {
             if (!state.concept) return;
             await api('POST', `/api/topics/${state.concept.id}/skip`).catch(() => {});
             state.concept = null;
@@ -868,7 +1095,7 @@
             renderFocusCard(null);
         });
 
-        $('#btn-copy-prompt').addEventListener('click', async () => {
+        $('#btn-copy-prompt')?.addEventListener('click', async () => {
             const text = $('#prompt-box-text').textContent;
             try {
                 await navigator.clipboard.writeText(text);
@@ -879,7 +1106,7 @@
         });
 
         // Complete Session Modal Trigger
-        $('#btn-concept-finish').addEventListener('click', () => {
+        $('#btn-concept-finish')?.addEventListener('click', () => {
             if (!state.concept) return;
             const subtitle = $('#complete-modal-subtitle');
             if (subtitle) {
@@ -888,14 +1115,14 @@
             $('#complete-modal-backdrop').hidden = false;
         });
 
-        $('#btn-close-complete-modal').addEventListener('click', () => {
+        $('#btn-close-complete-modal')?.addEventListener('click', () => {
             $('#complete-modal-backdrop').hidden = true;
         });
-        $('#btn-cancel-complete').addEventListener('click', () => {
+        $('#btn-cancel-complete')?.addEventListener('click', () => {
             $('#complete-modal-backdrop').hidden = true;
         });
 
-        $('#complete-session-form').addEventListener('submit', async (e) => {
+        $('#complete-session-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const coexplored = $('#input-coexplored').value.trim();
             const notes = $('#input-notes').value.trim();
@@ -925,37 +1152,38 @@
         });
 
         // Spark Inbox Floating Button & Modal
-        $('#btn-floating-spark').addEventListener('click', () => {
+        $('#btn-floating-spark')?.addEventListener('click', () => {
             loadSparksList();
             $('#spark-modal-backdrop').hidden = false;
             $('#input-spark-text').focus();
         });
-        $('#btn-close-spark-modal').addEventListener('click', () => {
+        $('#btn-close-spark-modal')?.addEventListener('click', () => {
             $('#spark-modal-backdrop').hidden = true;
         });
 
-        $('#btn-submit-spark').addEventListener('click', submitSpark);
-        $('#input-spark-text').addEventListener('keydown', (e) => {
+        $('#btn-submit-spark')?.addEventListener('click', submitSpark);
+        $('#input-spark-text')?.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') submitSpark();
         });
 
         // Keyboard Shortcut: Space on Dashboard (when not in an input) opens Spark Inbox
         document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+            if (e.code === 'Space' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName) && state.view === 'DASHBOARD') {
                 e.preventDefault();
                 loadSparksList();
                 $('#spark-modal-backdrop').hidden = false;
-                setTimeout(() => $('#input-spark-text').focus(), 50);
+                setTimeout(() => $('#input-spark-text')?.focus(), 50);
             }
             if (e.key === 'Escape') {
                 $('#spark-modal-backdrop').hidden = true;
                 $('#complete-modal-backdrop').hidden = true;
+                closeAuthModal();
             }
         });
 
         // Settings Themes
-        $('#btn-theme-dark').addEventListener('click', () => applyTheme('dark'));
-        $('#btn-theme-light').addEventListener('click', () => applyTheme('light'));
+        $('#btn-theme-dark')?.addEventListener('click', () => applyTheme('dark'));
+        $('#btn-theme-light')?.addEventListener('click', () => applyTheme('light'));
     }
 
     async function submitSpark() {

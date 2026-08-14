@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -9,12 +10,15 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <link rel="icon" type="image/png" href="assets/favicon.png">
     <link rel="apple-touch-icon" href="assets/favicon.png">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div id="app">
         <!-- Top Fixed Global Progress Bar (Full Window Width) -->
@@ -33,30 +37,35 @@
             <div class="topbar__left">
                 <a href="#" class="brand" id="nav-brand">
                     <img src="assets/logo.png" alt="CuriosityEngine" class="brand__logo-img">
-                    <span class="brand__name">CuriosityEngine</span>
+                    <span class="brand__name" data-i18n="nav.brand">CuriosityEngine</span>
                 </a>
                 <span class="topbar__date" id="topbar-date"></span>
             </div>
 
             <nav class="topbar__nav">
+                <!-- Nav links (Only shown when authenticated on dashboard/settings/constellation/history) -->
                 <div class="topbar__nav-links" id="topbar-nav-links" hidden>
                     <button class="topbar__btn" id="btn-nav-sparks" aria-label="Spark Inbox" title="Spark Inbox">
-                        <span class="icon">⚡</span>
                         <span class="topbar__label" id="nav-sparks-label" data-i18n="nav.sparks"></span>
                     </button>
-                    <button class="topbar__btn" id="btn-nav-constellation" aria-label="Constellation" title="Knowledge Constellation">
-                        <span class="icon">🌌</span>
+                    <button class="topbar__btn" id="btn-nav-constellation" aria-label="Constellation"
+                        title="Knowledge Constellation">
                         <span class="topbar__label" data-i18n="nav.constellation"></span>
                     </button>
                     <button class="topbar__btn" id="btn-nav-history" aria-label="History" title="History">
-                        <span class="icon">📚</span>
                         <span class="topbar__label" data-i18n="nav.history"></span>
                     </button>
                     <button class="topbar__btn" id="btn-nav-settings" aria-label="Settings" title="Settings">
-                        <span class="icon">⚙️</span>
                         <span class="topbar__label" data-i18n="nav.settings"></span>
                     </button>
                 </div>
+
+                <!-- Unauthenticated Auth Links (Shown on Landing Page) -->
+                <div class="topbar__auth-links" id="topbar-auth-links">
+                    <button class="topbar__btn topbar__btn--auth-login" id="btn-topbar-login" data-i18n="nav.login_btn"></button>
+                    <button class="topbar__btn topbar__btn--auth-register" id="btn-topbar-register" data-i18n="nav.register_btn"></button>
+                </div>
+
                 <select id="topbar-lang-select" class="lang-select" aria-label="Language">
                 </select>
             </nav>
@@ -64,14 +73,70 @@
 
         <!-- Main Workspace -->
         <main class="main" id="main">
-            
-            <!-- 1. AUTH VIEW (LOGIN / REGISTER) -->
-            <section class="view view--auth" id="view-auth" hidden aria-label="Authentication">
+
+            <!-- 1. LANDING PAGE VIEW (SaaS Style with Dynamic Headlines) -->
+            <section class="view view--landing" id="view-landing" aria-label="CuriosityEngine Landing">
+                <div class="landing-hero">
+                    <div class="badge badge--glow" data-i18n="landing.badge"></div>
+                    <h1 class="landing-hero-title">
+                        <span data-i18n="landing.title_static"></span><br>
+                        <span class="hero-dynamic-text-wrap">
+                            <span class="hero-dynamic-text" id="hero-dynamic-text"></span>
+                            <span class="hero-cursor" aria-hidden="true">|</span>
+                        </span>
+                    </h1>
+                    <p class="landing-hero-subtitle" data-i18n="landing.subtitle"></p>
+                    <div class="landing-cta-group">
+                        <button type="button" class="btn btn--primary btn--lg landing-cta-btn" id="btn-landing-cta" data-i18n="landing.cta_start"></button>
+                        <a href="#landing-features" class="btn btn--ghost btn--lg landing-how-btn" id="btn-landing-how" data-i18n="landing.cta_how"></a>
+                    </div>
+                </div>
+
+                <!-- Features Showcase Section -->
+                <div class="landing-features" id="landing-features">
+                    <div class="landing-features-header">
+                        <span class="badge" data-i18n="landing.features_badge"></span>
+                        <h2 class="landing-section-title" data-i18n="landing.features_title"></h2>
+                        <p class="landing-section-subtitle" data-i18n="landing.features_subtitle"></p>
+                    </div>
+
+                    <div class="landing-features-grid">
+                        <div class="feature-card">
+                            <div class="feature-card__icon-wrap">🌿</div>
+                            <span class="feature-card__tag" data-i18n="landing.f1_tag"></span>
+                            <h3 class="feature-card__title" data-i18n="landing.f1_title"></h3>
+                            <p class="feature-card__desc" data-i18n="landing.f1_desc"></p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-card__icon-wrap">🔬</div>
+                            <span class="feature-card__tag" data-i18n="landing.f2_tag"></span>
+                            <h3 class="feature-card__title" data-i18n="landing.f2_title"></h3>
+                            <p class="feature-card__desc" data-i18n="landing.f2_desc"></p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-card__icon-wrap">🌫️</div>
+                            <span class="feature-card__tag" data-i18n="landing.f3_tag"></span>
+                            <h3 class="feature-card__title" data-i18n="landing.f3_title"></h3>
+                            <p class="feature-card__desc" data-i18n="landing.f3_desc"></p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-card__icon-wrap">⚡</div>
+                            <span class="feature-card__tag" data-i18n="landing.f4_tag"></span>
+                            <h3 class="feature-card__title" data-i18n="landing.f4_title"></h3>
+                            <p class="feature-card__desc" data-i18n="landing.f4_desc"></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. AUTH MODAL (LOGIN / REGISTER / FIRST ADMIN SETUP) -->
+            <div class="auth-modal-backdrop" id="auth-modal-backdrop" hidden>
                 <div class="auth-card">
+                    <button type="button" class="modal-close auth-modal-close" id="btn-close-auth-modal" aria-label="Close">&times;</button>
                     <div class="auth-hero">
                         <img src="assets/logo.png" alt="CuriosityEngine" class="auth-hero-img">
-                        <h1 class="auth-title">CuriosityEngine</h1>
-                        <p class="auth-subtitle" data-i18n="auth.subtitle"></p>
+                        <h2 class="auth-title" id="auth-card-title" data-i18n="auth.login_title"></h2>
+                        <p class="auth-subtitle" id="auth-card-subtitle" data-i18n="auth.login_subtitle"></p>
                     </div>
                     <form id="auth-form" class="auth-form">
                         <div class="field">
@@ -80,27 +145,31 @@
                         </div>
                         <div class="field">
                             <label class="field__label" for="auth-password" data-i18n="auth.password"></label>
-                            <input type="password" class="input" id="auth-password" required autocomplete="current-password">
+                            <input type="password" class="input" id="auth-password" required
+                                autocomplete="current-password">
                         </div>
                         <p id="auth-error" class="form-error" style="display: none;"></p>
                         <div class="auth-actions">
                             <button type="submit" class="btn btn--primary btn--full" id="btn-login-submit">
-                                <span class="btn__text" data-i18n="auth.submit"></span>
+                                <span class="btn__text" id="auth-submit-text" data-i18n="auth.login_submit"></span>
                                 <span class="btn__loader" aria-hidden="true"></span>
                             </button>
                         </div>
+                        <div class="auth-switch-box">
+                            <button type="button" class="btn-link" id="btn-auth-switch" data-i18n="auth.switch_to_register"></button>
+                        </div>
                     </form>
                 </div>
-            </section>
+            </div>
 
-            <!-- 2. ONBOARDING VIEW (3-STEP SLIDE WIZARD) -->
+            <!-- 3. ONBOARDING VIEW (3-STEP SLIDE WIZARD) -->
             <section class="view view--onboarding" id="view-onboarding" hidden aria-label="Onboarding Wizard">
                 <div class="view__content onboarding-container">
 
                     <!-- Slide Card Container -->
                     <div class="wizard-card">
-                        
-                        <!-- SLIDE 1: DOMAINS & PASSIONS (1 ITEM PER ROW, CENTERED) -->
+
+                        <!-- SLIDE 1: DOMAINS & PASSIONS -->
                         <div class="wizard-slide" id="wizard-slide-1">
                             <div class="slide-header">
                                 <h2 class="slide-title" data-i18n="onboarding.step1_title"></h2>
@@ -108,32 +177,45 @@
                             </div>
 
                             <div class="chips-column" id="onboarding-domains-chips">
-                                <button type="button" class="chip-row" data-domain="math" data-i18n="onboarding.domains.math"></button>
-                                <button type="button" class="chip-row" data-domain="cs" data-i18n="onboarding.domains.cs"></button>
-                                <button type="button" class="chip-row" data-domain="physics" data-i18n="onboarding.domains.physics"></button>
-                                <button type="button" class="chip-row" data-domain="biology" data-i18n="onboarding.domains.biology"></button>
-                                <button type="button" class="chip-row" data-domain="hardware" data-i18n="onboarding.domains.hardware"></button>
-                                <button type="button" class="chip-row" data-domain="gamedev" data-i18n="onboarding.domains.gamedev"></button>
-                                <button type="button" class="chip-row" data-domain="ai" data-i18n="onboarding.domains.ai"></button>
-                                <button type="button" class="chip-row" data-domain="philosophy" data-i18n="onboarding.domains.philosophy"></button>
-                                <button type="button" class="chip-row" data-domain="economics" data-i18n="onboarding.domains.economics"></button>
-                                <button type="button" class="chip-row" data-domain="linguistics" data-i18n="onboarding.domains.linguistics"></button>
+                                <button type="button" class="chip-row" data-domain="math"
+                                    data-i18n="onboarding.domains.math"></button>
+                                <button type="button" class="chip-row" data-domain="cs"
+                                    data-i18n="onboarding.domains.cs"></button>
+                                <button type="button" class="chip-row" data-domain="physics"
+                                    data-i18n="onboarding.domains.physics"></button>
+                                <button type="button" class="chip-row" data-domain="biology"
+                                    data-i18n="onboarding.domains.biology"></button>
+                                <button type="button" class="chip-row" data-domain="hardware"
+                                    data-i18n="onboarding.domains.hardware"></button>
+                                <button type="button" class="chip-row" data-domain="gamedev"
+                                    data-i18n="onboarding.domains.gamedev"></button>
+                                <button type="button" class="chip-row" data-domain="ai"
+                                    data-i18n="onboarding.domains.ai"></button>
+                                <button type="button" class="chip-row" data-domain="philosophy"
+                                    data-i18n="onboarding.domains.philosophy"></button>
+                                <button type="button" class="chip-row" data-domain="economics"
+                                    data-i18n="onboarding.domains.economics"></button>
+                                <button type="button" class="chip-row" data-domain="linguistics"
+                                    data-i18n="onboarding.domains.linguistics"></button>
                             </div>
 
-                            <!-- Custom Tag Input (Minimal at bottom) -->
+                            <!-- Custom Tag Input -->
                             <div class="custom-chip-builder">
-                                <input type="text" class="input input--compact" id="input-custom-chip" data-i18n-placeholder="onboarding.custom_chip_placeholder">
-                                <button type="button" class="btn btn--secondary btn--compact" id="btn-add-custom-chip" data-i18n="onboarding.add_chip_btn"></button>
+                                <input type="text" class="input input--compact" id="input-custom-chip"
+                                    data-i18n-placeholder="onboarding.custom_chip_placeholder">
+                                <button type="button" class="btn btn--secondary btn--compact" id="btn-add-custom-chip"
+                                    data-i18n="onboarding.add_chip_btn"></button>
                             </div>
 
-                            <div id="onboarding-step1-error" class="onboarding-error-msg" style="display: none;" data-i18n="onboarding.step1_required_error"></div>
-
-                            <div class="wizard-actions wizard-actions--end">
-                                <button type="button" class="btn btn--primary" id="btn-wizard-step1-next" data-i18n="onboarding.btn_next"></button>
+                            <div class="wizard-actions">
+                                <span id="onboarding-step1-error" class="onboarding-inline-error" style="display: none;"
+                                    data-i18n="onboarding.step1_required_error"></span>
+                                <button type="button" class="btn btn--primary" id="btn-wizard-step1-next"
+                                    data-i18n="onboarding.btn_next"></button>
                             </div>
                         </div>
 
-                        <!-- SLIDE 2: GROUNDING LEVEL VERTICAL CARDS (3 COLUMNS) -->
+                        <!-- SLIDE 2: GROUNDING LEVEL VERTICAL CARDS (EQUAL WIDTH & VECTOR BOLTS) -->
                         <div class="wizard-slide" id="wizard-slide-2" hidden>
                             <div class="slide-header">
                                 <h2 class="slide-title" data-i18n="onboarding.step2_title"></h2>
@@ -142,16 +224,26 @@
 
                             <div class="level-cards-vertical">
                                 <div class="level-card-v" data-level="ground_zero">
-                                    <div class="level-card-v__icon">🧱</div>
+                                    <div class="level-bolts" aria-label="Level 1 of 3">
+                                        <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                        <svg class="bolt-svg empty" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                        <svg class="bolt-svg empty" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                    </div>
                                     <div class="level-card-v__body">
-                                        <span class="level-card-v__tag" data-i18n="onboarding.level_ground_zero_tag"></span>
-                                        <h3 class="level-card-v__title" data-i18n="onboarding.level_ground_zero_title"></h3>
+                                        <span class="level-card-v__tag"
+                                            data-i18n="onboarding.level_ground_zero_tag"></span>
+                                        <h3 class="level-card-v__title" data-i18n="onboarding.level_ground_zero_title">
+                                        </h3>
                                         <p class="level-card-v__desc" data-i18n="onboarding.level_ground_zero_desc"></p>
                                     </div>
                                     <div class="level-card-v__check" aria-hidden="true"></div>
                                 </div>
                                 <div class="level-card-v active" data-level="builder">
-                                    <div class="level-card-v__icon">⚡</div>
+                                    <div class="level-bolts" aria-label="Level 2 of 3">
+                                        <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                        <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                        <svg class="bolt-svg empty" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                    </div>
                                     <div class="level-card-v__body">
                                         <span class="level-card-v__tag" data-i18n="onboarding.level_builder_tag"></span>
                                         <h3 class="level-card-v__title" data-i18n="onboarding.level_builder_title"></h3>
@@ -160,7 +252,11 @@
                                     <div class="level-card-v__check" aria-hidden="true"></div>
                                 </div>
                                 <div class="level-card-v" data-level="deep">
-                                    <div class="level-card-v__icon">🔬</div>
+                                    <div class="level-bolts" aria-label="Level 3 of 3">
+                                        <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                        <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                        <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                    </div>
                                     <div class="level-card-v__body">
                                         <span class="level-card-v__tag" data-i18n="onboarding.level_deep_tag"></span>
                                         <h3 class="level-card-v__title" data-i18n="onboarding.level_deep_title"></h3>
@@ -171,12 +267,14 @@
                             </div>
 
                             <div class="wizard-actions">
-                                <button type="button" class="btn btn--ghost" id="btn-wizard-step2-prev" data-i18n="onboarding.btn_prev"></button>
-                                <button type="button" class="btn btn--primary" id="btn-wizard-step2-next" data-i18n="onboarding.btn_next"></button>
+                                <button type="button" class="btn btn--ghost" id="btn-wizard-step2-prev"
+                                    data-i18n="onboarding.btn_prev"></button>
+                                <button type="button" class="btn btn--primary" id="btn-wizard-step2-next"
+                                    data-i18n="onboarding.btn_next"></button>
                             </div>
                         </div>
 
-                        <!-- SLIDE 3: RECENT INTRIGUES (SPACIOUS & CLEAN) -->
+                        <!-- SLIDE 3: RECENT INTRIGUES -->
                         <div class="wizard-slide" id="wizard-slide-3" hidden>
                             <div class="slide-header">
                                 <h2 class="slide-title" data-i18n="onboarding.step3_title"></h2>
@@ -184,12 +282,14 @@
                             </div>
 
                             <div class="slide-content-spacious">
-                                <textarea class="textarea textarea--spacious-clean" id="onboarding-recent-input" data-i18n-placeholder="onboarding.recent_placeholder"></textarea>
+                                <textarea class="textarea textarea--spacious-clean" id="onboarding-recent-input"
+                                    data-i18n-placeholder="onboarding.recent_placeholder"></textarea>
                                 <p class="step3-hint" data-i18n="onboarding.step3_hint"></p>
                             </div>
 
                             <div class="wizard-actions">
-                                <button type="button" class="btn btn--ghost" id="btn-wizard-step3-prev" data-i18n="onboarding.btn_prev"></button>
+                                <button type="button" class="btn btn--ghost" id="btn-wizard-step3-prev"
+                                    data-i18n="onboarding.btn_prev"></button>
                                 <button type="button" class="btn btn--primary" id="btn-onboarding-submit">
                                     <span class="btn__text" data-i18n="onboarding.btn_submit"></span>
                                     <span class="btn__loader" aria-hidden="true"></span>
@@ -201,30 +301,48 @@
                 </div>
             </section>
 
-            <!-- 3. COLD START (DYNAMIC 2x2 SPARK CARDS) -->
+            <!-- 4. COLD START (SCALED + DYNAMIC 2x2 CARDS & SLIDING SEARCH) -->
             <section class="view view--cold-start" id="view-cold-start" hidden aria-label="Cold Start">
-                <div class="view__content">
-                    <span class="badge" data-i18n="cold_start.badge"></span>
-                    <h1 class="page-title" data-i18n="cold_start.title"></h1>
-                    <p class="page-subtitle" data-i18n="cold_start.subtitle"></p>
+                <div class="cold-start-wrapper">
+                    <!-- Cards Grid Screen -->
+                    <div class="cold-start-cards-view" id="cold-start-cards-view">
+                        <span class="badge" data-i18n="cold_start.badge"></span>
+                        <h1 class="page-title" data-i18n="cold_start.title"></h1>
+                        <p class="page-subtitle" data-i18n="cold_start.subtitle"></p>
 
-                    <div class="spark-grid" id="cold-start-cards-container">
-                        <!-- Populated dynamically via JS -->
+                        <div class="spark-grid" id="cold-start-cards-container">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+
+                        <div class="cold-start-actions-row">
+                            <button type="button" class="btn-text-action btn-text-action--custom" id="btn-cold-start-open-custom"
+                                data-i18n="cold_start.custom_thought_btn"></button>
+                            <button type="button" class="btn-text-action btn-text-action--reroll" id="btn-cold-start-reroll"
+                                data-i18n="cold_start.reroll_btn"></button>
+                        </div>
                     </div>
 
-                    <div class="cold-start-actions">
-                        <button type="button" class="btn-reroll" id="btn-cold-start-reroll">
-                            <span class="icon">🔄</span>
-                            <span class="btn__text" data-i18n="cold_start.reroll_btn"></span>
-                            <span class="btn__loader" aria-hidden="true"></span>
-                        </button>
-                    </div>
+                    <!-- Slide-Up Google-Style Search View -->
+                    <div class="cold-start-custom-view" id="cold-start-custom-view" hidden>
+                        <div class="cold-start-custom-topbar">
+                            <button type="button" class="btn-back-link" id="btn-cold-start-custom-back" data-i18n="cold_start.custom_view_back"></button>
+                        </div>
+                        <div class="cold-start-custom-content">
+                            <span class="badge" data-i18n="cold_start.badge"></span>
+                            <h2 class="cold-start-custom-title" data-i18n="cold_start.custom_view_title"></h2>
+                            <p class="cold-start-custom-subtitle" data-i18n="cold_start.custom_view_subtitle"></p>
 
-                    <div class="custom-spark-box">
-                        <p class="label label--subtle" data-i18n="cold_start.or_custom"></p>
-                        <div class="input-group">
-                            <input type="text" class="input" id="input-cold-start-custom" data-i18n-placeholder="cold_start.custom_placeholder">
-                            <button class="btn btn--secondary" id="btn-cold-start-custom-submit" data-i18n="cold_start.custom_submit"></button>
+                            <form id="form-cold-start-thought" class="google-search-bar-wrap">
+                                <div class="google-search-bar">
+                                    <span class="search-bar-icon" aria-hidden="true">✦</span>
+                                    <input type="text" class="search-bar-input" id="input-cold-start-thought"
+                                        data-i18n-placeholder="cold_start.custom_placeholder" autocomplete="off">
+                                    <button type="submit" class="btn btn--primary btn--search-submit" id="btn-submit-cold-start-thought">
+                                        <span class="btn__text" data-i18n="cold_start.custom_submit"></span>
+                                        <span class="btn__loader" aria-hidden="true"></span>
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -233,7 +351,7 @@
             <!-- 4. COMPASS & FOCUS HUB (MAIN ZEN DASHBOARD) -->
             <section class="view view--dashboard" id="view-dashboard" hidden aria-label="Curiosity Dashboard">
                 <div class="view__content">
-                    
+
                     <!-- Greeting & Vector Compass -->
                     <div class="compass-section" id="compass-section">
                         <div class="greeting-bar">
@@ -272,8 +390,10 @@
                         <!-- Custom User Spark Input -->
                         <div class="custom-spark-toggle">
                             <div class="input-group">
-                                <input type="text" class="input" id="input-custom-vector" data-i18n-placeholder="compass.input_placeholder">
-                                <button class="btn btn--secondary" id="btn-custom-vector-submit" data-i18n="compass.input_submit"></button>
+                                <input type="text" class="input" id="input-custom-vector"
+                                    data-i18n-placeholder="compass.input_placeholder">
+                                <button class="btn btn--secondary" id="btn-custom-vector-submit"
+                                    data-i18n="compass.input_submit"></button>
                             </div>
                         </div>
                     </div>
@@ -312,7 +432,8 @@
 
                             <!-- Actions Row -->
                             <div class="focus-card__actions" id="focus-actions-suggested">
-                                <button class="btn btn--ghost" id="btn-concept-skip" data-i18n="focus_card.skip_btn"></button>
+                                <button class="btn btn--ghost" id="btn-concept-skip"
+                                    data-i18n="focus_card.skip_btn"></button>
                                 <button class="btn btn--primary" id="btn-concept-accept">
                                     <span class="btn__text" data-i18n="focus_card.accept_btn"></span>
                                     <span class="icon">➔</span>
@@ -332,13 +453,15 @@
             </section>
 
             <!-- 5. KNOWLEDGE CONSTELLATION VIEW -->
-            <section class="view view--constellation" id="view-constellation" hidden aria-label="Knowledge Constellation">
+            <section class="view view--constellation" id="view-constellation" hidden
+                aria-label="Knowledge Constellation">
                 <div class="constellation-header">
                     <div>
                         <h1 class="page-title" data-i18n="constellation.title"></h1>
                         <p class="page-subtitle" id="constellation-subtitle" data-i18n="constellation.subtitle"></p>
                     </div>
-                    <button class="btn btn--ghost btn--small" id="btn-constellation-back" data-i18n="constellation.back_btn"></button>
+                    <button class="btn btn--ghost btn--small" id="btn-constellation-back"
+                        data-i18n="constellation.back_btn"></button>
                 </div>
                 <div class="canvas-container">
                     <canvas id="constellation-canvas"></canvas>
@@ -353,7 +476,8 @@
                 <div class="view__content view__content--wide">
                     <div class="history-header">
                         <h1 class="page-title" data-i18n="history.title"></h1>
-                        <button class="btn btn--ghost btn--small" id="btn-history-back" data-i18n="history.back_btn"></button>
+                        <button class="btn btn--ghost btn--small" id="btn-history-back"
+                            data-i18n="history.back_btn"></button>
                     </div>
                     <div class="history-list" id="history-list"></div>
                     <p class="history-empty" id="history-empty" hidden data-i18n="history.empty"></p>
@@ -365,14 +489,17 @@
                 <div class="view__content view__content--wide">
                     <div class="history-header">
                         <h1 class="page-title" data-i18n="settings.title"></h1>
-                        <button class="btn btn--ghost btn--small" id="btn-settings-back" data-i18n="settings.back_btn"></button>
+                        <button class="btn btn--ghost btn--small" id="btn-settings-back"
+                            data-i18n="settings.back_btn"></button>
                     </div>
 
                     <div class="settings-section">
                         <h3 class="settings-heading" data-i18n="settings.theme_heading"></h3>
                         <div class="theme-switch-group">
-                            <button type="button" class="btn btn--secondary" id="btn-theme-dark" data-i18n="settings.theme_dark"></button>
-                            <button type="button" class="btn btn--secondary" id="btn-theme-light" data-i18n="settings.theme_light"></button>
+                            <button type="button" class="btn btn--secondary" id="btn-theme-dark"
+                                data-i18n="settings.theme_dark"></button>
+                            <button type="button" class="btn btn--secondary" id="btn-theme-light"
+                                data-i18n="settings.theme_light"></button>
                         </div>
                     </div>
 
@@ -405,7 +532,8 @@
                 </div>
                 <p class="modal-subtitle" data-i18n="spark_box.subtitle"></p>
                 <div class="input-group">
-                    <input type="text" class="input" id="input-spark-text" data-i18n-placeholder="spark_box.input_placeholder">
+                    <input type="text" class="input" id="input-spark-text"
+                        data-i18n-placeholder="spark_box.input_placeholder">
                     <button class="btn btn--primary" id="btn-submit-spark" data-i18n="spark_box.add_btn"></button>
                 </div>
                 <div class="sparks-list" id="sparks-inbox-list"></div>
@@ -422,16 +550,20 @@
                 <p class="modal-subtitle" id="complete-modal-subtitle"></p>
                 <form id="complete-session-form" class="modal-form">
                     <div class="field">
-                        <label class="field__label" for="input-coexplored" data-i18n="complete_modal.co_explored_label"></label>
-                        <textarea class="textarea" id="input-coexplored" rows="3" data-i18n-placeholder="complete_modal.co_explored_placeholder"></textarea>
+                        <label class="field__label" for="input-coexplored"
+                            data-i18n="complete_modal.co_explored_label"></label>
+                        <textarea class="textarea" id="input-coexplored" rows="3"
+                            data-i18n-placeholder="complete_modal.co_explored_placeholder"></textarea>
                         <span class="field__hint" data-i18n="complete_modal.co_explored_hint"></span>
                     </div>
                     <div class="field">
                         <label class="field__label" for="input-notes" data-i18n="complete_modal.notes_label"></label>
-                        <input type="text" class="input" id="input-notes" data-i18n-placeholder="complete_modal.notes_placeholder">
+                        <input type="text" class="input" id="input-notes"
+                            data-i18n-placeholder="complete_modal.notes_placeholder">
                     </div>
                     <div class="modal-actions">
-                        <button type="button" class="btn btn--ghost" id="btn-cancel-complete" data-i18n="complete_modal.cancel_btn"></button>
+                        <button type="button" class="btn btn--ghost" id="btn-cancel-complete"
+                            data-i18n="complete_modal.cancel_btn"></button>
                         <button type="submit" class="btn btn--primary" id="btn-confirm-complete">
                             <span class="btn__text" data-i18n="complete_modal.save_btn"></span>
                             <span class="btn__loader" aria-hidden="true"></span>
@@ -442,7 +574,8 @@
         </div>
 
         <!-- Floating Quick Spark Trigger Button (Mobile & Desktop) -->
-        <button class="floating-spark-btn" id="btn-floating-spark" hidden aria-label="Złap Dygresję" title="Złap dygresję (Spacja)">
+        <button class="floating-spark-btn" id="btn-floating-spark" hidden aria-label="Złap Dygresję"
+            title="Złap dygresję (Spacja)">
             <span class="icon">⚡</span>
         </button>
 
@@ -463,4 +596,5 @@
 
     <script src="app.js"></script>
 </body>
+
 </html>
