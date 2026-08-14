@@ -80,7 +80,9 @@
 }
 
 /* --- Global Reset --- */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -139,9 +141,17 @@ body {
 }
 
 @keyframes orbFloat {
-    0% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(30px, -20px) scale(1.06); }
-    100% { transform: translate(-20px, 15px) scale(0.95); }
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate(30px, -20px) scale(1.06);
+    }
+
+    100% {
+        transform: translate(-20px, 15px) scale(0.95);
+    }
 }
 
 /* App Container */
@@ -276,8 +286,15 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* --- Typography & Badges --- */
@@ -425,10 +442,13 @@ body {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-.input, .textarea {
+.input,
+.textarea {
     width: 100%;
     padding: 0.75rem 1rem;
     font-family: var(--font-sans);
@@ -441,7 +461,8 @@ body {
     transition: border-color var(--duration-fast) var(--ease-out);
 }
 
-.input:focus, .textarea:focus {
+.input:focus,
+.textarea:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px var(--accent-glow);
 }
@@ -676,7 +697,8 @@ body {
     line-height: 1.25;
 }
 
-.focus-card__reason-box, .focus-card__model-box {
+.focus-card__reason-box,
+.focus-card__model-box {
     background: var(--bg-elevated);
     padding: var(--space-md);
     border-radius: var(--radius-md);
@@ -693,7 +715,8 @@ body {
     margin-bottom: 0.25rem;
 }
 
-.focus-card__reason, .focus-card__model {
+.focus-card__reason,
+.focus-card__model {
     font-size: var(--fs-base);
     color: var(--text-secondary);
     line-height: 1.5;
@@ -796,7 +819,8 @@ body {
     animation: fadeIn var(--duration-fast) var(--ease-out);
 }
 
-.modal-card, .modal-drawer {
+.modal-card,
+.modal-drawer {
     background: var(--bg-surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-xl);
@@ -942,6 +966,9 @@ body {
 }
 
 .toast__icon {
+    color: var(--success);
+}
+
 /* --- Topbar Nav Links Container --- */
 .topbar__nav-links {
     display: flex;
@@ -1772,7 +1799,7 @@ body {
     background: transparent;
     border: none;
     font-family: var(--font-sans);
-    font-size: 0.85rem; /* 1px smaller */
+    font-size: 0.85rem;
     font-weight: 500;
     color: var(--text-secondary);
     cursor: pointer;
@@ -1802,8 +1829,14 @@ body {
 }
 
 @keyframes slideUpView {
-    from { opacity: 0; transform: translateY(40px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .cold-start-custom-topbar {

@@ -63,8 +63,11 @@
 
     async function loadLanguage(code) {
         try {
-            const res = await fetch(`/i18n/${code}/ui.json`);
-            if (!res.ok) throw new Error(`Language file not found: ${code}`);
+            let res = await fetch(`/i18n/${code}/ui.json`).catch(() => null);
+            if (!res || !res.ok) {
+                res = await fetch(`i18n/${code}/ui.json`).catch(() => null);
+            }
+            if (!res || !res.ok) throw new Error(`Language file not found: ${code}`);
             lang = await res.json();
             langCode = code;
             applyTranslations();
