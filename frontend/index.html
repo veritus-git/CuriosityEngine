@@ -131,25 +131,34 @@
                             </div>
                         </div>
 
-                        <!-- SLIDE 2: GROUNDING LEVEL TILES -->
+                        <!-- SLIDE 2: GROUNDING LEVEL VERTICAL CARDS (3 COLUMNS) -->
                         <div class="wizard-slide" id="wizard-slide-2" hidden>
                             <div class="slide-header">
                                 <h2 class="slide-title" data-i18n="onboarding.step2_title"></h2>
                                 <p class="slide-subtitle" data-i18n="onboarding.step2_subtitle"></p>
                             </div>
 
-                            <div class="level-cards-grid">
-                                <div class="level-tile" data-level="ground_zero">
-                                    <h3 class="level-tile__title" data-i18n="onboarding.level_ground_zero_title"></h3>
-                                    <p class="level-tile__desc" data-i18n="onboarding.level_ground_zero_desc"></p>
+                            <div class="level-cards-vertical">
+                                <div class="level-card-v" data-level="ground_zero">
+                                    <div class="level-card-v__icon">🧱</div>
+                                    <span class="level-card-v__tag" data-i18n="onboarding.level_ground_zero_tag"></span>
+                                    <h3 class="level-card-v__title" data-i18n="onboarding.level_ground_zero_title"></h3>
+                                    <p class="level-card-v__desc" data-i18n="onboarding.level_ground_zero_desc"></p>
+                                    <div class="level-card-v__check" aria-hidden="true"></div>
                                 </div>
-                                <div class="level-tile active" data-level="builder">
-                                    <h3 class="level-tile__title" data-i18n="onboarding.level_builder_title"></h3>
-                                    <p class="level-tile__desc" data-i18n="onboarding.level_builder_desc"></p>
+                                <div class="level-card-v active" data-level="builder">
+                                    <div class="level-card-v__icon">⚡</div>
+                                    <span class="level-card-v__tag" data-i18n="onboarding.level_builder_tag"></span>
+                                    <h3 class="level-card-v__title" data-i18n="onboarding.level_builder_title"></h3>
+                                    <p class="level-card-v__desc" data-i18n="onboarding.level_builder_desc"></p>
+                                    <div class="level-card-v__check" aria-hidden="true"></div>
                                 </div>
-                                <div class="level-tile" data-level="deep">
-                                    <h3 class="level-tile__title" data-i18n="onboarding.level_deep_title"></h3>
-                                    <p class="level-tile__desc" data-i18n="onboarding.level_deep_desc"></p>
+                                <div class="level-card-v" data-level="deep">
+                                    <div class="level-card-v__icon">🔬</div>
+                                    <span class="level-card-v__tag" data-i18n="onboarding.level_deep_tag"></span>
+                                    <h3 class="level-card-v__title" data-i18n="onboarding.level_deep_title"></h3>
+                                    <p class="level-card-v__desc" data-i18n="onboarding.level_deep_desc"></p>
+                                    <div class="level-card-v__check" aria-hidden="true"></div>
                                 </div>
                             </div>
 
@@ -159,15 +168,27 @@
                             </div>
                         </div>
 
-                        <!-- SLIDE 3: RECENT INTRIGUES (SPACIOUS TEXTAREA) -->
+                        <!-- SLIDE 3: RECENT INTRIGUES & SPARK INSPIRATIONS -->
                         <div class="wizard-slide" id="wizard-slide-3" hidden>
                             <div class="slide-header">
                                 <h2 class="slide-title" data-i18n="onboarding.step3_title"></h2>
                                 <p class="slide-subtitle" data-i18n="onboarding.step3_subtitle"></p>
                             </div>
 
-                            <div class="slide-content-fill">
+                            <div class="slide-content-rich">
                                 <textarea class="textarea textarea--spacious" id="onboarding-recent-input" data-i18n-placeholder="onboarding.recent_placeholder"></textarea>
+
+                                <div class="step3-suggestions">
+                                    <span class="step3-suggestions__label" data-i18n="onboarding.step3_suggestions_title"></span>
+                                    <div class="step3-chips" id="step3-spark-chips">
+                                        <button type="button" class="spark-chip" data-spark="Jak działają GPU i potok renderowania shaderów?" data-i18n="onboarding.step3_spark_gpu"></button>
+                                        <button type="button" class="spark-chip" data-spark="Dlaczego kompresja wideo gubi jakość?" data-i18n="onboarding.step3_spark_video"></button>
+                                        <button type="button" class="spark-chip" data-spark="Koncepcja entropii w teorii informacji i fizyce" data-i18n="onboarding.step3_spark_entropy"></button>
+                                        <button type="button" class="spark-chip" data-spark="Jak silnik szachowy ocenia pozycję na planszy?" data-i18n="onboarding.step3_spark_chess"></button>
+                                    </div>
+                                </div>
+
+                                <p class="step3-hint" data-i18n="onboarding.step3_hint"></p>
                             </div>
 
                             <div class="wizard-actions">

@@ -683,15 +683,29 @@
             });
         }
 
-        // Level Tiles Selection
-        const levelGrid = $('.level-cards-grid');
-        if (levelGrid) {
-            levelGrid.addEventListener('click', (e) => {
-                const tile = e.target.closest('.level-tile');
-                if (!tile) return;
-                $$('.level-tile').forEach(t => t.classList.remove('active'));
-                tile.classList.add('active');
-                selectedLevel = tile.dataset.level || 'builder';
+        // Level Cards Selection (Vertical 3-Columns)
+        const levelContainer = $('.level-cards-vertical, .level-cards-grid');
+        if (levelContainer) {
+            levelContainer.addEventListener('click', (e) => {
+                const card = e.target.closest('.level-card-v, .level-tile');
+                if (!card) return;
+                $$('.level-card-v, .level-tile').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                selectedLevel = card.dataset.level || 'builder';
+            });
+        }
+
+        // Step 3 Spark Inspiration Chips
+        const sparkChipsContainer = $('#step3-spark-chips');
+        if (sparkChipsContainer) {
+            sparkChipsContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('.spark-chip');
+                if (!btn) return;
+                const textarea = $('#onboarding-recent-input');
+                if (textarea) {
+                    textarea.value = btn.dataset.spark || btn.textContent.trim();
+                    textarea.focus();
+                }
             });
         }
 

@@ -1053,7 +1053,7 @@ body {
 }
 
 .onboarding-container {
-    max-width: 520px;
+    max-width: 740px;
     width: 100%;
     margin: 0 auto;
     display: flex;
@@ -1087,12 +1087,12 @@ body {
 
 .slide-header {
     text-align: center;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.35rem;
     width: 100%;
 }
 
 .slide-title {
-    font-size: 1.55rem;
+    font-size: 1.6rem;
     font-weight: 700;
     color: #ffffff;
     letter-spacing: -0.01em;
@@ -1100,9 +1100,10 @@ body {
 }
 
 .slide-subtitle {
-    font-size: 0.92rem;
+    font-size: 0.94rem;
     color: #cbd5e1;
     line-height: 1.45;
+    max-width: 560px;
     margin: 0 auto;
 }
 
@@ -1112,6 +1113,7 @@ body {
     flex-direction: column;
     gap: 0.55rem;
     width: 100%;
+    max-width: 480px;
     margin: 0 auto;
 }
 
@@ -1152,6 +1154,7 @@ body {
     display: flex;
     gap: 0.5rem;
     width: 100%;
+    max-width: 480px;
     margin: 0.2rem auto 0 auto;
 }
 
@@ -1166,62 +1169,172 @@ body {
     white-space: nowrap;
 }
 
-/* Step 2: Level Tiles */
-.level-cards-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+/* Step 2: Vertical 3-Column Grounding Cards */
+.level-cards-vertical {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.1rem;
     width: 100%;
-    margin: 0 auto;
+    max-width: 740px;
+    margin: 0.4rem auto;
 }
 
-.level-tile {
-    padding: 1.2rem 1.5rem;
+.level-card-v {
     background: #10101d;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-xl);
+    padding: 2rem 1.4rem;
     cursor: pointer;
-    transition: all var(--duration-fast) var(--ease-out);
-    text-align: left;
+    transition: all var(--duration-normal) var(--ease-out);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    min-height: 400px;
 }
 
-.level-tile:hover {
+.level-card-v:hover {
     background: #17172c;
     border-color: #818cf8;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
-.level-tile.active {
-    background: #15152c;
+.level-card-v.active {
+    background: #15152e;
     border-color: #6366f1;
-    box-shadow: 0 0 22px rgba(99, 102, 241, 0.25);
+    box-shadow: 0 0 28px rgba(99, 102, 241, 0.35);
 }
 
-.level-tile__title {
-    font-size: 1.05rem;
+.level-card-v__icon {
+    font-size: 2.8rem;
+    margin-bottom: 0.75rem;
+    filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.4));
+}
+
+.level-card-v__tag {
+    display: inline-block;
+    font-size: 0.72rem;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #818cf8;
+    background: rgba(99, 102, 241, 0.12);
+    padding: 0.28rem 0.7rem;
+    border-radius: 999px;
+    margin-bottom: 0.85rem;
+}
+
+.level-card-v__title {
+    font-size: 1.12rem;
+    font-weight: 700;
     color: #ffffff;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.3;
 }
 
-.level-tile__desc {
-    font-size: 0.85rem;
+.level-card-v__desc {
+    font-size: 0.88rem;
     color: #94a3b8;
-    line-height: 1.4;
+    line-height: 1.5;
+    flex: 1;
 }
 
-/* Step 3: Spacious Content Area */
-.slide-content-fill {
+.level-card-v__check {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    margin-top: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--duration-fast) var(--ease-out);
+}
+
+.level-card-v.active .level-card-v__check {
+    border-color: #6366f1;
+    background: #6366f1;
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+}
+
+.level-card-v.active .level-card-v__check::after {
+    content: '✓';
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+/* Step 3: Rich Input & Clickable Sparks */
+.slide-content-rich {
     width: 100%;
+    max-width: 580px;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
 }
 
 .textarea--spacious {
-    min-height: 180px;
+    min-height: 150px;
     width: 100%;
     padding: 1.2rem;
     font-size: 0.95rem;
     line-height: 1.6;
     resize: vertical;
+    border-radius: var(--radius-lg);
+}
+
+.step3-suggestions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    text-align: left;
+    width: 100%;
+}
+
+.step3-suggestions__label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.step3-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.spark-chip {
+    background: #10101d;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    padding: 0.5rem 0.95rem;
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #cbd5e1;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+    text-align: left;
+}
+
+.spark-chip:hover {
+    background: #17172c;
+    border-color: #818cf8;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.2);
+}
+
+.step3-hint {
+    font-size: 0.82rem;
+    color: var(--text-tertiary);
+    text-align: center;
+    margin-top: 0.1rem;
 }
 
 /* Wizard Actions Bar */
@@ -1231,7 +1344,20 @@ body {
     justify-content: space-between;
     gap: 1rem;
     width: 100%;
+    max-width: 580px;
     margin-top: 0.75rem;
+}
+
+#wizard-slide-1 .wizard-actions {
+    max-width: 480px;
+}
+
+#wizard-slide-2 .wizard-actions {
+    max-width: 740px;
+}
+
+#wizard-slide-3 .wizard-actions {
+    max-width: 580px;
 }
 
 .wizard-actions .btn {
