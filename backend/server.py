@@ -20,7 +20,7 @@ from typing import Optional, List
 
 from .database import (
     init_db, get_active_concept, get_suggested_concept, get_concept,
-    update_concept_status, get_mastered_concepts, get_sparks,
+    create_concept, update_concept_status, get_mastered_concepts, get_sparks,
     create_spark, update_spark_status, get_graph_data, get_profile,
     update_profile
 )

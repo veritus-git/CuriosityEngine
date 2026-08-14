@@ -631,7 +631,6 @@
                 }
                 localStorage.setItem('curiosity_token', data.token);
                 await api('POST', '/api/profile', { language: langCode }).catch(() => {});
-                eventsBound = false;
                 init();
             } catch (error) {
                 err.textContent = error.message;
