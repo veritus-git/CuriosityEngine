@@ -1026,21 +1026,24 @@ body {
     transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* --- Onboarding Slide Wizard Layout (Clean Transparent & Optical Center) --- */
+/* --- Onboarding Slide Wizard Layout (Clean Transparent & Perfectly Centered) --- */
 .view--onboarding {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: calc(100vh - 120px);
     width: 100%;
-    padding: 0 1rem;
-    transform: translateY(-2.8rem); /* Ideal optical center compensating for topbar */
+    padding: 1.5rem 1rem;
 }
 
 .onboarding-container {
-    max-width: 560px;
+    max-width: 480px;
     width: 100%;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .wizard-card {
@@ -1060,8 +1063,7 @@ body {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    gap: 1.35rem;
-    animation: fadeIn var(--duration-fast) var(--ease-out);
+    gap: 1.25rem;
 }
 
 .wizard-slide[hidden] {
@@ -1070,22 +1072,22 @@ body {
 
 .slide-header {
     text-align: center;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.25rem;
+    width: 100%;
 }
 
 .slide-title {
-    font-size: 1.5rem;
+    font-size: 1.55rem;
     font-weight: 700;
     color: #ffffff;
     letter-spacing: -0.01em;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.35rem;
 }
 
 .slide-subtitle {
     font-size: 0.92rem;
     color: #cbd5e1;
     line-height: 1.45;
-    max-width: 480px;
     margin: 0 auto;
 }
 
@@ -1095,7 +1097,6 @@ body {
     flex-direction: column;
     gap: 0.55rem;
     width: 100%;
-    max-width: 460px;
     margin: 0 auto;
 }
 
@@ -1136,17 +1137,16 @@ body {
     display: flex;
     gap: 0.5rem;
     width: 100%;
-    max-width: 460px;
     margin: 0.2rem auto 0 auto;
 }
 
 .input--compact {
-    padding: 0.6rem 1rem;
+    padding: 0.65rem 1rem;
     font-size: 0.85rem;
 }
 
 .btn--compact {
-    padding: 0.6rem 1.1rem;
+    padding: 0.65rem 1.2rem;
     font-size: 0.85rem;
     white-space: nowrap;
 }
@@ -1157,12 +1157,11 @@ body {
     flex-direction: column;
     gap: 0.75rem;
     width: 100%;
-    max-width: 500px;
     margin: 0 auto;
 }
 
 .level-tile {
-    padding: 1.15rem 1.5rem;
+    padding: 1.2rem 1.5rem;
     background: #10101d;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-lg);
@@ -1198,7 +1197,6 @@ body {
 /* Step 3: Spacious Content Area */
 .slide-content-fill {
     width: 100%;
-    max-width: 500px;
     margin: 0 auto;
 }
 
@@ -1211,20 +1209,25 @@ body {
     resize: vertical;
 }
 
-/* Wizard Actions Bar (No Top Border Separator) */
+/* Wizard Actions Bar */
 .wizard-actions {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-md);
+    gap: 1rem;
     width: 100%;
-    max-width: 500px;
-    margin: 0.5rem auto 0 auto;
+    margin-top: 0.5rem;
+}
+
+.wizard-actions .btn {
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .wizard-actions--end {
     justify-content: flex-end;
-    max-width: 460px;
 }
 
 /* --- Zen Loading Overlay --- */
