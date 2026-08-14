@@ -53,7 +53,7 @@
             "f3_desc": "Gdy jesteś zmęczony i przytłoczony: proste, genialne analogie fizyczne dające natychmiastowe poczucie zrozumienia.",
             "f4_title": "Spark Inbox",
             "f4_tag": "Łapanie Dygresji",
-            "f4_desc": "Zapisuj przelotne myśli, by ich nie zapomnieć."
+            "f4_desc": "Zapisuj przelotne myśli, by ich nie zapomnieć. Silnik połączy je w grafie i przypomni o nich we właściwym momencie."
         },
         "greeting": {
             "late_night": "Nocne przemyślenia.",
@@ -440,12 +440,12 @@
             if (userProfile) userProfile.hidden = false;
             if (avatarInitial) avatarInitial.textContent = resolvedUser.charAt(0).toUpperCase();
             if (dropdownName) dropdownName.textContent = resolvedUser;
-            // Hide topbar language select when logged in, unless on Landing page
-            if (langSelect) langSelect.hidden = (state.view !== 'LANDING');
+            // ALWAYS hide topbar language select when logged in (even on Landing page)
+            if (langSelect) langSelect.hidden = true;
         } else {
             if (authLinks) authLinks.hidden = false;
             if (userProfile) userProfile.hidden = true;
-            if (langSelect) langSelect.hidden = false;
+            if (langSelect) langSelect.hidden = (state.view !== 'LANDING');
         }
     }
 
@@ -472,7 +472,7 @@
             if (navLinks) navLinks.hidden = true;
             if (floatingBtn) floatingBtn.hidden = true;
             if (globalProgress) globalProgress.hidden = true;
-            if (langSelect) langSelect.hidden = false;
+            if (langSelect) langSelect.hidden = Boolean(token);
             restartHeroTypewriter();
         } else if (viewName === 'ONBOARDING') {
             if (navLinks) navLinks.hidden = true;
@@ -1038,6 +1038,13 @@
         $('#btn-landing-cta')?.addEventListener('click', (e) => {
             e.preventDefault();
             openAuthModal('REGISTER');
+        });
+        $('#btn-landing-how')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            const target = $('#landing-features');
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         });
         $('#btn-close-auth-modal')?.addEventListener('click', (e) => {
             e.preventDefault();

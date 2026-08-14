@@ -43,7 +43,7 @@
             </div>
 
             <nav class="topbar__nav">
-                <!-- Nav links (Only shown when authenticated on dashboard/settings/constellation/history) -->
+                <!-- Nav links (Only shown when authenticated on dashboard/constellation/history) -->
                 <div class="topbar__nav-links" id="topbar-nav-links" hidden>
                     <button class="topbar__btn" id="btn-nav-sparks" aria-label="Spark Inbox" title="Spark Inbox">
                         <span class="topbar__label" id="nav-sparks-label" data-i18n="nav.sparks"></span>
@@ -54,9 +54,6 @@
                     </button>
                     <button class="topbar__btn" id="btn-nav-history" aria-label="History" title="History">
                         <span class="topbar__label" data-i18n="nav.history"></span>
-                    </button>
-                    <button class="topbar__btn" id="btn-nav-settings" aria-label="Settings" title="Settings">
-                        <span class="topbar__label" data-i18n="nav.settings"></span>
                     </button>
                 </div>
 
@@ -83,7 +80,7 @@
                     </div>
                 </div>
 
-                <!-- Language Selector (ONLY visible on Landing Page) -->
+                <!-- Language Selector (ONLY visible on Landing Page when NOT logged in) -->
                 <select id="topbar-lang-select" class="lang-select" aria-label="Language">
                 </select>
             </nav>
@@ -95,7 +92,6 @@
             <!-- 1. LANDING PAGE VIEW (SaaS Style with Dynamic Headlines) -->
             <section class="view view--landing" id="view-landing" aria-label="CuriosityEngine Landing">
                 <div class="landing-hero">
-                    <div class="badge badge--glow" data-i18n="landing.badge"></div>
                     <h1 class="landing-hero-title">
                         <span data-i18n="landing.title_static"></span><br>
                         <span class="hero-dynamic-text-wrap">
