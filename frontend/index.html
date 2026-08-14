@@ -11,6 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <link rel="apple-touch-icon" href="assets/favicon.png">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -30,7 +32,7 @@
         <header class="topbar" id="topbar">
             <div class="topbar__left">
                 <a href="#" class="brand" id="nav-brand">
-                    <span class="brand__logo">⚡</span>
+                    <img src="assets/logo.png" alt="CuriosityEngine" class="brand__logo-img">
                     <span class="brand__name">CuriosityEngine</span>
                 </a>
                 <span class="topbar__date" id="topbar-date"></span>
@@ -67,7 +69,7 @@
             <section class="view view--auth" id="view-auth" hidden aria-label="Authentication">
                 <div class="auth-card">
                     <div class="auth-hero">
-                        <span class="auth-icon">⚡</span>
+                        <img src="assets/logo.png" alt="CuriosityEngine" class="auth-hero-img">
                         <h1 class="auth-title">CuriosityEngine</h1>
                         <p class="auth-subtitle" data-i18n="auth.subtitle"></p>
                     </div>
@@ -170,7 +172,7 @@
 
                             <div class="wizard-actions">
                                 <button type="button" class="btn btn--ghost" id="btn-wizard-step3-prev" data-i18n="onboarding.btn_prev"></button>
-                                <button type="button" class="btn btn--primary btn--lg" id="btn-onboarding-submit">
+                                <button type="button" class="btn btn--primary" id="btn-onboarding-submit">
                                     <span class="btn__text" data-i18n="onboarding.btn_submit"></span>
                                     <span class="btn__loader" aria-hidden="true"></span>
                                 </button>
