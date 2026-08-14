@@ -45,6 +45,7 @@
             "economics": "📈 Economics & Game Theory",
             "linguistics": "🗣️ Linguistics & Semiotics"
         },
+        "step1_required_error": "Please select at least one domain to continue.",
         "step2_title": "Your baseline intuition",
         "step2_subtitle": "Choose the intuition style for your starter mental models:",
         "level_ground_zero_title": "Ground Zero",
@@ -59,12 +60,7 @@
         "step3_title": "What's on your mind lately?",
         "step3_subtitle": "Type any recent question, rabbit hole, or spark (or leave empty):",
         "recent_placeholder": "e.g. how do GPUs work, why video compression loses quality, how chess engines evaluate positions...",
-        "step3_suggestions_title": "Quick inspirations (click to insert):",
-        "step3_spark_gpu": "🎮 How do GPUs and rendering pipelines work?",
-        "step3_spark_video": "📹 Why does video compression lose quality?",
-        "step3_spark_entropy": "🌀 Concept of entropy in information theory",
-        "step3_spark_chess": "♟️ How does a chess engine evaluate positions?",
-        "step3_hint": "💡 You can leave this blank — engine will generate from your chosen domains.",
+        "step3_hint": "💡 You can leave this blank — engine will generate from your chosen step 1 domains.",
         "btn_next": "Next ➔",
         "btn_prev": "← Back",
         "btn_submit": "Generate My Starter Sparks ✨"

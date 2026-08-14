@@ -45,6 +45,7 @@
             "economics": "📈 Ekonomia & Teoria Gier",
             "linguistics": "🗣️ Językoznawstwo & Komunikacja"
         },
+        "step1_required_error": "Wybierz przynajmniej jedną dziedzinę, aby przejść dalej.",
         "step2_title": "Twój punkt wyjścia",
         "step2_subtitle": "Wybierz preferowany styl modeli mentalnych:",
         "level_ground_zero_title": "Zupełny Laik",
@@ -59,12 +60,7 @@
         "step3_title": "O czym ostatnio myślałeś?",
         "step3_subtitle": "Wpisz dowolne pytanie lub myśl z ostatnich dni (lub zostaw puste):",
         "recent_placeholder": "np. jak działają GPU, dlaczego kompresja wideo gubi jakość, jak silnik szachowy ocenia pozycję...",
-        "step3_suggestions_title": "Szybkie inspiracje (kliknij, aby wstawić):",
-        "step3_spark_gpu": "🎮 Jak działają GPU i potok renderowania?",
-        "step3_spark_video": "📹 Dlaczego kompresja wideo gubi jakość?",
-        "step3_spark_entropy": "🌀 Entropia w teorii informacji i fizyce",
-        "step3_spark_chess": "♟️ Jak silnik szachowy ocenia pozycję?",
-        "step3_hint": "💡 Możesz zostawić to pole puste — silnik wygeneruje tematy na podstawie Twoich dziedzin.",
+        "step3_hint": "💡 Możesz zostawić to pole puste — silnik wygeneruje tematy na podstawie Twoich dziedzin z kroku 1.",
         "btn_next": "Dalej ➔",
         "btn_prev": "← Wstecz",
         "btn_submit": "Wygeneruj moje tematy startowe ✨"

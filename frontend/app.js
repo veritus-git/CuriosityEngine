@@ -647,6 +647,10 @@
                 const chip = e.target.closest('.chip-row, .chip');
                 if (chip) {
                     chip.classList.toggle('active');
+                    const errBox = $('#onboarding-step1-error');
+                    if (errBox && $$('#onboarding-domains-chips .chip-row.active').length > 0) {
+                        errBox.style.display = 'none';
+                    }
                 }
             });
         }
@@ -667,6 +671,9 @@
             chipsContainer.appendChild(newChip);
             input.value = '';
             input.focus();
+
+            const errBox = $('#onboarding-step1-error');
+            if (errBox) errBox.style.display = 'none';
         }
 
         const btnAddCustomChip = $('#btn-add-custom-chip');
@@ -695,24 +702,27 @@
             });
         }
 
-        // Step 3 Spark Inspiration Chips
-        const sparkChipsContainer = $('#step3-spark-chips');
-        if (sparkChipsContainer) {
-            sparkChipsContainer.addEventListener('click', (e) => {
-                const btn = e.target.closest('.spark-chip');
-                if (!btn) return;
-                const textarea = $('#onboarding-recent-input');
-                if (textarea) {
-                    textarea.value = btn.dataset.spark || btn.textContent.trim();
-                    textarea.focus();
-                }
-            });
-        }
-
         // Wizard Step Navigation
         const btnStep1Next = $('#btn-wizard-step1-next');
         if (btnStep1Next) {
-            btnStep1Next.addEventListener('click', () => setWizardStep(2));
+            btnStep1Next.addEventListener('click', () => {
+                const selectedChips = $$('#onboarding-domains-chips .chip-row.active');
+                const errBox = $('#onboarding-step1-error');
+                const chipsEl = $('#onboarding-domains-chips');
+
+                if (selectedChips.length === 0) {
+                    if (errBox) errBox.style.display = 'block';
+                    if (chipsEl) {
+                        chipsEl.classList.remove('shake-anim');
+                        void chipsEl.offsetWidth; // trigger reflow
+                        chipsEl.classList.add('shake-anim');
+                    }
+                    return;
+                }
+
+                if (errBox) errBox.style.display = 'none';
+                setWizardStep(2);
+            });
         }
 
         const btnStep2Prev = $('#btn-wizard-step2-prev');
