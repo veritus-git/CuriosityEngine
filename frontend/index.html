@@ -423,49 +423,49 @@
             <section class="view view--dashboard" id="view-dashboard" hidden aria-label="Curiosity Dashboard">
                 <div class="view__content dashboard-container">
 
-                    <!-- STAGE 1: CONCEPT DISCOVERY (FLOATING HERO DESIGN) -->
+                    <!-- STAGE 1: CONCEPT DISCOVERY (ASYMMETRIC SPLIT LAYOUT) -->
                     <div class="dashboard-stage dashboard-stage--discovery" id="dashboard-stage-discovery">
-                        <div class="discovery-hero">
-                            <div class="discovery-hero__badge-row">
-                                <span class="badge badge--glow" data-i18n="focus_card.proposal_badge"></span>
-                                <span class="domain-pill" id="discovery-concept-domain"></span>
-                            </div>
-
-                            <h1 class="discovery-hero__title" id="discovery-concept-title"></h1>
-
-                            <!-- Most Logiczny (Why this topic) -->
-                            <div class="discovery-reason-row">
-                                <span class="discovery-reason-icon" aria-hidden="true">🌱</span>
-                                <div class="discovery-reason-content">
-                                    <span class="discovery-reason-label" data-i18n="focus_card.why_label"></span>
-                                    <p class="discovery-reason-text" id="discovery-concept-reason"></p>
+                        
+                        <div class="discovery-split-hero">
+                            
+                            <!-- LEFT COLUMN (~2/5 width, Left-Aligned Huge Title + Actions) -->
+                            <div class="discovery-col discovery-col--left">
+                                <div class="discovery-badge-row">
+                                    <span class="domain-pill" id="discovery-concept-domain"></span>
+                                </div>
+                                <h1 class="discovery-hero__title" id="discovery-concept-title"></h1>
+                                
+                                <div class="discovery-actions">
+                                    <button type="button" class="btn btn--primary btn--lg btn--explore" id="btn-discovery-explore">
+                                        <span class="btn__text" data-i18n="focus_card.accept_btn"></span>
+                                    </button>
+                                    <button type="button" class="btn btn--ghost btn--save-spark" id="btn-discovery-save-spark" data-i18n-title="focus_card.save_to_sparks_btn">
+                                        <span class="btn__text" data-i18n="focus_card.save_to_sparks_btn"></span>
+                                    </button>
                                 </div>
                             </div>
 
-                            <!-- Intuicja & Wprowadzenie -->
-                            <div class="discovery-model-row">
-                                <span class="discovery-model-icon" aria-hidden="true">💡</span>
-                                <div class="discovery-model-content">
-                                    <span class="discovery-model-label" data-i18n="focus_card.model_label"></span>
-                                    <p class="discovery-model-text" id="discovery-concept-model"></p>
+                            <!-- RIGHT COLUMN (~3/5 width, Left-Aligned Clean Paragraphs: Intuicja ON TOP, Most Logiczny BELOW) -->
+                            <div class="discovery-col discovery-col--right">
+                                
+                                <!-- Intuicja & Wprowadzenie (ON TOP) -->
+                                <div class="discovery-text-block discovery-text-block--model">
+                                    <span class="discovery-text-label discovery-text-label--model" data-i18n="focus_card.model_label"></span>
+                                    <p class="discovery-text-content" id="discovery-concept-model"></p>
                                 </div>
+
+                                <!-- Most Logiczny (BELOW INTUICJA) -->
+                                <div class="discovery-text-block discovery-text-block--reason">
+                                    <span class="discovery-text-label discovery-text-label--reason" data-i18n="focus_card.why_label"></span>
+                                    <p class="discovery-text-content" id="discovery-concept-reason"></p>
+                                </div>
+
                             </div>
 
-                            <!-- Primary Action Buttons -->
-                            <div class="discovery-actions">
-                                <button type="button" class="btn btn--primary btn--lg btn--explore" id="btn-discovery-explore">
-                                    <span class="btn__text" data-i18n="focus_card.accept_btn"></span>
-                                </button>
-                                <button type="button" class="btn btn--secondary btn--lg btn--reroll" id="btn-discovery-reroll">
-                                    <span class="btn__text" data-i18n="focus_card.skip_btn"></span>
-                                    <span class="btn__loader" aria-hidden="true"></span>
-                                </button>
-                            </div>
                         </div>
 
-                        <!-- Sleek Vector Switcher Bar (Unobtrusive secondary controls) -->
+                        <!-- 4 VECTOR CATEGORY SELECTOR BAR (Bottom Horizontal Bar) -->
                         <div class="vector-switcher-bar">
-                            <span class="vector-switcher-label" data-i18n="compass.subtitle"></span>
                             <div class="vector-pills-row" id="dashboard-vector-pills">
                                 <button type="button" class="vector-pill active" data-vector="adjacent">
                                     <span class="vector-pill__icon">🌿</span>
@@ -474,10 +474,6 @@
                                 <button type="button" class="vector-pill" data-vector="deep_dive">
                                     <span class="vector-pill__icon">🔬</span>
                                     <span class="vector-pill__text" data-i18n="compass.deep_dive"></span>
-                                </button>
-                                <button type="button" class="vector-pill" data-vector="spark">
-                                    <span class="vector-pill__icon">⚡</span>
-                                    <span class="vector-pill__text" data-i18n="compass.spark"></span>
                                 </button>
                                 <button type="button" class="vector-pill" data-vector="cross_domain">
                                     <span class="vector-pill__icon">🌌</span>
@@ -488,7 +484,12 @@
                                     <span class="vector-pill__text" data-i18n="compass.mental_fog"></span>
                                 </button>
                             </div>
+                            <button type="button" class="btn-text-reroll-batch" id="btn-dashboard-reroll-batch">
+                                <span class="btn-text-reroll__label" data-i18n="focus_card.reroll_batch_btn"></span>
+                                <span class="btn__loader" aria-hidden="true"></span>
+                            </button>
                         </div>
+
                     </div>
 
                     <!-- STAGE 2: FOCUS & ACTIVE EXPLORATION (WITH ELEVATED GRAYISH PROMPT BOX) -->
@@ -579,16 +580,6 @@
                         <h1 class="page-title" data-i18n="settings.title"></h1>
                         <button class="btn btn--ghost btn--small" id="btn-settings-back"
                             data-i18n="settings.back_btn"></button>
-                    </div>
-
-                    <div class="settings-section">
-                        <h3 class="settings-heading" data-i18n="settings.theme_heading"></h3>
-                        <div class="theme-switch-group">
-                            <button type="button" class="btn btn--secondary" id="btn-theme-dark"
-                                data-i18n="settings.theme_dark"></button>
-                            <button type="button" class="btn btn--secondary" id="btn-theme-light"
-                                data-i18n="settings.theme_light"></button>
-                        </div>
                     </div>
 
                     <div class="settings-section">

@@ -149,6 +149,101 @@ def build_generation_prompts(
     return system_prompt, user_msg
 
 
+def build_batch_generation_prompts(
+    recent_concepts: List[Dict[str, Any]],
+    all_titles: List[str],
+    profile: Optional[Dict[str, Any]] = None,
+    language: Optional[str] = None
+) -> tuple[str, str]:
+    """
+    Build prompts to generate 4 distinct topic proposals simultaneously in a single AI request:
+    'adjacent', 'deep_dive', 'cross_domain', and 'mental_fog'.
+    """
+    lang = language or (profile.get("language", "en") if profile else "en")
+    prompts = load_prompts(lang)
+    labels = _get(prompts, "context_labels", default={})
+
+    # 1. Context construction
+    ctx_parts = []
+    if recent_concepts:
+        history_lines = [
+            f"- {c['title']} ({c.get('domain', 'general')}): {c.get('summary', '')}"
+            for c in recent_concepts[:6]
+        ]
+        h_label = _get(labels, "recent_history", default="Recently mastered concepts:")
+        ctx_parts.append(f"{h_label}\n" + "\n".join(history_lines))
+
+    if all_titles:
+        t_label = _get(labels, "all_topics", default="All explored titles:")
+        ctx_parts.append(f"{t_label} {', '.join(all_titles[-25:])}")
+
+    if profile:
+        pref_lines = []
+        level = profile.get("grounding_level", "builder")
+        form_of_address = profile.get("form_of_address", "neutral")
+        l_label = _get(labels, "grounding_level", default="Grounding level:")
+        pref_lines.append(f"{l_label} {level}")
+        pref_lines.append(_get_grounding_instruction(level, lang))
+        if profile.get("active_domains"):
+            d_label = _get(labels, "preferred_areas", default="Active domains:")
+            pref_lines.append(f"{d_label} {', '.join(profile['active_domains'])}")
+        address_inst = _get_form_of_address_instruction(form_of_address, lang)
+        if address_inst:
+            pref_lines.append(address_inst)
+        if profile.get("custom_instructions"):
+            c_label = _get(labels, "custom_notes", default="User notes:")
+            pref_lines.append(f"{c_label} {profile['custom_instructions']}")
+        if pref_lines:
+            header = _get(labels, "user_preferences", default="Cognitive profile:")
+            ctx_parts.append(f"{header}\n" + "\n".join(pref_lines))
+
+    full_context = "\n\n".join(ctx_parts).strip()
+
+    # 2. System Prompt
+    system_prompt = _get(prompts, "batch_topic_generation", "system", default="")
+    lang_instruction = _get(prompts, "language_instruction", default="")
+    system_prompt = system_prompt.replace("{language_instruction}", lang_instruction)
+
+    # 3. User Message Template
+    user_template = _get(prompts, "batch_topic_generation", "user", default="")
+    user_msg = user_template.replace("{context}", full_context)
+
+    return system_prompt, user_msg
+
+
+def build_dynamic_prompt_synthesis_prompts(
+    concept_title: str,
+    domain: str = "General",
+    intuitive_model: Optional[str] = None,
+    short_reason: Optional[str] = None,
+    known_concepts: Optional[List[str]] = None,
+    profile: Optional[Dict[str, Any]] = None
+) -> tuple[str, str]:
+    """
+    Build prompts to synthesize a custom, cohesive, 1-paragraph prompt for external LLMs
+    specifically tailored for that exact topic without rigid boilerplate.
+    """
+    lang = profile.get("language", "en") if profile else "en"
+    level = profile.get("grounding_level", "builder") if profile else "builder"
+    prompts = load_prompts(lang)
+
+    system_prompt = _get(prompts, "prompt_synthesis", "system", default="")
+    lang_instruction = _get(prompts, "language_instruction", default="")
+    system_prompt = system_prompt.replace("{language_instruction}", lang_instruction)
+
+    user_template = _get(prompts, "prompt_synthesis", "user", default="")
+    known_str = ", ".join(known_concepts[:4]) if known_concepts else ("Brak" if lang == "pl" else "None")
+
+    user_msg = user_template.replace("{topic}", concept_title)
+    user_msg = user_msg.replace("{domain}", domain)
+    user_msg = user_msg.replace("{intuitive_model}", intuitive_model or "")
+    user_msg = user_msg.replace("{short_reason}", short_reason or "")
+    user_msg = user_msg.replace("{level}", level)
+    user_msg = user_msg.replace("{known_concepts}", known_str)
+
+    return system_prompt, user_msg
+
+
 def build_direct_topic_prompts(
     title: str,
     domain: str,

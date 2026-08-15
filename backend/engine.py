@@ -9,18 +9,151 @@ from .database import (
     create_concept, get_concept, get_active_concept, get_suggested_concept,
     update_concept_status, reject_all_suggested_concepts, get_mastered_concepts,
     get_recent_concepts, get_all_concept_titles, get_sparks, update_spark_status,
-    create_bridge, complete_multiconcept_session, get_profile,
+    create_spark, create_bridge, complete_multiconcept_session, get_profile,
     get_all_concepts_with_embeddings, get_sparks_with_embeddings
 )
 from .ai import generate_ai_json, generate_embedding, cosine_similarity, AIError
 from .prompts import (
-    build_generation_prompts, build_multiconcept_parse_prompts,
+    build_generation_prompts, build_batch_generation_prompts,
+    build_dynamic_prompt_synthesis_prompts, build_multiconcept_parse_prompts,
     build_external_learning_prompt, build_cold_start_generation_prompts,
     build_direct_topic_prompts, build_cold_start_from_thought_prompts,
     load_prompts
 )
 
 logger = logging.getLogger("curiosity.engine")
+
+
+async def generate_batch_concept_suggestions(
+    current_action: str = "skipped"
+) -> Dict[str, Any]:
+    """
+    Generate 4 distinct topic proposals across the 4 primary exploration vectors in a single AI call:
+    'adjacent', 'deep_dive', 'cross_domain', and 'mental_fog'.
+    """
+    # 1. Update any existing suggested concepts
+    reject_all_suggested_concepts(new_status=current_action)
+
+    # 2. Gather context
+    recent = get_recent_concepts(limit=8)
+    all_titles = get_all_concept_titles()
+    profile = get_profile()
+    lang = profile.get("language", "pl")
+
+    # 3. Build batch generation prompt
+    sys_prompt, user_prompt = build_batch_generation_prompts(
+        recent_concepts=recent,
+        all_titles=all_titles,
+        profile=profile,
+        language=lang
+    )
+
+    # 4. Generate with AI
+    parsed = await generate_ai_json(sys_prompt, user_prompt)
+
+    vectors = ["adjacent", "deep_dive", "cross_domain", "mental_fog"]
+    results = {}
+
+    for v in vectors:
+        v_data = parsed.get(v)
+        if not v_data or not v_data.get("topic"):
+            # Fallback title if missing
+            title = f"Pojęcie ({v})" if lang == "pl" else f"Concept ({v})"
+            domain = "General"
+            summary = "Most asocjacyjny do Twojej wiedzy." if lang == "pl" else "Associative bridge."
+            intuitive_model = "Intuicyjny model pojęcia." if lang == "pl" else "Intuitive concept model."
+        else:
+            title = v_data.get("topic", "").strip()
+            domain = v_data.get("domain", "General").strip()
+            summary = v_data.get("short_reason", "").strip()
+            intuitive_model = v_data.get("intuitive_model", "").strip()
+
+        # Generate embedding
+        emb = await generate_embedding(f"{title} {domain} {summary}")
+
+        concept = create_concept(
+            title=title,
+            domain=domain,
+            summary=summary,
+            intuitive_model=intuitive_model,
+            difficulty=profile.get("grounding_level", "intermediate"),
+            status="suggested",
+            embedding=emb,
+            source_mode=v
+        )
+        results[v] = concept
+
+    logger.info(f"Generated 4-vector batch proposals: {[c['title'] for c in results.values()]}")
+    return results
+
+
+async def generate_dynamic_learning_prompt(concept_id: int) -> str:
+    """
+    Synthesize a tailored, dynamic, 1-paragraph prompt for external LLMs using AI.
+    Falls back gracefully to domain-aware universal prompt builder.
+    """
+    concept = get_concept(concept_id)
+    if not concept:
+        return ""
+
+    mastered = get_mastered_concepts(limit=6)
+    known = [m["title"] for m in mastered if m["id"] != concept_id]
+    profile = get_profile()
+    lang = profile.get("language", "pl")
+
+    try:
+        sys_prompt, user_prompt = build_dynamic_prompt_synthesis_prompts(
+            concept_title=concept["title"],
+            domain=concept.get("domain", "General"),
+            intuitive_model=concept.get("intuitive_model", ""),
+            short_reason=concept.get("summary", ""),
+            known_concepts=known,
+            profile=profile
+        )
+        parsed = await generate_ai_json(sys_prompt, user_prompt)
+        prompt_text = parsed.get("prompt") or parsed.get("text") or ""
+        if prompt_text and len(prompt_text.strip()) > 20:
+            return prompt_text.strip()
+    except Exception as e:
+        logger.warning(f"Dynamic prompt synthesis notice ({e}), using fallback builder.")
+
+    return build_external_learning_prompt(
+        concept_title=concept["title"],
+        domain=concept.get("domain", "General"),
+        intuitive_model=concept.get("intuitive_model"),
+        known_concepts=known,
+        profile=profile
+    )
+
+
+def save_topic_as_spark(title: str, domain: str, summary: str, concept_id: Optional[int] = None) -> Dict[str, Any]:
+    """Save a proposed topic directly into the user's sparks inbox."""
+    raw_text = f"{title} ({domain}): {summary}".strip()
+    spark = create_spark(
+        raw_text=raw_text,
+        parent_concept_id=concept_id
+    )
+    logger.info(f"Saved topic '{title}' to sparks inbox.")
+    return spark
+
+
+def get_learning_prompt(concept_id: int) -> str:
+    """Build the external LLM prompt for a specific concept."""
+    concept = get_concept(concept_id)
+    if not concept:
+        return ""
+
+    mastered = get_mastered_concepts(limit=6)
+    known = [m["title"] for m in mastered if m["id"] != concept_id]
+    profile = get_profile()
+
+    return build_external_learning_prompt(
+        concept_title=concept["title"],
+        domain=concept.get("domain", "general"),
+        intuitive_model=concept.get("intuitive_model"),
+        known_concepts=known,
+        profile=profile
+    )
 
 
 async def select_starter_topic(

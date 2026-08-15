@@ -27,9 +27,11 @@ from .database import (
 from .ai import get_ai_status, AIError, generate_embedding
 from .auth import register_user, login_user, get_current_user_token, get_user_count
 from .engine import (
-    generate_concept_suggestion, complete_session_with_coexplored,
-    get_learning_prompt, generate_dynamic_starter_cards,
-    select_starter_topic, generate_starter_cards_from_thought
+    generate_concept_suggestion, generate_batch_concept_suggestions,
+    generate_dynamic_learning_prompt, save_topic_as_spark,
+    complete_session_with_coexplored, get_learning_prompt,
+    generate_dynamic_starter_cards, select_starter_topic,
+    generate_starter_cards_from_thought
 )
 from .prompts import load_prompts
 
@@ -191,6 +193,49 @@ async def suggest_topic(req: SuggestRequest, username: str = Depends(get_current
         raise HTTPException(status_code=502, detail=str(e))
 
 
+class SaveTopicToSparksRequest(BaseModel):
+    title: str
+    domain: str = "General"
+    summary: str = ""
+    concept_id: Optional[int] = None
+
+
+@app.post("/api/topics/batch-suggest")
+async def batch_suggest_topics(username: str = Depends(get_current_user_token)):
+    """Generate 4 distinct concept proposals for the 4 primary vectors in one single AI request."""
+    ai_status = get_ai_status()
+    if not ai_status["configured"]:
+        raise HTTPException(
+            status_code=400,
+            detail="AI is not configured. Please set AI_API_KEY in .env and restart."
+        )
+    try:
+        batch = await generate_batch_concept_suggestions()
+        return {
+            "proposals": batch,
+            "state": "CONCEPT_SUGGESTED"
+        }
+    except Exception as e:
+        logger.exception("Error generating batch concept proposals")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/topics/save-to-sparks")
+async def save_topic_to_sparks_route(req: SaveTopicToSparksRequest, username: str = Depends(get_current_user_token)):
+    """Save a proposed topic directly into user's sparks drawer."""
+    try:
+        spark = save_topic_as_spark(
+            title=req.title,
+            domain=req.domain,
+            summary=req.summary,
+            concept_id=req.concept_id
+        )
+        return {"status": "saved", "spark": spark}
+    except Exception as e:
+        logger.exception("Error saving topic to sparks")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/api/topics/select-starter")
 async def select_starter_concept(req: SelectStarterTopicRequest, username: str = Depends(get_current_user_token)):
     ai_status = get_ai_status()
@@ -205,7 +250,7 @@ async def select_starter_concept(req: SelectStarterTopicRequest, username: str =
             domain=req.domain,
             summary=req.summary
         )
-        prompt = get_learning_prompt(concept["id"])
+        prompt = await generate_dynamic_learning_prompt(concept["id"])
         return {
             "concept": concept,
             "prompt": prompt,
@@ -224,12 +269,18 @@ async def accept_concept(concept_id: int, username: str = Depends(get_current_us
 
     update_concept_status(concept_id, "active")
     updated = get_concept(concept_id)
-    prompt = get_learning_prompt(concept_id)
+    prompt = await generate_dynamic_learning_prompt(concept_id)
     return {
         "concept": updated,
         "prompt": prompt,
         "state": "CONCEPT_ACTIVE"
     }
+
+
+@app.get("/api/topics/{concept_id}/dynamic-prompt")
+async def get_concept_dynamic_prompt(concept_id: int, username: str = Depends(get_current_user_token)):
+    prompt = await generate_dynamic_learning_prompt(concept_id)
+    return {"prompt": prompt}
 
 
 @app.post("/api/topics/{concept_id}/skip")

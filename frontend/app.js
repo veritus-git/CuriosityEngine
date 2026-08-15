@@ -237,7 +237,9 @@
         ai: { configured: false },
         profile: {},
         coldStartActive: false,
-        coldStartCards: []
+        coldStartCards: [],
+        batchProposals: null,
+        activeVector: 'adjacent'
     };
 
     // ─── Wizard & Auth State ───
@@ -355,18 +357,9 @@
         }
     }
 
-    // ─── Theme Management ───
+    // ─── Theme Management (Dark Zen Default) ───
     const root = document.documentElement;
-    function applyTheme(theme) {
-        if (theme === 'dark') {
-            root.setAttribute('data-theme', 'dark');
-        } else {
-            root.setAttribute('data-theme', 'light');
-        }
-        localStorage.setItem('curiosity_theme', theme);
-    }
-    const savedTheme = localStorage.getItem('curiosity_theme') || 'dark';
-    applyTheme(savedTheme);
+    root.setAttribute('data-theme', 'dark');
 
     // ─── DOM References ───
     const $ = (sel) => document.querySelector(sel);
@@ -480,7 +473,7 @@
             if (floatingBtn) floatingBtn.hidden = true;
             if (globalProgress) globalProgress.hidden = false;
             if (langSelect) langSelect.hidden = true;
-            setWizardStep(1);
+            setWizardStep(0);
         } else if (viewName === 'COLD_START') {
             if (navLinks) navLinks.hidden = true;
             if (floatingBtn) floatingBtn.hidden = true;
@@ -716,31 +709,50 @@
         }
     }
 
-    // ─── Topic Suggestion Trigger (Compass Vectors) ───
-    async function triggerSuggestion(vector, userInput = null, sparkId = null) {
-        const btn = document.querySelector(`[data-vector="${vector}"]`);
-        if (btn) btn.classList.add('loading');
+    // ─── Batch 4-Vector Topic Suggestions ───
+    async function loadBatchSuggestions(forceReroll = false) {
+        const rerollBtn = $('#btn-dashboard-reroll-batch');
+        if (rerollBtn) rerollBtn.classList.add('loading');
         setGlobalLoading(true, 'loading.generating');
 
         try {
-            const res = await api('POST', '/api/topics/suggest', {
-                vector: vector,
-                user_input: userInput,
-                spark_id: sparkId,
-                current_action: 'skip'
-            });
-
-            state.concept = res.concept;
-            state.prompt = res.prompt;
+            const data = await api('POST', '/api/topics/batch-suggest');
+            state.batchProposals = data.proposals || {};
+            state.concept = state.batchProposals[state.activeVector] || Object.values(state.batchProposals)[0] || null;
             state.coldStartActive = false;
             renderDashboard('discovery');
             showView('DASHBOARD');
         } catch (err) {
             showToast(err.message || t('errors.server_down'));
         } finally {
-            if (btn) btn.classList.remove('loading');
+            if (rerollBtn) rerollBtn.classList.remove('loading');
             setGlobalLoading(false);
         }
+    }
+
+    // ─── Typewriter Text Streaming Animation ───
+    const activeTypewriters = new Map();
+    function runTypewriter(element, text, speed = 12) {
+        if (!element) return;
+        if (activeTypewriters.has(element)) {
+            clearInterval(activeTypewriters.get(element));
+            activeTypewriters.delete(element);
+        }
+        if (!text) {
+            element.textContent = '';
+            return;
+        }
+        element.textContent = '';
+        let idx = 0;
+        const interval = setInterval(() => {
+            idx++;
+            element.textContent = text.slice(0, idx);
+            if (idx >= text.length) {
+                clearInterval(interval);
+                activeTypewriters.delete(element);
+            }
+        }, speed);
+        activeTypewriters.set(element, interval);
     }
 
     // ─── Dashboard 2-Stage Rendering (Discovery vs Focus) ───
@@ -748,13 +760,7 @@
         const stageDiscovery = $('#dashboard-stage-discovery');
         const stageFocus = $('#dashboard-stage-focus');
 
-        if (!state.concept) {
-            if (stageDiscovery) stageDiscovery.hidden = false;
-            if (stageFocus) stageFocus.hidden = true;
-            return;
-        }
-
-        const isFocus = (mode === 'focus' || state.concept.status === 'active');
+        const isFocus = (mode === 'focus' || (state.concept && state.concept.status === 'active'));
 
         if (isFocus) {
             if (stageDiscovery) stageDiscovery.hidden = true;
@@ -764,22 +770,50 @@
             const fDomain = $('#focus-concept-domain');
             const fPrompt = $('#prompt-card-content');
 
-            if (fTitle) fTitle.textContent = state.concept.title;
-            if (fDomain) fDomain.textContent = state.concept.domain || 'General';
+            if (fTitle && state.concept) fTitle.textContent = state.concept.title;
+            if (fDomain && state.concept) fDomain.textContent = state.concept.domain || 'General';
             if (fPrompt) fPrompt.textContent = state.prompt || '';
+            document.body.setAttribute('data-vector-theme', state.concept?.source_mode || state.activeVector || 'adjacent');
         } else {
             if (stageDiscovery) stageDiscovery.hidden = false;
             if (stageFocus) stageFocus.hidden = true;
+
+            // Resolve concept for active vector from batch proposals if available
+            if (state.batchProposals && state.batchProposals[state.activeVector]) {
+                state.concept = state.batchProposals[state.activeVector];
+            }
+
+            if (!state.concept) {
+                loadBatchSuggestions();
+                return;
+            }
+
+            document.body.setAttribute('data-vector-theme', state.activeVector);
+
+            // Update active state on vector pills
+            $$('#dashboard-vector-pills .vector-pill').forEach(pill => {
+                pill.classList.toggle('active', pill.dataset.vector === state.activeVector);
+            });
 
             const dTitle = $('#discovery-concept-title');
             const dDomain = $('#discovery-concept-domain');
             const dReason = $('#discovery-concept-reason');
             const dModel = $('#discovery-concept-model');
 
-            if (dTitle) dTitle.textContent = state.concept.title;
             if (dDomain) dDomain.textContent = state.concept.domain || 'General';
-            if (dReason) dReason.textContent = state.concept.summary || '';
-            if (dModel) dModel.textContent = state.concept.intuitive_model || '';
+
+            if (dTitle) {
+                dTitle.classList.add('fade-out');
+                setTimeout(() => {
+                    dTitle.textContent = state.concept.title;
+                    dTitle.classList.remove('fade-out');
+                    dTitle.classList.add('fade-in');
+                    setTimeout(() => dTitle.classList.remove('fade-in'), 250);
+                }, 100);
+            }
+
+            runTypewriter(dModel, state.concept.intuitive_model || '', 11);
+            runTypewriter(dReason, state.concept.summary || '', 11);
         }
     }
 
@@ -1011,10 +1045,13 @@
             } else {
                 if (data.state === 'CONCEPT_ACTIVE') {
                     renderDashboard('focus');
-                } else {
+                    showView('DASHBOARD');
+                } else if (state.concept) {
                     renderDashboard('discovery');
+                    showView('DASHBOARD');
+                } else {
+                    await loadBatchSuggestions();
                 }
-                showView('DASHBOARD');
             }
         } catch (err) {
             if (err.message === 'Unauthorized') {
@@ -1447,6 +1484,9 @@
         // Dashboard Stage 1: Discovery Actions
         $('#btn-discovery-explore')?.addEventListener('click', async () => {
             if (!state.concept) return;
+            const btn = $('#btn-discovery-explore');
+            if (btn) btn.classList.add('loading');
+            setGlobalLoading(true, 'loading.connecting');
             try {
                 const res = await api('POST', `/api/topics/${state.concept.id}/accept`);
                 state.concept = res.concept;
@@ -1454,26 +1494,48 @@
                 renderDashboard('focus');
             } catch (err) {
                 showToast(err.message);
+            } finally {
+                if (btn) btn.classList.remove('loading');
+                setGlobalLoading(false);
             }
         });
 
-        $('#btn-discovery-reroll')?.addEventListener('click', async () => {
-            const activePill = document.querySelector('#dashboard-vector-pills .vector-pill.active');
-            const vector = activePill ? activePill.dataset.vector : 'adjacent';
-            triggerSuggestion(vector);
+        $('#btn-discovery-save-spark')?.addEventListener('click', async () => {
+            if (!state.concept) return;
+            try {
+                await api('POST', '/api/topics/save-to-sparks', {
+                    title: state.concept.title,
+                    domain: state.concept.domain || 'General',
+                    summary: state.concept.summary || '',
+                    concept_id: state.concept.id
+                });
+                state.sparksCount = (state.sparksCount || 0) + 1;
+                const sparksBadge = $('#nav-sparks-label');
+                if (sparksBadge) {
+                    sparksBadge.textContent = t('nav.sparks', { n: state.sparksCount });
+                }
+                showToast(t('focus_card.saved_to_sparks_toast'));
+            } catch (err) {
+                showToast(err.message || t('errors.server_down'));
+            }
+        });
+
+        $('#btn-dashboard-reroll-batch')?.addEventListener('click', async () => {
+            await loadBatchSuggestions(true);
         });
 
         $$('#dashboard-vector-pills .vector-pill').forEach(btn => {
             btn.addEventListener('click', () => {
-                $$('#dashboard-vector-pills .vector-pill').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
                 const vector = btn.dataset.vector;
-                triggerSuggestion(vector);
+                if (!vector || vector === state.activeVector) return;
+                state.activeVector = vector;
+                renderDashboard('discovery');
             });
         });
 
         // Dashboard Stage 2: Focus Actions & Robust Clipboard Copy
-        $('#btn-focus-back')?.addEventListener('click', () => {
+        $('#btn-focus-back')?.addEventListener('click', (e) => {
+            e.preventDefault();
             renderDashboard('discovery');
         });
 
@@ -1555,8 +1617,7 @@
                 state.concept = null;
                 state.prompt = null;
                 state.coldStartActive = false;
-                renderDashboard('discovery');
-                triggerSuggestion('adjacent');
+                await loadBatchSuggestions(true);
                 showToast(t('complete_modal.title'));
             } catch (err) {
                 showToast(err.message);
@@ -1596,9 +1657,6 @@
             }
         });
 
-        // Settings Themes
-        $('#btn-theme-dark')?.addEventListener('click', () => applyTheme('dark'));
-        $('#btn-theme-light')?.addEventListener('click', () => applyTheme('light'));
     }
 
     async function submitSpark() {
