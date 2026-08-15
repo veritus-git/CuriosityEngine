@@ -1,4 +1,4 @@
-# <img src="frontend/assets/logo.png" alt="CuriosityEngine Logo" width="64" height="64" valign="middle" /> CuriosityEngine
+# <img src="frontend/assets/logo.png" alt="CuriosityEngine Logo" width="48" height="48" valign="middle" /> CuriosityEngine
 
 **One interesting thing at a time.**
 
@@ -70,7 +70,7 @@ Open `http://localhost:8080` in your browser. (Since the server binds to `0.0.0.
 
 If you want it to run permanently in the background (and auto-start on boot):
 
-1. Check your exact project path by running `pwd` in the repository directory (e.g. `/home/szymon/homelab/CuriosityEngine` or `/home/pi/CuriosityEngine`).
+1. Check your exact project path by running `pwd` in the repository directory (e.g. `/home/user/homelab/CuriosityEngine` or `/home/pi/CuriosityEngine`).
 2. Create a service file: `sudo nano /etc/systemd/system/curiosity-engine.service`
 3. Add the following (replace `YOUR_USERNAME` with your Linux user and `/PATH/TO/CuriosityEngine` with the path from step 1):
 ```ini
