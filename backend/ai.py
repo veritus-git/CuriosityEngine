@@ -22,7 +22,7 @@ MODEL = os.getenv("AI_MODEL", "gemini-3.7-flash")
 FALLBACK_MODEL = os.getenv("AI_FALLBACK_MODEL", "gemini-3.5-flash-lite")
 API_KEY = os.getenv("AI_API_KEY", "")
 
-TIMEOUT = 60.0
+TIMEOUT = float(os.getenv("AI_TIMEOUT", "12.0"))
 
 
 class AIError(Exception):

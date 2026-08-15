@@ -121,26 +121,38 @@ rm -rf ~/CuriosityEngine
 
 
 
-## AI Integration
+## AI Integration & Environment Variables
 
-The app supports three providers:
+CuriosityEngine is designed as a standalone, customizable shell. All intelligence is driven by your preferred AI provider configured in `.env`:
 
-| Provider | `AI_PROVIDER` | Example `AI_MODEL` |
-|----------|---------------|---------------------|
-| Google Gemini | `gemini` | `gemini-2.0-flash`, `gemini-3.1-flash-lite` |
-| OpenAI | `openai` | `gpt-4o-mini`, `gpt-4o` |
-| Anthropic | `anthropic` | `claude-sonnet-4-20250514` |
+| Provider | `AI_PROVIDER` | `AI_MODEL` | `AI_FALLBACK_MODEL` | `AI_EMBEDDING_MODEL` |
+|----------|---------------|------------|---------------------|----------------------|
+| Google Gemini (Recommended) | `gemini` | `gemini-3.7-flash` | `gemini-3.5-flash-lite` | `gemini-embedding-001` |
+| OpenAI | `openai` | `gpt-4o` | `gpt-4o-mini` | `text-embedding-3-small` |
+| Anthropic | `anthropic` | `claude-3-7-sonnet-20250219` | `claude-3-5-haiku-20241022` | *(Uses built-in fallback)* |
 
-You can also use OpenAI-compatible APIs (Ollama, etc.) by setting `AI_BASE_URL`:
+### Example `.env` Configuration:
+```env
+# AI Provider & Models
+AI_PROVIDER=gemini
+AI_MODEL=gemini-3.7-flash
+AI_FALLBACK_MODEL=gemini-3.5-flash-lite
+AI_EMBEDDING_MODEL=gemini-embedding-001
+AI_TIMEOUT=12.0
+AI_API_KEY=your-gemini-api-key-here
 
+# Server
+HOST=0.0.0.0
+PORT=8080
+```
+
+You can also use any OpenAI-compatible API (Ollama, vLLM, LocalAI) by configuring `AI_BASE_URL`:
 ```env
 AI_PROVIDER=openai
 AI_BASE_URL=http://localhost:11434/v1
 AI_MODEL=llama3
 AI_API_KEY=ollama
 ```
-
-The AI generates structured JSON with a topic suggestion. The backend validates the response before saving.
 
 
 

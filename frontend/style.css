@@ -184,7 +184,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--space-md) var(--space-xl);
+    padding: 0.85rem 1.5rem;
     border-bottom: 1px solid var(--border-subtle);
     backdrop-filter: blur(16px);
     background: rgba(12, 12, 20, 0.6);
@@ -275,9 +275,9 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: var(--space-xl) var(--space-md);
-    max-width: 1040px;
-    width: 100%;
+    padding: 1rem 1rem 2.5rem 1rem;
+    max-width: 1720px;
+    width: 98%;
     margin: 0 auto;
 }
 
@@ -598,13 +598,13 @@ body {
 }
 
 .dashboard-container {
-    width: 95%;
-    max-width: 1620px;
+    width: 100%;
+    max-width: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 1.5rem 1.5rem 3rem 1.5rem;
+    padding: 0.5rem 0 2.5rem 0;
 }
 
 .dashboard-stage {
@@ -621,11 +621,11 @@ body {
 /* --- Stage 1: Discovery Split Hero --- */
 .discovery-split-hero {
     display: grid;
-    grid-template-columns: 1.12fr 1fr;
+    grid-template-columns: 1.22fr 1fr;
     gap: 3.5rem;
     align-items: start;
     width: 100%;
-    min-height: 340px;
+    min-height: 280px;
     margin-bottom: 2rem;
     animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -933,7 +933,7 @@ body {
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    max-width: 760px;
+    max-width: 1060px;
     margin-bottom: 0.25rem;
 }
 
@@ -946,6 +946,9 @@ body {
     font-weight: 500;
     cursor: pointer;
     padding: 0.4rem 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
     transition: color var(--duration-fast);
 }
 
@@ -969,12 +972,12 @@ body {
 }
 
 .focus-hero__title {
-    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    font-size: clamp(2rem, 4vw, 2.9rem);
     font-weight: 800;
     color: #ffffff;
-    line-height: 1.2;
+    line-height: 1.18;
     letter-spacing: -0.02em;
-    max-width: 780px;
+    max-width: 1060px;
     margin: 0;
 }
 
@@ -982,9 +985,9 @@ body {
 .focus-context-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.25rem;
+    gap: 1.4rem;
     width: 100%;
-    max-width: 780px;
+    max-width: 1060px;
     margin-top: 0.25rem;
 }
 
@@ -992,10 +995,10 @@ body {
     background: rgba(255, 255, 255, 0.025);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: var(--radius-lg);
-    padding: 1.1rem 1.3rem;
+    padding: 1.25rem 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.45rem;
     text-align: left;
 }
 
@@ -1013,20 +1016,20 @@ body {
 }
 
 .focus-context-text {
-    font-size: 0.94rem;
-    line-height: 1.56;
-    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.96rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.88);
     margin: 0;
 }
 
 /* Prompt Card Elevated (Grayish, No Scroll, Minimal Top-Right Copy Button) */
 .prompt-card-elevated {
     width: 100%;
-    max-width: 780px;
+    max-width: 1060px;
     background: #141424;
     border: 1px solid rgba(255, 255, 255, 0.11);
     border-radius: var(--radius-xl);
-    padding: 1.6rem 1.8rem 1.8rem 1.8rem;
+    padding: 1.8rem 2rem 2rem 2rem;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
     display: flex;
     flex-direction: column;

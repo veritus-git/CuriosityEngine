@@ -755,22 +755,22 @@
             const char = text[i];
             caret.insertAdjacentText('beforebegin', char);
 
-            // 2x Faster organic non-linear timing with micro-pauses at punctuation
-            let delay = 4 + Math.floor(Math.random() * 8); // Fast base typing: 4-12ms
+            // Ultra-snappy, organic non-linear typing
+            let delay = 1 + Math.floor(Math.random() * 4); // Base: 1-5ms
 
             if (char === '.' || char === '!' || char === '?') {
-                delay = 70 + Math.floor(Math.random() * 35); // 70-105ms at sentence end
+                delay = 35 + Math.floor(Math.random() * 20); // 35-55ms at sentence end
             } else if (char === ',' || char === ';' || char === ':') {
-                delay = 30 + Math.floor(Math.random() * 20); // 30-50ms at comma
+                delay = 16 + Math.floor(Math.random() * 14); // 16-30ms at comma
             } else if (char === ' ') {
-                delay = 8 + Math.floor(Math.random() * 5);
+                delay = 3 + Math.floor(Math.random() * 3);
             }
 
             await sleep(delay);
         }
 
         if (token === currentTypewriterToken) {
-            await sleep(40);
+            await sleep(20);
             caret.remove();
         }
     }
@@ -789,7 +789,7 @@
         if (token !== currentTypewriterToken) return;
 
         // Small breath pause between paragraphs
-        await sleep(50);
+        await sleep(25);
         if (token !== currentTypewriterToken) return;
 
         // 2. Stream Most Logiczny (BELOW)
