@@ -376,25 +376,23 @@
     }
 
     function populateSettingsView() {
-        const badgeEl = $('#settings-ai-badge-text');
-        const providerEl = $('#settings-ai-provider');
-        const modelPrimaryEl = $('#settings-ai-model-primary');
-        const modelFallbackEl = $('#settings-ai-model-fallback');
-        const modelEmbeddingEl = $('#settings-ai-model-embedding');
+        const info = $('#settings-ai-info');
         const selectLang = $('#select-settings-language');
         const selectAddress = $('#select-settings-address');
-        const profileLevel = $('#settings-profile-level');
-        const accountUser = $('#settings-account-username');
+        const selectLevel = $('#select-settings-level');
 
-        if (state.ai) {
-            if (badgeEl) {
-                badgeEl.textContent = state.ai.configured ? t('settings.ai_configured') : t('settings.ai_not_configured');
-                badgeEl.className = `badge ${state.ai.configured ? 'badge--success' : 'badge--danger'}`;
+        if (info) {
+            if (state.ai && state.ai.configured) {
+                const providerName = state.ai.provider === 'gemini' ? 'Google Gemini' : (state.ai.provider || 'Google Gemini');
+                info.innerHTML = `
+                    <div>Status: <span class="status-ok">● ${t('settings.ai_configured')} (${providerName})</span></div>
+                    <div>Model syntezy: <code>${state.ai.model || 'gemini-3.7-flash'}</code></div>
+                    <div>Model fallback: <code>gemini-3.5-flash-lite</code></div>
+                    <div>Model embedding: <code>gemini-embedding-001</code></div>
+                `;
+            } else {
+                info.innerHTML = `<div>Status: <span class="status-err">● ${t('settings.ai_not_configured')}</span></div>`;
             }
-            if (providerEl) providerEl.textContent = state.ai.provider === 'gemini' ? 'Google Gemini' : (state.ai.provider || 'Google Gemini');
-            if (modelPrimaryEl) modelPrimaryEl.textContent = state.ai.model || 'gemini-3.7-flash';
-            if (modelFallbackEl) modelFallbackEl.textContent = 'gemini-3.5-flash-lite';
-            if (modelEmbeddingEl) modelEmbeddingEl.textContent = 'gemini-embedding-001';
         }
 
         if (selectLang) {
@@ -405,16 +403,8 @@
             selectAddress.value = state.profile.form_of_address || 'neutral';
         }
 
-        if (profileLevel) {
-            const level = (state.profile && state.profile.grounding_level) || 'builder';
-            let label = t('onboarding.level_builder_title') || 'Builder / Systemy';
-            if (level === 'ground_zero') label = t('onboarding.level_ground_zero_title') || 'Od Zera / Intuicja';
-            if (level === 'deep') label = t('onboarding.level_deep_title') || 'Pod Maską / Ekspert';
-            profileLevel.textContent = label;
-        }
-
-        if (accountUser) {
-            accountUser.textContent = state.username || localStorage.getItem('curiosity_username') || 'User';
+        if (selectLevel && state.profile) {
+            selectLevel.value = state.profile.grounding_level || 'builder';
         }
     }
 
@@ -1648,6 +1638,14 @@
             if (state.profile) state.profile.form_of_address = formVal;
             if (localStorage.getItem('curiosity_token')) {
                 await api('POST', '/api/profile', { form_of_address: formVal }).catch(() => {});
+            }
+        });
+
+        $('#select-settings-level')?.addEventListener('change', async (e) => {
+            const levelVal = e.target.value;
+            if (state.profile) state.profile.grounding_level = levelVal;
+            if (localStorage.getItem('curiosity_token')) {
+                await api('POST', '/api/profile', { grounding_level: levelVal }).catch(() => {});
             }
         });
 
