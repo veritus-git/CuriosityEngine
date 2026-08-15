@@ -629,12 +629,12 @@ body {
     gap: 3.5rem;
     align-items: stretch;
     width: 100%;
-    min-height: 250px;
-    transition: min-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), gap 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    min-height: 280px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Left Column: Big Topic Title + Domain Badge + Most Logiczny (80% Max Width) */
+/* Left Column: Big Topic Title + Domain Badge + Most Logiczny (80% Max Width, Fixed Space) */
 .discovery-col--left {
     display: flex;
     flex-direction: column;
@@ -643,7 +643,8 @@ body {
     width: 100%;
     justify-content: flex-start;
     gap: 0.4rem;
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    min-height: 280px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .discovery-badge-row {
@@ -675,20 +676,10 @@ body {
     line-height: 1.15;
     letter-spacing: -0.03em;
     margin: 0;
-    min-height: 110px;
+    min-height: 125px;
     text-wrap: balance;
     word-break: break-word;
-    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.discovery-hero__title.fade-out {
-    opacity: 0;
-    transform: translateY(-6px);
-}
-
-.discovery-hero__title.fade-in {
-    opacity: 1;
-    transform: translateY(0);
+    transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .discovery-reason-box {
@@ -698,8 +689,8 @@ body {
     gap: 0.25rem;
     text-align: left;
     max-width: 80%;
-    min-height: 55px;
-    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    min-height: 60px;
+    transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .discovery-reason-text {
@@ -707,7 +698,7 @@ body {
     line-height: 1.55;
     color: rgba(255, 255, 255, 0.72);
     margin: 0;
-    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Right Column: Intuicja (ON TOP, Width Locked to Actions) & Bottom-Anchored Actions */
@@ -717,15 +708,15 @@ body {
     align-items: flex-start;
     text-align: left;
     width: 100%;
-    max-width: 410px;
+    max-width: 420px;
     justify-content: space-between;
     height: 100%;
-    min-height: 250px;
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    min-height: 280px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .discovery-text-block--model {
-    min-height: 120px;
+    min-height: 140px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;

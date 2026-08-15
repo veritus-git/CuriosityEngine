@@ -165,7 +165,7 @@
         "accept_btn": "Explore this topic",
         "skip_btn": "Different suggestion",
         "reroll_batch_btn": "New set of 4 concepts",
-        "save_to_sparks_btn": "Save to Sparks",
+        "save_to_sparks_btn": "Save for later",
         "saved_to_sparks_toast": "✓ Saved topic to sparks inbox!",
         "reject_btn": "Skip this topic",
         "prompt_box_label": "Ready Prompt for Your LLM",

@@ -836,21 +836,23 @@
             if (dDomain) dDomain.textContent = state.concept.domain || 'General';
 
             if (dTitle) {
-                dTitle.classList.add('fade-out');
+                dTitle.style.opacity = '0';
+                dTitle.style.transform = 'translateY(-4px)';
                 setTimeout(() => {
                     dTitle.textContent = state.concept.title;
-                    dTitle.classList.remove('fade-out');
-                    dTitle.classList.add('fade-in');
-                    setTimeout(() => dTitle.classList.remove('fade-in'), 220);
-                }, 90);
+                    dTitle.style.opacity = '1';
+                    dTitle.style.transform = 'translateY(0)';
+                }, 110);
             }
 
             if (dReason) {
                 dReason.style.opacity = '0';
+                dReason.style.transform = 'translateY(-3px)';
                 setTimeout(() => {
                     dReason.textContent = state.concept.summary || '';
                     dReason.style.opacity = '1';
-                }, 90);
+                    dReason.style.transform = 'translateY(0)';
+                }, 110);
             }
 
             // Stream Intuicja on the right with organic typewriter
