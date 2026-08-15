@@ -286,12 +286,15 @@ body {
     width: 70%;
     margin: 0 auto;
     overflow-y: auto;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
 }
 
 .main::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none;
+    /* Chrome, Safari, Opera */
     width: 0;
     height: 0;
 }
@@ -772,6 +775,7 @@ body {
         opacity: 0;
         transform: translateY(12px);
     }
+
     100% {
         opacity: 1;
         transform: translateY(0);
@@ -2819,14 +2823,22 @@ html {
     color: #818cf8;
 }
 
-.settings-info .status-ok { color: var(--success); font-weight: 600; }
-.settings-info .status-err { color: var(--error); font-weight: 600; }
+.settings-info .status-ok {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.settings-info .status-err {
+    color: var(--error);
+    font-weight: 600;
+}
 
 /* --- Zen Loading Overlay & Rotating Logo --- */
 @keyframes rotateLogoContinuous {
     from {
         transform: rotate(0deg);
     }
+
     to {
         transform: rotate(360deg);
     }
@@ -2882,8 +2894,8 @@ html {
     position: relative;
 }
 
-.discovery-split-hero.is-loading > *,
-.focus-session-card.is-loading > * {
+.discovery-split-hero.is-loading>*,
+.focus-session-card.is-loading>* {
     filter: blur(10px) brightness(0.4);
     pointer-events: none;
     user-select: none;
