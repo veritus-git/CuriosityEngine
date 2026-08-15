@@ -37,6 +37,7 @@ async def generate_batch_concept_suggestions(
     # 2. Gather context
     recent = get_recent_concepts(limit=8)
     all_titles = get_all_concept_titles()
+    inbox_sparks = get_sparks(status="inbox", limit=5)
     profile = get_profile()
     lang = profile.get("language", "pl")
 
@@ -45,7 +46,8 @@ async def generate_batch_concept_suggestions(
         recent_concepts=recent,
         all_titles=all_titles,
         profile=profile,
-        language=lang
+        language=lang,
+        inbox_sparks=inbox_sparks
     )
 
     # 4. Generate with AI
@@ -105,14 +107,12 @@ async def generate_dynamic_learning_prompt(concept_id: int) -> str:
         sys_prompt, user_prompt = build_dynamic_prompt_synthesis_prompts(
             concept_title=concept["title"],
             domain=concept.get("domain", "General"),
-            intuitive_model=concept.get("intuitive_model", ""),
-            short_reason=concept.get("summary", ""),
             known_concepts=known,
             profile=profile
         )
         parsed = await generate_ai_json(sys_prompt, user_prompt)
         prompt_text = parsed.get("prompt") or parsed.get("text") or ""
-        if prompt_text and len(prompt_text.strip()) > 20:
+        if prompt_text and len(prompt_text.strip()) > 15:
             return prompt_text.strip()
     except Exception as e:
         logger.warning(f"Dynamic prompt synthesis notice ({e}), using fallback builder.")
@@ -195,12 +195,12 @@ async def select_starter_topic(
         summary=topic_summary,
         intuitive_model=intuitive_model,
         difficulty=profile.get("grounding_level", "intermediate"),
-        status="suggested",
+        status="active",
         embedding=emb,
         source_mode="starter_select"
     )
 
-    logger.info(f"Directly selected starter topic: {title}")
+    logger.info(f"Directly activated starter topic: {title}")
     return concept
 
 

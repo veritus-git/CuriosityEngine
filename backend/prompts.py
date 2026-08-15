@@ -153,7 +153,8 @@ def build_batch_generation_prompts(
     recent_concepts: List[Dict[str, Any]],
     all_titles: List[str],
     profile: Optional[Dict[str, Any]] = None,
-    language: Optional[str] = None
+    language: Optional[str] = None,
+    inbox_sparks: Optional[List[Dict[str, Any]]] = None
 ) -> tuple[str, str]:
     """
     Build prompts to generate 4 distinct topic proposals simultaneously in a single AI request:
@@ -168,14 +169,20 @@ def build_batch_generation_prompts(
     if recent_concepts:
         history_lines = [
             f"- {c['title']} ({c.get('domain', 'general')}): {c.get('summary', '')}"
-            for c in recent_concepts[:6]
+            for c in recent_concepts[:8]
         ]
-        h_label = _get(labels, "recent_history", default="Recently mastered concepts:")
+        h_label = _get(labels, "recent_history", default="Recently explored/mastered concepts:")
         ctx_parts.append(f"{h_label}\n" + "\n".join(history_lines))
 
+    if inbox_sparks:
+        spark_lines = [f"- {s.get('raw_text', '')}" for s in inbox_sparks[:4] if s.get('raw_text')]
+        if spark_lines:
+            s_label = "Zapisane przelotne dygresje w skrzynce (Sparks):" if lang == "pl" else "Inbox sparks & transient thoughts:"
+            ctx_parts.append(f"{s_label}\n" + "\n".join(spark_lines))
+
     if all_titles:
-        t_label = _get(labels, "all_topics", default="All explored titles:")
-        ctx_parts.append(f"{t_label} {', '.join(all_titles[-25:])}")
+        t_label = _get(labels, "all_topics", default="All previously touched topics:")
+        ctx_parts.append(f"{t_label} {', '.join(all_titles[-35:])}")
 
     if profile:
         pref_lines = []
@@ -214,14 +221,12 @@ def build_batch_generation_prompts(
 def build_dynamic_prompt_synthesis_prompts(
     concept_title: str,
     domain: str = "General",
-    intuitive_model: Optional[str] = None,
-    short_reason: Optional[str] = None,
     known_concepts: Optional[List[str]] = None,
     profile: Optional[Dict[str, Any]] = None
 ) -> tuple[str, str]:
     """
-    Build prompts to synthesize a custom, cohesive, 1-paragraph prompt for external LLMs
-    specifically tailored for that exact topic without rigid boilerplate.
+    Build prompts to synthesize a custom, concise, 2-3 sentence prompt for external LLMs
+    specifically instructing how to teach that topic without rigid boilerplate or self-explaining.
     """
     lang = profile.get("language", "en") if profile else "en"
     level = profile.get("grounding_level", "builder") if profile else "builder"
@@ -236,8 +241,6 @@ def build_dynamic_prompt_synthesis_prompts(
 
     user_msg = user_template.replace("{topic}", concept_title)
     user_msg = user_msg.replace("{domain}", domain)
-    user_msg = user_msg.replace("{intuitive_model}", intuitive_model or "")
-    user_msg = user_msg.replace("{short_reason}", short_reason or "")
     user_msg = user_msg.replace("{level}", level)
     user_msg = user_msg.replace("{known_concepts}", known_str)
 

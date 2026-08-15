@@ -254,7 +254,7 @@ async def select_starter_concept(req: SelectStarterTopicRequest, username: str =
         return {
             "concept": concept,
             "prompt": prompt,
-            "state": "CONCEPT_SUGGESTED"
+            "state": "CONCEPT_ACTIVE"
         }
     except Exception as e:
         logger.exception("Error selecting starter topic")

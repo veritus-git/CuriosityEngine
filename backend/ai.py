@@ -85,8 +85,8 @@ async def generate_embedding(text: str) -> List[float]:
                     return resp.json()["data"][0]["embedding"]
         elif provider in ("gemini", "google"):
             base_url = os.getenv("AI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta")
-            model = os.getenv("AI_EMBEDDING_MODEL", "text-embedding-004")
-            async with httpx.AsyncClient(timeout=15.0) as client:
+            model = os.getenv("AI_EMBEDDING_MODEL", "embedding-001")
+            async with httpx.AsyncClient(timeout=10.0) as client:
                 resp = await client.post(
                     f"{base_url}/models/{model}:embedContent",
                     params={"key": API_KEY},
@@ -96,9 +96,13 @@ async def generate_embedding(text: str) -> List[float]:
                     }
                 )
                 if resp.status_code == 200:
-                    return resp.json()["embedding"]["values"]
+                    data = resp.json()
+                    values = data.get("embedding", {}).get("values")
+                    if values:
+                        return values
+        return fallback_semantic_vector(text)
     except Exception as e:
-        logger.warning(f"Embedding API call notice ({e}), using fallback semantic vector.")
+        logger.debug(f"Embedding notice ({e}), using fallback semantic vector.")
 
     return fallback_semantic_vector(text)
 

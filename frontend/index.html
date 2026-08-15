@@ -190,22 +190,22 @@
                                 <div class="step0-section">
                                     <span class="step0-label" data-i18n="onboarding.step0_lang_label"></span>
                                     <div class="step0-lang-pills" id="onboarding-lang-pills">
-                                        <button type="button" class="lang-pill active" data-lang="pl">🇵🇱 Polski</button>
                                         <button type="button" class="lang-pill" data-lang="en">🇬🇧 English</button>
+                                        <button type="button" class="lang-pill active" data-lang="pl">🇵🇱 Polski</button>
                                     </div>
                                 </div>
 
                                 <div class="step0-section">
                                     <span class="step0-label" data-i18n="onboarding.step0_address_label"></span>
                                     <div class="step0-gender-grid" id="onboarding-gender-grid">
-                                        <button type="button" class="gender-pill active" data-gender="neutral">
-                                            <span data-i18n="onboarding.gender_neutral"></span>
-                                        </button>
-                                        <button type="button" class="gender-pill" data-gender="male">
+                                        <button type="button" class="gender-pill active" data-gender="male">
                                             <span data-i18n="onboarding.gender_male"></span>
                                         </button>
                                         <button type="button" class="gender-pill" data-gender="female">
                                             <span data-i18n="onboarding.gender_female"></span>
+                                        </button>
+                                        <button type="button" class="gender-pill" data-gender="neutral">
+                                            <span data-i18n="onboarding.gender_neutral"></span>
                                         </button>
                                         <button type="button" class="gender-pill" data-gender="custom">
                                             <span data-i18n="onboarding.gender_custom"></span>
@@ -436,10 +436,11 @@
                                 <h1 class="discovery-hero__title" id="discovery-concept-title"></h1>
                                 
                                 <div class="discovery-actions">
-                                    <button type="button" class="btn btn--primary btn--lg btn--explore" id="btn-discovery-explore">
+                                    <button type="button" class="btn btn--primary btn--explore" id="btn-discovery-explore">
                                         <span class="btn__text" data-i18n="focus_card.accept_btn"></span>
                                     </button>
                                     <button type="button" class="btn btn--ghost btn--save-spark" id="btn-discovery-save-spark" data-i18n-title="focus_card.save_to_sparks_btn">
+                                        <svg class="btn-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                                         <span class="btn__text" data-i18n="focus_card.save_to_sparks_btn"></span>
                                     </button>
                                 </div>
@@ -468,23 +469,32 @@
                         <div class="vector-switcher-bar">
                             <div class="vector-pills-row" id="dashboard-vector-pills">
                                 <button type="button" class="vector-pill active" data-vector="adjacent">
-                                    <span class="vector-pill__icon">🌿</span>
+                                    <span class="vector-pill__icon">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"></circle><circle cx="18" cy="18" r="3"></circle><path d="M8.59 13.51l6.83 3.98"></path><path d="M15.41 6.51l-6.82 3.98"></path></svg>
+                                    </span>
                                     <span class="vector-pill__text" data-i18n="compass.adjacent"></span>
                                 </button>
                                 <button type="button" class="vector-pill" data-vector="deep_dive">
-                                    <span class="vector-pill__icon">🔬</span>
+                                    <span class="vector-pill__icon">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 13 12 18 17 13"></polyline><polyline points="7 6 12 11 17 6"></polyline></svg>
+                                    </span>
                                     <span class="vector-pill__text" data-i18n="compass.deep_dive"></span>
                                 </button>
                                 <button type="button" class="vector-pill" data-vector="cross_domain">
-                                    <span class="vector-pill__icon">🌌</span>
+                                    <span class="vector-pill__icon">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+                                    </span>
                                     <span class="vector-pill__text" data-i18n="compass.cross_domain"></span>
                                 </button>
                                 <button type="button" class="vector-pill" data-vector="mental_fog">
-                                    <span class="vector-pill__icon">🌫️</span>
+                                    <span class="vector-pill__icon">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
+                                    </span>
                                     <span class="vector-pill__text" data-i18n="compass.mental_fog"></span>
                                 </button>
                             </div>
                             <button type="button" class="btn-text-reroll-batch" id="btn-dashboard-reroll-batch">
+                                <svg class="btn-reroll__icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                                 <span class="btn-text-reroll__label" data-i18n="focus_card.reroll_batch_btn"></span>
                                 <span class="btn__loader" aria-hidden="true"></span>
                             </button>

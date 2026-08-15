@@ -244,7 +244,7 @@
 
     // ─── Wizard & Auth State ───
     let wizardCurrentStep = 0;
-    let selectedGender = 'neutral';
+    let selectedGender = 'male';
     let selectedLevel = 'builder';
     let authMode = 'LOGIN'; // 'LOGIN' | 'REGISTER' | 'FIRST_SETUP'
 
@@ -700,7 +700,7 @@
             state.concept = res.concept;
             state.prompt = res.prompt;
             state.coldStartActive = false;
-            renderDashboard('discovery');
+            renderDashboard('focus');
             showView('DASHBOARD');
         } catch (err) {
             showToast(err.message || t('errors.server_down'));
@@ -730,29 +730,72 @@
         }
     }
 
-    // ─── Typewriter Text Streaming Animation ───
-    const activeTypewriters = new Map();
-    function runTypewriter(element, text, speed = 12) {
+    // ─── Sequential Non-Linear Typewriter with Organic Pauses & Caret ───
+    let currentTypewriterToken = 0;
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function streamTextNonLinear(element, text, token, caretClass = 'typewriter-caret') {
         if (!element) return;
-        if (activeTypewriters.has(element)) {
-            clearInterval(activeTypewriters.get(element));
-            activeTypewriters.delete(element);
-        }
+        element.innerHTML = '';
+        const caret = document.createElement('span');
+        caret.className = caretClass;
+        element.appendChild(caret);
+
         if (!text) {
-            element.textContent = '';
+            caret.remove();
             return;
         }
-        element.textContent = '';
-        let idx = 0;
-        const interval = setInterval(() => {
-            idx++;
-            element.textContent = text.slice(0, idx);
-            if (idx >= text.length) {
-                clearInterval(interval);
-                activeTypewriters.delete(element);
+
+        for (let i = 0; i < text.length; i++) {
+            if (token !== currentTypewriterToken) return;
+
+            const char = text[i];
+            caret.insertAdjacentText('beforebegin', char);
+
+            // Organic non-linear timing with micro-pauses at punctuation
+            let delay = 9 + Math.floor(Math.random() * 15); // Fast base typing: 9-24ms
+
+            if (char === '.' || char === '!' || char === '?') {
+                delay = 140 + Math.floor(Math.random() * 70); // 140-210ms at sentence end
+            } else if (char === ',' || char === ';' || char === ':') {
+                delay = 65 + Math.floor(Math.random() * 40); // 65-105ms at comma
+            } else if (char === ' ') {
+                delay = 15 + Math.floor(Math.random() * 12);
             }
-        }, speed);
-        activeTypewriters.set(element, interval);
+
+            await sleep(delay);
+        }
+
+        if (token === currentTypewriterToken) {
+            await sleep(80);
+            caret.remove();
+        }
+    }
+
+    async function runSequentialDiscoveryTypewriter(modelEl, modelText, reasonEl, reasonText) {
+        const token = ++currentTypewriterToken;
+
+        if (modelEl) modelEl.innerHTML = '';
+        if (reasonEl) reasonEl.innerHTML = '';
+
+        // 1. Stream Intuicja & Wprowadzenie (ON TOP)
+        if (modelEl && modelText) {
+            await streamTextNonLinear(modelEl, modelText, token);
+        }
+
+        if (token !== currentTypewriterToken) return;
+
+        // Small breath pause between paragraphs
+        await sleep(90);
+        if (token !== currentTypewriterToken) return;
+
+        // 2. Stream Most Logiczny (BELOW)
+        if (reasonEl && reasonText) {
+            await streamTextNonLinear(reasonEl, reasonText, token);
+        }
     }
 
     // ─── Dashboard 2-Stage Rendering (Discovery vs Focus) ───
@@ -808,12 +851,16 @@
                     dTitle.textContent = state.concept.title;
                     dTitle.classList.remove('fade-out');
                     dTitle.classList.add('fade-in');
-                    setTimeout(() => dTitle.classList.remove('fade-in'), 250);
-                }, 100);
+                    setTimeout(() => dTitle.classList.remove('fade-in'), 220);
+                }, 90);
             }
 
-            runTypewriter(dModel, state.concept.intuitive_model || '', 11);
-            runTypewriter(dReason, state.concept.summary || '', 11);
+            runSequentialDiscoveryTypewriter(
+                dModel,
+                state.concept.intuitive_model || '',
+                dReason,
+                state.concept.summary || ''
+            );
         }
     }
 
