@@ -504,10 +504,6 @@
                     <div class="dashboard-stage dashboard-stage--focus" id="dashboard-stage-focus" hidden>
                         <div class="focus-hero">
                             <div class="focus-hero__topbar">
-                                <button type="button" class="btn-back-link" id="btn-focus-back">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                                    <span data-i18n="focus_card.back_to_discovery_btn"></span>
-                                </button>
                                 <span class="badge badge--active" data-i18n="focus_card.focus_badge"></span>
                             </div>
 
@@ -560,6 +556,10 @@
                                     <svg class="btn-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                                     <span class="btn__text" data-i18n="focus_card.add_spark_btn"></span>
                                 </button>
+                                <button type="button" class="btn btn--ghost btn--abandon" id="btn-focus-abandon">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    <span class="btn__text" data-i18n="focus_card.abandon_btn"></span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -601,27 +601,118 @@
 
             <!-- 7. SETTINGS VIEW -->
             <section class="view view--settings" id="view-settings" hidden aria-label="Settings">
-                <div class="view__content view__content--wide">
-                    <div class="history-header">
-                        <h1 class="page-title" data-i18n="settings.title"></h1>
+                <div class="view__content view__content--wide settings-wrapper">
+                    <div class="settings-header">
+                        <div>
+                            <h1 class="page-title" data-i18n="settings.title"></h1>
+                        </div>
                         <button class="btn btn--ghost btn--small" id="btn-settings-back"
                             data-i18n="settings.back_btn"></button>
                     </div>
 
-                    <div class="settings-section">
-                        <h3 class="settings-heading" data-i18n="settings.language_heading"></h3>
-                        <p class="settings-hint" data-i18n="settings.language_hint"></p>
-                        <select class="input" id="select-settings-language"></select>
-                    </div>
+                    <div class="settings-cards-list">
+                        <!-- 1. AI Status & Models Card -->
+                        <div class="settings-card">
+                            <div class="settings-card__header">
+                                <div class="settings-card__title-group">
+                                    <span class="settings-card__icon">⚡</span>
+                                    <h2 class="settings-card__title" data-i18n="settings.ai_heading"></h2>
+                                </div>
+                                <div class="settings-ai-badge" id="settings-ai-badge">
+                                    <span class="badge badge--success" id="settings-ai-badge-text" data-i18n="settings.ai_configured"></span>
+                                </div>
+                            </div>
+                            <div class="settings-meta-grid">
+                                <div class="settings-meta-item">
+                                    <span class="settings-meta-label" data-i18n="settings.ai_provider_label"></span>
+                                    <span class="settings-meta-value" id="settings-ai-provider">Google Gemini</span>
+                                </div>
+                                <div class="settings-meta-item">
+                                    <span class="settings-meta-label" data-i18n="settings.ai_primary_model_label"></span>
+                                    <span class="settings-meta-value settings-meta-value--code" id="settings-ai-model-primary">gemini-3.7-flash</span>
+                                </div>
+                                <div class="settings-meta-item">
+                                    <span class="settings-meta-label" data-i18n="settings.ai_fallback_model_label"></span>
+                                    <span class="settings-meta-value settings-meta-value--code" id="settings-ai-model-fallback">gemini-3.5-flash-lite</span>
+                                </div>
+                                <div class="settings-meta-item">
+                                    <span class="settings-meta-label" data-i18n="settings.ai_embedding_model_label"></span>
+                                    <span class="settings-meta-value settings-meta-value--code" id="settings-ai-model-embedding">gemini-embedding-001</span>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="settings-section">
-                        <h3 class="settings-heading" data-i18n="settings.ai_heading"></h3>
-                        <div class="settings-info" id="settings-ai-info"></div>
-                    </div>
+                        <!-- 2. Interface Language & Personalization Card -->
+                        <div class="settings-card">
+                            <div class="settings-card__header">
+                                <div class="settings-card__title-group">
+                                    <span class="settings-card__icon">🌐</span>
+                                    <h2 class="settings-card__title" data-i18n="settings.language_heading"></h2>
+                                </div>
+                            </div>
+                            <p class="settings-card__hint" data-i18n="settings.language_hint"></p>
+                            <div class="settings-form-row">
+                                <select class="input settings-input" id="select-settings-language"></select>
+                            </div>
+                            <div class="settings-divider"></div>
+                            <div class="settings-card__header">
+                                <div class="settings-card__title-group">
+                                    <span class="settings-card__icon">🗣️</span>
+                                    <h2 class="settings-card__title" data-i18n="settings.address_heading"></h2>
+                                </div>
+                            </div>
+                            <p class="settings-card__hint" data-i18n="settings.address_hint"></p>
+                            <div class="settings-form-row">
+                                <select class="input settings-input" id="select-settings-address">
+                                    <option value="neutral">Nijaka / Neutralna</option>
+                                    <option value="ty">Forma bezpośrednia ("Ty / Odkryłeś")</option>
+                                    <option value="pan_pani">Forma oficjalna ("Pan / Pani")</option>
+                                </select>
+                            </div>
+                        </div>
 
-                    <div class="settings-section">
-                        <h3 class="settings-heading" data-i18n="settings.privacy_heading"></h3>
-                        <p class="settings-hint" data-i18n="settings.privacy_text"></p>
+                        <!-- 3. Cognitive Profile & Depth -->
+                        <div class="settings-card">
+                            <div class="settings-card__header">
+                                <div class="settings-card__title-group">
+                                    <span class="settings-card__icon">🧠</span>
+                                    <h2 class="settings-card__title" data-i18n="settings.profile_heading"></h2>
+                                </div>
+                            </div>
+                            <div class="settings-meta-item">
+                                <span class="settings-meta-label" data-i18n="settings.profile_level_label"></span>
+                                <span class="settings-meta-value" id="settings-profile-level">Builder / Systemy</span>
+                            </div>
+                        </div>
+
+                        <!-- 4. Privacy & Local Storage Card -->
+                        <div class="settings-card">
+                            <div class="settings-card__header">
+                                <div class="settings-card__title-group">
+                                    <span class="settings-card__icon">🔒</span>
+                                    <h2 class="settings-card__title" data-i18n="settings.privacy_heading"></h2>
+                                </div>
+                                <span class="badge" data-i18n="settings.privacy_badge"></span>
+                            </div>
+                            <p class="settings-card__hint" data-i18n="settings.privacy_text"></p>
+                        </div>
+
+                        <!-- 5. Account & Security Card -->
+                        <div class="settings-card">
+                            <div class="settings-card__header">
+                                <div class="settings-card__title-group">
+                                    <span class="settings-card__icon">👤</span>
+                                    <h2 class="settings-card__title" data-i18n="settings.account_heading"></h2>
+                                </div>
+                            </div>
+                            <div class="settings-account-row">
+                                <div class="settings-account-info">
+                                    <span class="settings-meta-label" data-i18n="settings.account_logged_as"></span>
+                                    <span class="settings-meta-value" id="settings-account-username">User</span>
+                                </div>
+                                <button type="button" class="btn btn--danger btn--small" id="btn-settings-logout" data-i18n="settings.account_logout_btn"></button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -686,8 +777,8 @@
 
         <!-- Global Zen Loading Overlay -->
         <div class="loading-overlay" id="loading-overlay" hidden aria-live="polite">
-            <div class="loading-box">
-                <div class="loading-spinner-orb"></div>
+            <div class="loading-content">
+                <img src="assets/logo.png" alt="Loading" class="loading-logo-spin">
                 <p class="loading-text" id="loading-text" data-i18n="loading.generating"></p>
             </div>
         </div>

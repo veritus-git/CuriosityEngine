@@ -290,6 +290,15 @@ async def get_concept_dynamic_prompt(concept_id: int, username: str = Depends(ge
     return {"prompt": prompt}
 
 
+@app.post("/api/topics/{concept_id}/abandon")
+async def abandon_concept(concept_id: int, username: str = Depends(get_current_user_token)):
+    concept = get_concept(concept_id)
+    if not concept:
+        raise HTTPException(status_code=404, detail="Concept not found")
+    update_concept_status(concept_id, "abandoned")
+    return {"state": "NO_CONCEPT", "status": "abandoned"}
+
+
 @app.post("/api/topics/{concept_id}/skip")
 async def skip_concept(concept_id: int, username: str = Depends(get_current_user_token)):
     concept = get_concept(concept_id)

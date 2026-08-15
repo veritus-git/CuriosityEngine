@@ -155,16 +155,24 @@
             "input_submit": "Generuj temat"
         },
         "focus_card": {
-            "suggested_label": "Dzisiejsza Propozycja",
-            "active_label": "Trwająca Eksploracja",
+            "proposal_badge": "Dzisiejsza Propozycja",
+            "focus_badge": "Aktywna Sesja",
             "why_label": "Most Logiczny",
-            "model_label": "Intuicja & Model Mentalny",
+            "model_label": "Wprowadzenie",
             "accept_btn": "Zbadaj ten temat",
             "skip_btn": "Inna propozycja",
-            "reject_btn": "Nie interesuje mnie to",
-            "copy_prompt_btn": "Kopiuj Prompt do ChatGPT / Claude",
-            "prompt_copied": "Prompt skopiowany do schowka ✓",
-            "finish_btn": "Oznacz jako Opanowane ✓",
+            "reroll_batch_btn": "Nowy zestaw 4 tematów",
+            "save_to_sparks_btn": "Zachowaj na później",
+            "saved_to_sparks_toast": "✓ Zapisano temat do pudełka dygresji!",
+            "reject_btn": "Pomiń ten temat",
+            "prompt_box_label": "Gotowy Prompt do Twojego LLM",
+            "copy_prompt_tooltip": "Kopiuj prompt do schowka",
+            "prompt_copied": "✓ Skopiowano prompt do schowka!",
+            "finish_btn": "Oznacz jako opanowane",
+            "add_spark_btn": "Zapisz Dygresję",
+            "abandon_btn": "Porzuć temat",
+            "abandon_toast": "Temat został porzucony.",
+            "back_to_discovery_btn": "Wróć do wyboru tematu",
             "loading": "Generowanie propozycji..."
         },
         "complete_modal": {
@@ -203,16 +211,25 @@
         "settings": {
             "title": "Ustawienia i Profil",
             "back_btn": "← Wróć",
-            "theme_heading": "Wygląd",
-            "theme_light": "Jasny",
-            "theme_dark": "Ciemny",
+            "ai_heading": "Status AI & Modele",
+            "ai_configured": "Połączono & Aktywne ✓",
+            "ai_not_configured": "Brak klucza API ✗",
+            "ai_provider_label": "Dostawca AI",
+            "ai_primary_model_label": "Model syntezy (główny)",
+            "ai_fallback_model_label": "Model rezerwowy (fallback)",
+            "ai_embedding_model_label": "Model embeddingów",
             "language_heading": "Język Interfejsu",
             "language_hint": "Wybierz język aplikacji.",
-            "ai_heading": "Status AI",
-            "ai_configured": "Skonfigurowano ✓",
-            "ai_not_configured": "Brak klucza API ✗",
+            "address_heading": "Forma Zwrotu AI",
+            "address_hint": "Określ jak sztuczna inteligencja ma formułować teksty i zwroty.",
+            "profile_heading": "Styl Poznawczy & Poziom",
+            "profile_level_label": "Głębia tłumaczeń (punkt wyjścia)",
+            "account_heading": "Konto & Bezpieczeństwo",
+            "account_logged_as": "Zalogowano jako",
+            "account_logout_btn": "Wyloguj się",
             "privacy_heading": "Prywatność & Baza Lokalna",
-            "privacy_text": "Wszystkie Twoje dane, embeddingi i historia są przechowywane w lokalnej bazie SQLite. Twój klucz API nigdy nie opuszcza Twojego serwera."
+            "privacy_badge": "100% Lokalne & Bezpieczne",
+            "privacy_text": "Wszystkie Twoje dane, embeddingi, dygresje oraz historia eksploracji są przechowywane w lokalnej bazie SQLite. Twój klucz API nigdy nie opuszcza Twojego serwera."
         },
         "errors": {
             "server_down": "Błąd połączenia z serwerem. Upewnij się, że backend działa.",
@@ -352,8 +369,52 @@
             await api('POST', '/api/profile', { language: code }).catch(() => {});
         }
         updateGreetingAndDates();
+        populateSettingsView();
         if (state.coldStartActive && state.profile && state.profile.onboarded) {
             await loadColdStartCards();
+        }
+    }
+
+    function populateSettingsView() {
+        const badgeEl = $('#settings-ai-badge-text');
+        const providerEl = $('#settings-ai-provider');
+        const modelPrimaryEl = $('#settings-ai-model-primary');
+        const modelFallbackEl = $('#settings-ai-model-fallback');
+        const modelEmbeddingEl = $('#settings-ai-model-embedding');
+        const selectLang = $('#select-settings-language');
+        const selectAddress = $('#select-settings-address');
+        const profileLevel = $('#settings-profile-level');
+        const accountUser = $('#settings-account-username');
+
+        if (state.ai) {
+            if (badgeEl) {
+                badgeEl.textContent = state.ai.configured ? t('settings.ai_configured') : t('settings.ai_not_configured');
+                badgeEl.className = `badge ${state.ai.configured ? 'badge--success' : 'badge--danger'}`;
+            }
+            if (providerEl) providerEl.textContent = state.ai.provider === 'gemini' ? 'Google Gemini' : (state.ai.provider || 'Google Gemini');
+            if (modelPrimaryEl) modelPrimaryEl.textContent = state.ai.model || 'gemini-3.7-flash';
+            if (modelFallbackEl) modelFallbackEl.textContent = 'gemini-3.5-flash-lite';
+            if (modelEmbeddingEl) modelEmbeddingEl.textContent = 'gemini-embedding-001';
+        }
+
+        if (selectLang) {
+            selectLang.value = localStorage.getItem('curiosity_lang') || (state.profile && state.profile.language) || 'pl';
+        }
+
+        if (selectAddress && state.profile) {
+            selectAddress.value = state.profile.form_of_address || 'neutral';
+        }
+
+        if (profileLevel) {
+            const level = (state.profile && state.profile.grounding_level) || 'builder';
+            let label = t('onboarding.level_builder_title') || 'Builder / Systemy';
+            if (level === 'ground_zero') label = t('onboarding.level_ground_zero_title') || 'Od Zera / Intuicja';
+            if (level === 'deep') label = t('onboarding.level_deep_title') || 'Pod Maską / Ekspert';
+            profileLevel.textContent = label;
+        }
+
+        if (accountUser) {
+            accountUser.textContent = state.username || localStorage.getItem('curiosity_username') || 'User';
         }
     }
 
@@ -711,9 +772,15 @@
 
     // ─── Batch 4-Vector Topic Suggestions ───
     async function loadBatchSuggestions(forceReroll = false) {
+        if (state.concept && state.concept.status === 'active') {
+            renderDashboard('focus');
+            showView('DASHBOARD');
+            return;
+        }
         const rerollBtn = $('#btn-dashboard-reroll-batch');
+        const heroEl = $('.discovery-split-hero');
         if (rerollBtn) rerollBtn.classList.add('loading');
-        setGlobalLoading(true, 'loading.generating');
+        if (heroEl) heroEl.classList.add('is-loading');
 
         try {
             const data = await api('POST', '/api/topics/batch-suggest');
@@ -726,7 +793,7 @@
             showToast(err.message || t('errors.server_down'));
         } finally {
             if (rerollBtn) rerollBtn.classList.remove('loading');
-            setGlobalLoading(false);
+            if (heroEl) heroEl.classList.remove('is-loading');
         }
     }
 
@@ -820,6 +887,11 @@
 
     // ─── Dashboard 2-Stage Rendering (Discovery vs Focus) ───
     function renderDashboard(mode = 'discovery') {
+        // Enforce focus mode if an active concept is currently in progress
+        if (state.concept && state.concept.status === 'active') {
+            mode = 'focus';
+        }
+
         const stageDiscovery = $('#dashboard-stage-discovery');
         const stageFocus = $('#dashboard-stage-focus');
 
@@ -1161,7 +1233,26 @@
         });
         $('#btn-landing-cta')?.addEventListener('click', (e) => {
             e.preventDefault();
-            openAuthModal('REGISTER');
+            const token = localStorage.getItem('curiosity_token');
+            if (token || state.username) {
+                if (state.coldStartActive) {
+                    if (!state.profile || !state.profile.onboarded) {
+                        setWizardStep(0);
+                        showView('ONBOARDING');
+                    } else {
+                        showView('COLD_START');
+                    }
+                } else {
+                    if (state.concept && state.concept.status === 'active') {
+                        renderDashboard('focus');
+                    } else {
+                        renderDashboard('discovery');
+                    }
+                    showView('DASHBOARD');
+                }
+            } else {
+                openAuthModal('REGISTER');
+            }
         });
         $('#btn-landing-how')?.addEventListener('click', (e) => {
             e.preventDefault();
@@ -1208,23 +1299,7 @@
             }
         });
 
-        $('#btn-user-menu-dashboard')?.addEventListener('click', () => {
-            if (userDropdownMenu) userDropdownMenu.hidden = true;
-            showView(state.coldStartActive ? (state.profile.onboarded ? 'COLD_START' : 'ONBOARDING') : 'DASHBOARD');
-        });
-
-        $('#btn-user-menu-settings')?.addEventListener('click', () => {
-            if (userDropdownMenu) userDropdownMenu.hidden = true;
-            showView('SETTINGS');
-            const info = $('#settings-ai-info');
-            if (info) {
-                info.innerHTML = state.ai.configured
-                    ? `<span style="color: var(--success);">${t('settings.ai_configured')} (${state.ai.provider} - ${state.ai.model})</span>`
-                    : `<span style="color: var(--error);">${t('settings.ai_not_configured')}</span>`;
-            }
-        });
-
-        $('#btn-user-menu-logout')?.addEventListener('click', () => {
+        function handleLogout() {
             if (userDropdownMenu) userDropdownMenu.hidden = true;
             localStorage.removeItem('curiosity_token');
             localStorage.removeItem('curiosity_username');
@@ -1234,7 +1309,21 @@
             showView('LANDING');
             updateTopbarAuthState();
             showToast(t('nav.user_logout'));
+        }
+
+        $('#btn-user-menu-dashboard')?.addEventListener('click', () => {
+            if (userDropdownMenu) userDropdownMenu.hidden = true;
+            showView(state.coldStartActive ? (state.profile.onboarded ? 'COLD_START' : 'ONBOARDING') : 'DASHBOARD');
         });
+
+        $('#btn-user-menu-settings')?.addEventListener('click', () => {
+            if (userDropdownMenu) userDropdownMenu.hidden = true;
+            populateSettingsView();
+            showView('SETTINGS');
+        });
+
+        $('#btn-user-menu-logout')?.addEventListener('click', handleLogout);
+        $('#btn-settings-logout')?.addEventListener('click', handleLogout);
 
         // Auth Form Submission
         $('#auth-form')?.addEventListener('submit', async (e) => {
@@ -1550,12 +1639,15 @@
             loadHistoryArchive();
         });
         $('#btn-nav-settings')?.addEventListener('click', () => {
+            populateSettingsView();
             showView('SETTINGS');
-            const info = $('#settings-ai-info');
-            if (info) {
-                info.innerHTML = state.ai.configured
-                    ? `<span style="color: var(--success);">${t('settings.ai_configured')} (${state.ai.provider} - ${state.ai.model})</span>`
-                    : `<span style="color: var(--error);">${t('settings.ai_not_configured')}</span>`;
+        });
+
+        $('#select-settings-address')?.addEventListener('change', async (e) => {
+            const formVal = e.target.value;
+            if (state.profile) state.profile.form_of_address = formVal;
+            if (localStorage.getItem('curiosity_token')) {
+                await api('POST', '/api/profile', { form_of_address: formVal }).catch(() => {});
             }
         });
 
@@ -1616,9 +1708,23 @@
         });
 
         // Dashboard Stage 2: Focus Actions & Robust Clipboard Copy
-        $('#btn-focus-back')?.addEventListener('click', (e) => {
+        $('#btn-focus-abandon')?.addEventListener('click', async (e) => {
             e.preventDefault();
-            renderDashboard('discovery');
+            if (!state.concept) return;
+            const conceptId = state.concept.id;
+            const btn = $('#btn-focus-abandon');
+            if (btn) btn.classList.add('loading');
+            try {
+                await api('POST', `/api/topics/${conceptId}/abandon`);
+                showToast(t('focus_card.abandon_toast'));
+                state.concept = null;
+                state.prompt = null;
+                await loadBatchSuggestions(true);
+            } catch (err) {
+                showToast(err.message || t('errors.server_down'));
+            } finally {
+                if (btn) btn.classList.remove('loading');
+            }
         });
 
         $('#btn-copy-prompt')?.addEventListener('click', async () => {
