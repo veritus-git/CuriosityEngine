@@ -1378,10 +1378,10 @@ body {
     width: 52px;
     height: 52px;
     border-radius: 50%;
-    background: var(--accent);
+    background: var(--vector-accent, var(--accent));
     color: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 0 8px 24px var(--accent-glow-strong), 0 0 16px var(--accent-glow);
+    box-shadow: 0 8px 24px var(--vector-accent-glow, var(--accent-glow-strong)), 0 0 16px var(--vector-accent-glow, var(--accent-glow));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1397,8 +1397,9 @@ body {
 }
 
 .floating-spark-btn:hover {
+    background: var(--vector-accent-hover, var(--accent-dim));
     transform: scale(1.1) translateY(-2px);
-    box-shadow: 0 12px 30px var(--accent-glow-strong), 0 0 24px var(--accent-glow);
+    box-shadow: 0 12px 30px var(--vector-accent-glow, var(--accent-glow-strong)), 0 0 24px var(--vector-accent-glow, var(--accent-glow));
 }
 
 .floating-spark-btn:hover .floating-spark-svg {
