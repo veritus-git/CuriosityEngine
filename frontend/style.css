@@ -11,6 +11,7 @@
 
     /* Dynamic Vector Theme Accents (Transitions smoothly per vector) */
     --vector-accent: #6366f1;
+    --vector-accent-hover: #4f46e5;
     --vector-accent-glow: rgba(99, 102, 241, 0.38);
     --vector-accent-light: #818cf8;
     --vector-accent-subtle: rgba(99, 102, 241, 0.12);
@@ -69,6 +70,7 @@
 
 body[data-vector-theme="adjacent"] {
     --vector-accent: #6366f1;
+    --vector-accent-hover: #4f46e5;
     --vector-accent-glow: rgba(99, 102, 241, 0.38);
     --vector-accent-light: #818cf8;
     --vector-accent-subtle: rgba(99, 102, 241, 0.12);
@@ -76,6 +78,7 @@ body[data-vector-theme="adjacent"] {
 
 body[data-vector-theme="deep_dive"] {
     --vector-accent: #10b981;
+    --vector-accent-hover: #059669;
     --vector-accent-glow: rgba(16, 185, 129, 0.38);
     --vector-accent-light: #34d399;
     --vector-accent-subtle: rgba(16, 185, 129, 0.12);
@@ -83,6 +86,7 @@ body[data-vector-theme="deep_dive"] {
 
 body[data-vector-theme="cross_domain"] {
     --vector-accent: #a855f7;
+    --vector-accent-hover: #9333ea;
     --vector-accent-glow: rgba(168, 85, 247, 0.38);
     --vector-accent-light: #c084fc;
     --vector-accent-subtle: rgba(168, 85, 247, 0.12);
@@ -90,6 +94,7 @@ body[data-vector-theme="cross_domain"] {
 
 body[data-vector-theme="mental_fog"] {
     --vector-accent: #f59e0b;
+    --vector-accent-hover: #d97706;
     --vector-accent-glow: rgba(245, 158, 11, 0.38);
     --vector-accent-light: #fbbf24;
     --vector-accent-subtle: rgba(245, 158, 11, 0.12);
@@ -281,6 +286,14 @@ body {
     width: 70%;
     margin: 0 auto;
     overflow-y: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.main::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+    width: 0;
+    height: 0;
 }
 
 .view {
@@ -678,8 +691,6 @@ body {
     margin: 0;
     text-wrap: balance;
     word-break: break-word;
-    will-change: opacity, transform;
-    transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .discovery-reason-box {
@@ -689,8 +700,6 @@ body {
     gap: 0.25rem;
     text-align: left;
     max-width: 80%;
-    will-change: opacity, transform;
-    transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .discovery-reason-text {
@@ -752,8 +761,26 @@ body {
 }
 
 .btn--explore:hover {
+    background: var(--vector-accent-hover) !important;
     transform: translateY(-2px);
     box-shadow: 0 0 32px var(--vector-accent-glow), 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Fluid Discovery Text Transitions */
+@keyframes discoveryFadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: discoveryFadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    will-change: opacity, transform;
 }
 
 .btn-arrow-svg {
@@ -1598,6 +1625,7 @@ html {
     display: inline-block;
     background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     min-height: 1.2em;
 }

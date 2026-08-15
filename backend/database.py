@@ -239,6 +239,23 @@ def get_suggested_concept() -> Optional[Dict[str, Any]]:
     return dict(row) if row else None
 
 
+def get_latest_batch_proposals() -> Dict[str, Dict[str, Any]]:
+    """Return the active 4-vector topic proposals currently in suggested status."""
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT * FROM concepts WHERE status = 'suggested' ORDER BY id DESC LIMIT 12"
+    ).fetchall()
+    conn.close()
+    
+    proposals: Dict[str, Dict[str, Any]] = {}
+    for r in rows:
+        d = dict(r)
+        mode = d.get("source_mode") or "adjacent"
+        if mode not in proposals:
+            proposals[mode] = d
+    return proposals
+
+
 def update_concept_status(concept_id: int, status: str):
     conn = get_connection()
     if status == "mastered":
@@ -252,11 +269,43 @@ def update_concept_status(concept_id: int, status: str):
     conn.close()
 
 
-def reject_all_suggested_concepts(new_status: str = "skipped"):
+def archive_unselected_batch_proposals(exclude_id: Optional[int] = None):
+    """
+    Transition any remaining suggested concepts to 'proposed_unselected'.
+    Preserves them in database history so the AI maintains memory of past recommendations.
+    """
+    conn = get_connection()
+    if exclude_id is not None:
+        conn.execute(
+            "UPDATE concepts SET status = 'proposed_unselected' WHERE status = 'suggested' AND id != ?",
+            (exclude_id,)
+        )
+    else:
+        conn.execute(
+            "UPDATE concepts SET status = 'proposed_unselected' WHERE status = 'suggested'"
+        )
+    conn.commit()
+    conn.close()
+
+
+def reject_all_suggested_concepts(new_status: str = "proposed_unselected"):
     conn = get_connection()
     conn.execute("UPDATE concepts SET status = ? WHERE status = 'suggested'", (new_status,))
     conn.commit()
     conn.close()
+
+
+def get_previously_proposed_concepts(limit: int = 25) -> List[Dict[str, Any]]:
+    """Return concepts that were previously proposed to the user for AI context."""
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT id, title, domain, summary, source_mode, created_at, status FROM concepts "
+        "WHERE status IN ('proposed_unselected', 'skipped', 'suggested') "
+        "ORDER BY created_at DESC LIMIT ?",
+        (limit,)
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
 
 
 def get_mastered_concepts(limit: int = 50) -> List[Dict[str, Any]]:

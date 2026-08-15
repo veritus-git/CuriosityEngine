@@ -874,39 +874,22 @@
                 $('.vector-switcher-bar')
             ];
 
-            // 1. Soft fade-out
-            if (dTitle) {
-                dTitle.style.opacity = '0';
-                dTitle.style.transform = 'translateY(-4px)';
-            }
-            if (dReasonBox) {
-                dReasonBox.style.opacity = '0';
-                dReasonBox.style.transform = 'translateY(-3px)';
-            }
+            smoothFlipAnimate(trackElements, () => {
+                if (dDomain) dDomain.textContent = state.concept.domain || 'General';
+                if (dTitle) dTitle.textContent = state.concept.title;
+                if (dReason) dReason.textContent = state.concept.summary || '';
 
-            // 2. Update DOM & FLIP glide
-            setTimeout(() => {
-                smoothFlipAnimate(trackElements, () => {
-                    if (dDomain) dDomain.textContent = state.concept.domain || 'General';
-                    if (dTitle) dTitle.textContent = state.concept.title;
-                    if (dReason) dReason.textContent = state.concept.summary || '';
+                // Trigger smooth 60fps fade-in-up emerging from below without blinking
+                [dDomain, dTitle, dReasonBox].forEach(el => {
+                    if (!el) return;
+                    el.classList.remove('animate-fade-in-up');
+                    void el.offsetWidth;
+                    el.classList.add('animate-fade-in-up');
                 });
+            });
 
-                // 3. Ultra-smooth fade-in in 60-120fps
-                requestAnimationFrame(() => {
-                    if (dTitle) {
-                        dTitle.style.opacity = '1';
-                        dTitle.style.transform = 'translateY(0)';
-                    }
-                    if (dReasonBox) {
-                        dReasonBox.style.opacity = '1';
-                        dReasonBox.style.transform = 'translateY(0)';
-                    }
-                });
-
-                // 4. Stream Intuicja on the right with organic typewriter
-                runDiscoveryIntuitionTypewriter(dModel, state.concept.intuitive_model || '');
-            }, 60);
+            // Stream Intuicja on the right with organic typewriter
+            runDiscoveryIntuitionTypewriter(dModel, state.concept.intuitive_model || '');
         }
     }
 
@@ -1112,7 +1095,13 @@
             const data = await api('GET', '/api/state');
             state.username = data.username || localStorage.getItem('curiosity_username') || 'User';
             if (data.username) localStorage.setItem('curiosity_username', data.username);
+            state.batchProposals = data.batch_proposals || {};
             state.concept = data.concept;
+            if (!state.concept && state.batchProposals && state.batchProposals[state.activeVector]) {
+                state.concept = state.batchProposals[state.activeVector];
+            } else if (!state.concept && state.batchProposals && Object.keys(state.batchProposals).length > 0) {
+                state.concept = Object.values(state.batchProposals)[0];
+            }
             state.prompt = data.prompt;
             state.sparksCount = data.sparks_count || 0;
             state.masteredCount = data.mastered_count || 0;

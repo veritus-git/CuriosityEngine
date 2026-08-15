@@ -10,7 +10,8 @@ from .database import (
     update_concept_status, reject_all_suggested_concepts, get_mastered_concepts,
     get_recent_concepts, get_all_concept_titles, get_sparks, update_spark_status,
     create_spark, create_bridge, complete_multiconcept_session, get_profile,
-    get_all_concepts_with_embeddings, get_sparks_with_embeddings
+    get_all_concepts_with_embeddings, get_sparks_with_embeddings,
+    get_previously_proposed_concepts
 )
 from .ai import generate_ai_json, generate_embedding, cosine_similarity, AIError
 from .prompts import (
@@ -36,7 +37,9 @@ async def generate_batch_concept_suggestions(
 
     # 2. Gather context
     recent = get_recent_concepts(limit=8)
+    mastered = get_mastered_concepts(limit=50)
     all_titles = get_all_concept_titles()
+    previously_proposed = get_previously_proposed_concepts(limit=20)
     inbox_sparks = get_sparks(status="inbox", limit=5)
     profile = get_profile()
     lang = profile.get("language", "pl")
@@ -47,7 +50,9 @@ async def generate_batch_concept_suggestions(
         all_titles=all_titles,
         profile=profile,
         language=lang,
-        inbox_sparks=inbox_sparks
+        inbox_sparks=inbox_sparks,
+        mastered_count=len(mastered),
+        previously_proposed=previously_proposed
     )
 
     # 4. Generate with AI
@@ -250,7 +255,9 @@ async def generate_concept_suggestion(
 
     # 2. Gather context
     recent = get_recent_concepts(limit=8)
+    mastered = get_mastered_concepts(limit=50)
     all_titles = get_all_concept_titles()
+    previously_proposed = get_previously_proposed_concepts(limit=20)
     profile = get_profile()
 
     extra_context = user_input
@@ -276,7 +283,9 @@ async def generate_concept_suggestion(
         recent_concepts=recent,
         all_titles=all_titles,
         profile=profile,
-        extra_context=extra_context
+        extra_context=extra_context,
+        mastered_count=len(mastered),
+        previously_proposed=previously_proposed
     )
 
     # 4. Generate with AI

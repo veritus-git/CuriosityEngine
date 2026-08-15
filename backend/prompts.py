@@ -78,12 +78,60 @@ def _get_form_of_address_instruction(form: Optional[str], language: str = "en") 
     return ""
 
 
+def _get_knowledge_depth_instruction(mastered_count: int, language: str = "en") -> str:
+    """Generate dynamic instruction to enforce progressive depth from foundational gateway concepts to deep specializations."""
+    if language == "pl":
+        if mastered_count <= 3:
+            return (
+                f"FAZA WIEDZY I GŁĘBOKOŚCI (Wrota i Fundamenty — {mastered_count} opanowanych pojęć): "
+                "Użytkownik dopiero zaczyna swoją podróż. KRYTYCZNE: Proponuj tematy FUNDAMENTALNE, SZEROKIE I PRZYSTĘPNE "
+                "w danej dziedzinie — stanowiące intuicyjne wrota i kluczowe modele mentalne "
+                "(np. dla Generatywnego AI: 'Jak model przewiduje następne słowo (Next-Token Prediction)' lub 'Wektory cech i embeddingi'; "
+                "dla CS: 'Bramki logiczne i sumator binarny' lub 'Kompilator vs Interpreter'; "
+                "dla Fizyki: 'Zasada zachowania pędu' lub 'Fale elektromagnetyczne'). "
+                "BEZWZGLĘDNIE UNIKAJ na tym etapie niszowych, hyper-szczegółowych zagadnień czy formalnych teorii (np. Reguła 110, kwantyzacja NF4, formalne twierdzenia zupełności)."
+            )
+        elif mastered_count <= 9:
+            return (
+                f"FAZA WIEDZY I GŁĘBOKOŚCI (Rozgałęzianie i Architektura — {mastered_count} opanowanych pojęć): "
+                "Użytkownik posiada bazowe fundamenty. Proponuj mechanizmy architektoniczne, łączenie kropek pomiędzy koncepcjami "
+                "oraz przejście do praktycznych struktur składowych."
+            )
+        else:
+            return (
+                f"FAZA WIEDZY I GŁĘBOKOŚCI (Głęboka Eksploracja i Niszowe Niuanse — {mastered_count} opanowanych pojęć): "
+                "Użytkownik ma bogatą bazę wiedzy. Możesz wchodzić w zaawansowane mechanizmy pod maską, nietypowe optymalizacje "
+                "i głębokie zależności."
+            )
+    else:
+        if mastered_count <= 3:
+            return (
+                f"KNOWLEDGE DEPTH STAGE (Foundational Gateway Concepts — {mastered_count} mastered concepts): "
+                "The user is just starting their journey. CRITICAL: Suggest ACCESSIBLE, BROAD, AND HIGH-IMPACT "
+                "GATEWAY CONCEPTS in the domains — establishing core mental models (e.g. for AI: 'Next-Token Prediction in LLMs' "
+                "or 'Feature Vectors and Embeddings'; for CS: 'Logic Gates and Binary Adders'). "
+                "STRICTLY AVOID hyper-niche or overly specialized sub-theorems (like Rule 110 or deep formal sub-proofs) at this early stage."
+            )
+        elif mastered_count <= 9:
+            return (
+                f"KNOWLEDGE DEPTH STAGE (Branching & Systems Architecture — {mastered_count} mastered concepts): "
+                "The user has core foundations established. Suggest architectural components, tradeoffs, and connecting dots."
+            )
+        else:
+            return (
+                f"KNOWLEDGE DEPTH STAGE (Deep Specialization & Nuance — {mastered_count} mastered concepts): "
+                "The user has an extensive knowledge graph. Feel free to explore deep under-the-hood mechanisms and specialized nuances."
+            )
+
+
 def build_generation_prompts(
     vector: str,
     recent_concepts: List[Dict[str, Any]],
     all_titles: List[str],
     profile: Dict[str, Any],
-    extra_context: Optional[str] = None
+    extra_context: Optional[str] = None,
+    mastered_count: int = 0,
+    previously_proposed: Optional[List[Dict[str, Any]]] = None
 ) -> tuple[str, str]:
     """
     Build system and user prompts for topic generation based on the chosen vector.
@@ -97,6 +145,9 @@ def build_generation_prompts(
     labels = _get(prompts, "context_labels", default={})
     ctx_parts = []
 
+    # Knowledge Depth Guidance
+    ctx_parts.append(_get_knowledge_depth_instruction(mastered_count, lang))
+
     if recent_concepts:
         lines = []
         for c in recent_concepts[:8]:
@@ -106,6 +157,20 @@ def build_generation_prompts(
             lines.append(line)
         recent_label = _get(labels, "recent_history", default="Recent knowledge nodes:")
         ctx_parts.append(f"{recent_label}\n" + "\n".join(lines))
+
+    if previously_proposed:
+        prop_lines = [
+            f"- {p['title']} ({p.get('domain', 'general')})"
+            for p in previously_proposed[:10]
+            if p.get("title")
+        ]
+        if prop_lines:
+            p_label = "Tematy proponowane w przeszłości (widziane przez użytkownika):" if lang == "pl" else "Previously proposed topics shown to the user:"
+            ctx_parts.append(f"{p_label}\n" + "\n".join(prop_lines) + "\n" + (
+                "ZASADA PROPOZYCJI: Powyższe tematy były już wcześniej proponowane. NIE traktuj ich jako zakazu — możesz zaproponować dany temat ponownie, jeśli teraz świetnie pasuje do aktualnego kontekstu, ale unikaj powtarzania tego samego tematu bezpośrednio w kolejnych partiach."
+                if lang == "pl" else
+                "PROPOSAL PRINCIPLE: The above topics were offered previously. Do not treat them as permanent bans — you may re-propose one if it now fits the learning context, but avoid repetitive duplicates back-to-back."
+            ))
 
     if all_titles:
         all_label = _get(labels, "all_topics", default="All explored titles:")
@@ -154,7 +219,9 @@ def build_batch_generation_prompts(
     all_titles: List[str],
     profile: Optional[Dict[str, Any]] = None,
     language: Optional[str] = None,
-    inbox_sparks: Optional[List[Dict[str, Any]]] = None
+    inbox_sparks: Optional[List[Dict[str, Any]]] = None,
+    mastered_count: int = 0,
+    previously_proposed: Optional[List[Dict[str, Any]]] = None
 ) -> tuple[str, str]:
     """
     Build prompts to generate 4 distinct topic proposals simultaneously in a single AI request:
@@ -166,6 +233,10 @@ def build_batch_generation_prompts(
 
     # 1. Context construction
     ctx_parts = []
+
+    # Progressive Knowledge Depth Guidance
+    ctx_parts.append(_get_knowledge_depth_instruction(mastered_count, lang))
+
     if recent_concepts:
         history_lines = [
             f"- {c['title']} ({c.get('domain', 'general')}): {c.get('summary', '')}"
@@ -173,6 +244,20 @@ def build_batch_generation_prompts(
         ]
         h_label = _get(labels, "recent_history", default="Recently explored/mastered concepts:")
         ctx_parts.append(f"{h_label}\n" + "\n".join(history_lines))
+
+    if previously_proposed:
+        prop_lines = [
+            f"- {p['title']} ({p.get('domain', 'general')})"
+            for p in previously_proposed[:10]
+            if p.get("title")
+        ]
+        if prop_lines:
+            p_label = "Tematy proponowane w przeszłości (widziane przez użytkownika):" if lang == "pl" else "Previously proposed topics shown to the user:"
+            ctx_parts.append(f"{p_label}\n" + "\n".join(prop_lines) + "\n" + (
+                "ZASADA PROPOZYCJI: Powyższe tematy były już wcześniej proponowane. NIE traktuj ich jako zakazu — możesz zaproponować dany temat ponownie, jeśli teraz świetnie pasuje do aktualnego kontekstu, ale unikaj powtarzania tego samego tematu bezpośrednio w kolejnych partiach."
+                if lang == "pl" else
+                "PROPOSAL PRINCIPLE: The above topics were offered previously. Do not treat them as permanent bans — you may re-propose one if it now fits the learning context, but avoid repetitive duplicates back-to-back."
+            ))
 
     if inbox_sparks:
         spark_lines = [f"- {s.get('raw_text', '')}" for s in inbox_sparks[:4] if s.get('raw_text')]

@@ -22,7 +22,7 @@ from .database import (
     init_db, get_active_concept, get_suggested_concept, get_concept,
     create_concept, update_concept_status, get_mastered_concepts, get_sparks,
     create_spark, update_spark_status, get_graph_data, get_profile,
-    update_profile
+    update_profile, get_latest_batch_proposals, archive_unselected_batch_proposals
 )
 from .ai import get_ai_status, AIError, generate_embedding
 from .auth import register_user, login_user, get_current_user_token, get_user_count
@@ -133,6 +133,7 @@ async def login(req: AuthRequest):
 async def get_app_state(username: str = Depends(get_current_user_token)):
     """Return unified state for the Zen Dashboard."""
     active = get_active_concept()
+    batch_proposals = get_latest_batch_proposals()
     suggested = get_suggested_concept()
     ai_status = get_ai_status()
     mastered = get_mastered_concepts(limit=100)
@@ -143,6 +144,10 @@ async def get_app_state(username: str = Depends(get_current_user_token)):
         state = "CONCEPT_ACTIVE"
         concept = active
         prompt = get_learning_prompt(active["id"])
+    elif batch_proposals:
+        state = "CONCEPT_SUGGESTED"
+        concept = batch_proposals.get("adjacent") or list(batch_proposals.values())[0]
+        prompt = get_learning_prompt(concept["id"]) if concept else None
     elif suggested:
         state = "CONCEPT_SUGGESTED"
         concept = suggested
@@ -157,11 +162,12 @@ async def get_app_state(username: str = Depends(get_current_user_token)):
         "username": username,
         "concept": concept,
         "prompt": prompt,
+        "batch_proposals": batch_proposals,
         "sparks_count": len(sparks),
         "mastered_count": len(mastered),
         "ai": ai_status,
         "profile": profile,
-        "cold_start_active": (len(mastered) == 0 and not active and not suggested)
+        "cold_start_active": (len(mastered) == 0 and not active and not suggested and not batch_proposals)
     }
 
 
@@ -268,6 +274,7 @@ async def accept_concept(concept_id: int, username: str = Depends(get_current_us
         raise HTTPException(status_code=404, detail="Concept not found")
 
     update_concept_status(concept_id, "active")
+    archive_unselected_batch_proposals(exclude_id=concept_id)
     updated = get_concept(concept_id)
     prompt = await generate_dynamic_learning_prompt(concept_id)
     return {
