@@ -1,4 +1,4 @@
-# <img src="frontend/assets/logo.png" alt="CuriosityEngine Logo" width="32" height="32" valign="middle" /> CuriosityEngine
+# <img src="frontend/assets/logo.png" alt="CuriosityEngine Logo" width="64" height="64" valign="middle" /> CuriosityEngine
 
 **One interesting thing at a time.**
 
@@ -66,12 +66,13 @@ python -m backend.server
 ```
 Open `http://localhost:8080` in your browser. (Since the server binds to `0.0.0.0`, you can also access it from your phone on the same network via `http://<your-local-ip>:8080`).
 
-### Running as a Background Service (Servers)
+### Running as a Background Service (Servers & Homelabs)
 
 If you want it to run permanently in the background (and auto-start on boot):
 
-1. Create a service file: `sudo nano /etc/systemd/system/curiosity-engine.service`
-2. Add the following (replace `YOUR_USERNAME` with your actual Linux user, e.g. `pi` or `linux`):
+1. Check your exact project path by running `pwd` in the repository directory (e.g. `/home/szymon/homelab/CuriosityEngine` or `/home/pi/CuriosityEngine`).
+2. Create a service file: `sudo nano /etc/systemd/system/curiosity-engine.service`
+3. Add the following (replace `YOUR_USERNAME` with your Linux user and `/PATH/TO/CuriosityEngine` with the path from step 1):
 ```ini
 [Unit]
 Description=CuriosityEngine
@@ -80,17 +81,18 @@ After=network.target
 [Service]
 Type=simple
 User=YOUR_USERNAME
-WorkingDirectory=/home/YOUR_USERNAME/CuriosityEngine
-Environment=PATH=/home/YOUR_USERNAME/CuriosityEngine/venv/bin
-ExecStart=/home/YOUR_USERNAME/CuriosityEngine/venv/bin/python -m backend.server
+WorkingDirectory=/PATH/TO/CuriosityEngine
+Environment=PATH=/PATH/TO/CuriosityEngine/venv/bin
+ExecStart=/PATH/TO/CuriosityEngine/venv/bin/python -m backend.server
 Restart=always
 RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
 ```
-3. Enable and start the service:
+4. Reload systemd, enable, and start the service:
 ```bash
+sudo systemctl daemon-reload
 sudo systemctl enable curiosity-engine
 sudo systemctl start curiosity-engine
 ```
