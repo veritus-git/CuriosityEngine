@@ -622,14 +622,15 @@ body {
     display: none !important;
 }
 
-/* --- Stage 1: Discovery Split Hero (Expansive Layout, Top-Aligned & Rock-Solid) --- */
+/* --- Stage 1: Discovery Split Hero (Expansive Layout, Fluid Transitions & Grounded Actions) --- */
 .discovery-split-hero {
     display: grid;
     grid-template-columns: 1.25fr 1fr;
     gap: 3.5rem;
-    align-items: start;
+    align-items: stretch;
     width: 100%;
-    min-height: 230px;
+    min-height: 250px;
+    transition: min-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), gap 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -640,7 +641,9 @@ body {
     align-items: flex-start;
     text-align: left;
     width: 100%;
+    justify-content: flex-start;
     gap: 0.4rem;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .discovery-badge-row {
@@ -648,6 +651,7 @@ body {
     align-items: center;
     gap: 0.75rem;
     margin-bottom: 0.45rem;
+    min-height: 28px;
 }
 
 .domain-pill {
@@ -661,7 +665,7 @@ body {
     border: 1px solid var(--vector-accent-glow);
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .discovery-hero__title {
@@ -671,9 +675,10 @@ body {
     line-height: 1.15;
     letter-spacing: -0.03em;
     margin: 0;
+    min-height: 110px;
     text-wrap: balance;
     word-break: break-word;
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .discovery-hero__title.fade-out {
@@ -687,12 +692,14 @@ body {
 }
 
 .discovery-reason-box {
-    margin-top: 0.85rem;
+    margin-top: 0.75rem;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
     text-align: left;
     max-width: 80%;
+    min-height: 55px;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .discovery-reason-text {
@@ -700,26 +707,31 @@ body {
     line-height: 1.55;
     color: rgba(255, 255, 255, 0.72);
     margin: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Right Column: Intuicja (ON TOP, Flowing Downwards) & Stable Fixed Action Buttons */
+/* Right Column: Intuicja (ON TOP, Width Locked to Actions) & Bottom-Anchored Actions */
 .discovery-col--right {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     text-align: left;
     width: 100%;
-    gap: 1.6rem;
+    max-width: 410px;
+    justify-content: space-between;
+    height: 100%;
+    min-height: 250px;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .discovery-text-block--model {
-    min-height: 130px;
+    min-height: 120px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
     width: 100%;
+    max-width: 100%;
 }
 
 .discovery-actions {
@@ -729,6 +741,8 @@ body {
     justify-content: flex-start;
     gap: 0.85rem;
     width: 100%;
+    margin-top: auto;
+    padding-top: 1.25rem;
 }
 
 .btn--explore {
