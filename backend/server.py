@@ -84,6 +84,7 @@ class OnboardingRequest(BaseModel):
     level: str = "builder"
     recent_thought: Optional[str] = None
     language: Optional[str] = None
+    form_of_address: Optional[str] = "neutral"
 
 class RegenerateColdStartRequest(BaseModel):
     rejected_topics: List[str] = Field(default_factory=list)
@@ -95,6 +96,7 @@ class ProfileUpdateRequest(BaseModel):
     active_domains: Optional[List[str]] = None
     custom_instructions: Optional[str] = None
     language: Optional[str] = None
+    form_of_address: Optional[str] = None
 
 
 # ─── Auth Routes ───
@@ -317,7 +319,8 @@ async def update_user_profile(req: ProfileUpdateRequest, username: str = Depends
         grounding_level=req.grounding_level,
         active_domains=req.active_domains,
         custom_instructions=req.custom_instructions,
-        language=req.language
+        language=req.language,
+        form_of_address=req.form_of_address
     )
     return res
 
@@ -352,6 +355,7 @@ async def complete_onboarding_route(req: OnboardingRequest, username: str = Depe
         grounding_level=req.level,
         custom_instructions=req.recent_thought,
         language=target_lang,
+        form_of_address=req.form_of_address,
         onboarded=True,
         starter_cards=cards
     )

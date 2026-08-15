@@ -241,7 +241,8 @@
     };
 
     // ─── Wizard & Auth State ───
-    let wizardCurrentStep = 1;
+    let wizardCurrentStep = 0;
+    let selectedGender = 'neutral';
     let selectedLevel = 'builder';
     let authMode = 'LOGIN'; // 'LOGIN' | 'REGISTER' | 'FIRST_SETUP'
 
@@ -643,10 +644,12 @@
     // ─── Onboarding Slide Wizard Controller ───
     function setWizardStep(step) {
         wizardCurrentStep = step;
+        const slide0 = $('#wizard-slide-0');
         const slide1 = $('#wizard-slide-1');
         const slide2 = $('#wizard-slide-2');
         const slide3 = $('#wizard-slide-3');
 
+        if (slide0) slide0.hidden = (step !== 0);
         if (slide1) slide1.hidden = (step !== 1);
         if (slide2) slide2.hidden = (step !== 2);
         if (slide3) slide3.hidden = (step !== 3);
@@ -704,7 +707,7 @@
             state.concept = res.concept;
             state.prompt = res.prompt;
             state.coldStartActive = false;
-            renderFocusCard('suggested');
+            renderDashboard('discovery');
             showView('DASHBOARD');
         } catch (err) {
             showToast(err.message || t('errors.server_down'));
@@ -730,7 +733,7 @@
             state.concept = res.concept;
             state.prompt = res.prompt;
             state.coldStartActive = false;
-            renderFocusCard('suggested');
+            renderDashboard('discovery');
             showView('DASHBOARD');
         } catch (err) {
             showToast(err.message || t('errors.server_down'));
@@ -740,40 +743,43 @@
         }
     }
 
-    // ─── Focus Card Rendering ───
-    function renderFocusCard(mode = 'suggested') {
-        const wrapper = $('#focus-card-wrapper');
-        const compass = $('#compass-section');
-        const titleEl = $('#focus-card-title');
-        const badgeEl = $('#focus-card-badge');
-        const domainEl = $('#focus-card-domain');
-        const reasonEl = $('#focus-card-reason');
-        const modelEl = $('#focus-card-model');
-        const promptEl = $('#prompt-box-text');
-        const actionsSuggested = $('#focus-actions-suggested');
-        const actionsActive = $('#focus-actions-active');
+    // ─── Dashboard 2-Stage Rendering (Discovery vs Focus) ───
+    function renderDashboard(mode = 'discovery') {
+        const stageDiscovery = $('#dashboard-stage-discovery');
+        const stageFocus = $('#dashboard-stage-focus');
 
         if (!state.concept) {
-            if (wrapper) wrapper.hidden = true;
-            if (compass) compass.hidden = false;
+            if (stageDiscovery) stageDiscovery.hidden = false;
+            if (stageFocus) stageFocus.hidden = true;
             return;
         }
 
-        if (wrapper) wrapper.hidden = false;
-        if (titleEl) titleEl.textContent = state.concept.title;
-        if (domainEl) domainEl.textContent = state.concept.domain || 'General';
-        if (reasonEl) reasonEl.textContent = state.concept.summary || '';
-        if (modelEl) modelEl.textContent = state.concept.intuitive_model || '';
-        if (promptEl) promptEl.textContent = state.prompt || '';
+        const isFocus = (mode === 'focus' || state.concept.status === 'active');
 
-        if (mode === 'active' || state.concept.status === 'active') {
-            if (badgeEl) badgeEl.textContent = t('focus_card.active_label');
-            if (actionsSuggested) actionsSuggested.hidden = true;
-            if (actionsActive) actionsActive.hidden = false;
+        if (isFocus) {
+            if (stageDiscovery) stageDiscovery.hidden = true;
+            if (stageFocus) stageFocus.hidden = false;
+
+            const fTitle = $('#focus-concept-title');
+            const fDomain = $('#focus-concept-domain');
+            const fPrompt = $('#prompt-card-content');
+
+            if (fTitle) fTitle.textContent = state.concept.title;
+            if (fDomain) fDomain.textContent = state.concept.domain || 'General';
+            if (fPrompt) fPrompt.textContent = state.prompt || '';
         } else {
-            if (badgeEl) badgeEl.textContent = t('focus_card.suggested_label');
-            if (actionsSuggested) actionsSuggested.hidden = false;
-            if (actionsActive) actionsActive.hidden = true;
+            if (stageDiscovery) stageDiscovery.hidden = false;
+            if (stageFocus) stageFocus.hidden = true;
+
+            const dTitle = $('#discovery-concept-title');
+            const dDomain = $('#discovery-concept-domain');
+            const dReason = $('#discovery-concept-reason');
+            const dModel = $('#discovery-concept-model');
+
+            if (dTitle) dTitle.textContent = state.concept.title;
+            if (dDomain) dDomain.textContent = state.concept.domain || 'General';
+            if (dReason) dReason.textContent = state.concept.summary || '';
+            if (dModel) dModel.textContent = state.concept.intuitive_model || '';
         }
     }
 
@@ -996,6 +1002,7 @@
 
             if (state.coldStartActive) {
                 if (!state.profile || !state.profile.onboarded) {
+                    setWizardStep(0);
                     showView('ONBOARDING');
                 } else {
                     await loadColdStartCards();
@@ -1003,11 +1010,9 @@
                 }
             } else {
                 if (data.state === 'CONCEPT_ACTIVE') {
-                    renderFocusCard('active');
-                } else if (data.state === 'CONCEPT_SUGGESTED') {
-                    renderFocusCard('suggested');
+                    renderDashboard('focus');
                 } else {
-                    renderFocusCard(null);
+                    renderDashboard('discovery');
                 }
                 showView('DASHBOARD');
             }
@@ -1210,7 +1215,35 @@
             });
         }
 
+        // Onboarding Step 0: Language & Form of Address
+        $$('#onboarding-lang-pills .lang-pill').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                $$('#onboarding-lang-pills .lang-pill').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const code = btn.dataset.lang;
+                await switchLanguage(code);
+            });
+        });
+
+        $$('#onboarding-gender-grid .gender-pill').forEach(btn => {
+            btn.addEventListener('click', () => {
+                $$('#onboarding-gender-grid .gender-pill').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedGender = btn.dataset.gender || 'neutral';
+                const customWrap = $('#step0-custom-gender-wrap');
+                if (selectedGender === 'custom') {
+                    if (customWrap) customWrap.style.display = 'block';
+                    $('#input-custom-gender')?.focus();
+                } else {
+                    if (customWrap) customWrap.style.display = 'none';
+                }
+            });
+        });
+
         // Wizard Step Navigation
+        $('#btn-wizard-step0-next')?.addEventListener('click', () => setWizardStep(1));
+        $('#btn-wizard-step1-prev')?.addEventListener('click', () => setWizardStep(0));
+
         const btnStep1Next = $('#btn-wizard-step1-next');
         if (btnStep1Next) {
             btnStep1Next.addEventListener('click', () => {
@@ -1255,6 +1288,9 @@
                 e.preventDefault();
                 const activeChips = Array.from($$('#onboarding-domains-chips .chip-row.active')).map(c => c.textContent.trim().replace(/^✨\s*/, ''));
                 const recentThought = ($('#onboarding-recent-input')?.value || '').trim();
+                const formOfAddress = selectedGender === 'custom'
+                    ? ($('#input-custom-gender')?.value.trim() || 'neutral')
+                    : selectedGender;
 
                 setGlobalLoading(true, 'loading.onboarding');
                 try {
@@ -1262,7 +1298,8 @@
                         interests: activeChips.length > 0 ? activeChips : ['Matematyka', 'Computer Science'],
                         level: selectedLevel,
                         recent_thought: recentThought,
-                        language: langCode
+                        language: langCode,
+                        form_of_address: formOfAddress
                     });
 
                     state.coldStartCards = res.cards || [];
@@ -1407,55 +1444,79 @@
         $('#btn-history-back')?.addEventListener('click', () => showView('DASHBOARD'));
         $('#btn-settings-back')?.addEventListener('click', () => showView('DASHBOARD'));
 
-        // Compass Cards Vector Clicks
-        $$('.compass-card').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const vector = btn.dataset.vector;
-                triggerSuggestion(vector);
-            });
-        });
-
-        // Custom Vector Input in Compass Hub
-        $('#btn-custom-vector-submit')?.addEventListener('click', () => {
-            const val = $('#input-custom-vector').value.trim();
-            if (val) triggerSuggestion('user_spark', val);
-        });
-        $('#input-custom-vector')?.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const val = e.target.value.trim();
-                if (val) triggerSuggestion('user_spark', val);
-            }
-        });
-
-        // Focus Card Actions
-        $('#btn-concept-accept')?.addEventListener('click', async () => {
+        // Dashboard Stage 1: Discovery Actions
+        $('#btn-discovery-explore')?.addEventListener('click', async () => {
             if (!state.concept) return;
             try {
                 const res = await api('POST', `/api/topics/${state.concept.id}/accept`);
                 state.concept = res.concept;
                 state.prompt = res.prompt;
-                renderFocusCard('active');
+                renderDashboard('focus');
             } catch (err) {
                 showToast(err.message);
             }
         });
 
-        $('#btn-concept-skip')?.addEventListener('click', async () => {
-            if (!state.concept) return;
-            await api('POST', `/api/topics/${state.concept.id}/skip`).catch(() => {});
-            state.concept = null;
-            state.prompt = null;
-            renderFocusCard(null);
+        $('#btn-discovery-reroll')?.addEventListener('click', async () => {
+            const activePill = document.querySelector('#dashboard-vector-pills .vector-pill.active');
+            const vector = activePill ? activePill.dataset.vector : 'adjacent';
+            triggerSuggestion(vector);
+        });
+
+        $$('#dashboard-vector-pills .vector-pill').forEach(btn => {
+            btn.addEventListener('click', () => {
+                $$('#dashboard-vector-pills .vector-pill').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const vector = btn.dataset.vector;
+                triggerSuggestion(vector);
+            });
+        });
+
+        // Dashboard Stage 2: Focus Actions & Robust Clipboard Copy
+        $('#btn-focus-back')?.addEventListener('click', () => {
+            renderDashboard('discovery');
         });
 
         $('#btn-copy-prompt')?.addEventListener('click', async () => {
-            const text = $('#prompt-box-text').textContent;
+            const text = $('#prompt-card-content')?.textContent || '';
+            if (!text) return;
             try {
-                await navigator.clipboard.writeText(text);
-                showToast(t('focus_card.prompt_copied'));
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(text);
+                } else {
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    ta.style.position = 'fixed';
+                    ta.style.opacity = '0';
+                    document.body.appendChild(ta);
+                    ta.focus();
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                }
+                const toast = $('#copy-feedback-toast');
+                if (toast) {
+                    toast.style.display = 'inline-block';
+                    setTimeout(() => { toast.style.display = 'none'; }, 2200);
+                }
             } catch (err) {
                 showToast(t('errors.copy_failed'));
             }
+        });
+
+        $('#btn-focus-finish')?.addEventListener('click', () => {
+            if (!state.concept) return;
+            const subtitle = $('#complete-modal-subtitle');
+            if (subtitle) {
+                subtitle.textContent = t('complete_modal.subtitle', { topic: state.concept.title });
+            }
+            $('#complete-modal-backdrop').hidden = false;
+        });
+
+        $('#btn-focus-add-spark')?.addEventListener('click', () => {
+            loadSparksList();
+            $('#spark-modal-backdrop').hidden = false;
+            setTimeout(() => $('#input-spark-text')?.focus(), 50);
         });
 
         // Complete Session Modal Trigger
@@ -1494,7 +1555,8 @@
                 state.concept = null;
                 state.prompt = null;
                 state.coldStartActive = false;
-                renderFocusCard(null);
+                renderDashboard('discovery');
+                triggerSuggestion('adjacent');
                 showToast(t('complete_modal.title'));
             } catch (err) {
                 showToast(err.message);

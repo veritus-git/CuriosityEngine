@@ -172,15 +172,62 @@
                 </div>
             </div>
 
-            <!-- 3. ONBOARDING VIEW (3-STEP SLIDE WIZARD) -->
+            <!-- 3. ONBOARDING VIEW (4-STEP SLIDE WIZARD) -->
             <section class="view view--onboarding" id="view-onboarding" hidden aria-label="Onboarding Wizard">
                 <div class="view__content onboarding-container">
 
                     <!-- Slide Card Container -->
                     <div class="wizard-card">
 
+                        <!-- SLIDE 0: LANGUAGE & PERSONALIZATION / FORM OF ADDRESS -->
+                        <div class="wizard-slide" id="wizard-slide-0">
+                            <div class="slide-header">
+                                <h2 class="slide-title" data-i18n="onboarding.step0_title"></h2>
+                                <p class="slide-subtitle" data-i18n="onboarding.step0_subtitle"></p>
+                            </div>
+
+                            <div class="slide-content-spacious">
+                                <div class="step0-section">
+                                    <span class="step0-label" data-i18n="onboarding.step0_lang_label"></span>
+                                    <div class="step0-lang-pills" id="onboarding-lang-pills">
+                                        <button type="button" class="lang-pill active" data-lang="pl">🇵🇱 Polski</button>
+                                        <button type="button" class="lang-pill" data-lang="en">🇬🇧 English</button>
+                                    </div>
+                                </div>
+
+                                <div class="step0-section">
+                                    <span class="step0-label" data-i18n="onboarding.step0_address_label"></span>
+                                    <div class="step0-gender-grid" id="onboarding-gender-grid">
+                                        <button type="button" class="gender-pill active" data-gender="neutral">
+                                            <span data-i18n="onboarding.gender_neutral"></span>
+                                        </button>
+                                        <button type="button" class="gender-pill" data-gender="male">
+                                            <span data-i18n="onboarding.gender_male"></span>
+                                        </button>
+                                        <button type="button" class="gender-pill" data-gender="female">
+                                            <span data-i18n="onboarding.gender_female"></span>
+                                        </button>
+                                        <button type="button" class="gender-pill" data-gender="custom">
+                                            <span data-i18n="onboarding.gender_custom"></span>
+                                        </button>
+                                    </div>
+                                    <div class="step0-custom-input-wrap" id="step0-custom-gender-wrap" style="display: none;">
+                                        <input type="text" class="input input--compact" id="input-custom-gender"
+                                            data-i18n-placeholder="onboarding.gender_custom_placeholder">
+                                    </div>
+                                </div>
+
+                                <p class="step0-disclaimer" data-i18n="onboarding.step0_disclaimer"></p>
+                            </div>
+
+                            <div class="wizard-actions wizard-actions--step1">
+                                <button type="button" class="btn btn--primary btn--step-next" id="btn-wizard-step0-next"
+                                    data-i18n="onboarding.btn_next"></button>
+                            </div>
+                        </div>
+
                         <!-- SLIDE 1: DOMAINS & PASSIONS -->
-                        <div class="wizard-slide" id="wizard-slide-1">
+                        <div class="wizard-slide" id="wizard-slide-1" hidden>
                             <div class="slide-header">
                                 <h2 class="slide-title" data-i18n="onboarding.step1_title"></h2>
                                 <p class="slide-subtitle" data-i18n="onboarding.step1_subtitle"></p>
@@ -217,15 +264,19 @@
                                     data-i18n="onboarding.add_chip_btn"></button>
                             </div>
 
-                            <div class="wizard-actions wizard-actions--step1">
-                                <span id="onboarding-step1-error" class="onboarding-inline-error" style="display: none;"
-                                    data-i18n="onboarding.step1_required_error"></span>
-                                <button type="button" class="btn btn--primary btn--step-next" id="btn-wizard-step1-next"
-                                    data-i18n="onboarding.btn_next"></button>
+                            <div class="wizard-actions">
+                                <button type="button" class="btn btn--ghost" id="btn-wizard-step1-prev"
+                                    data-i18n="onboarding.btn_prev"></button>
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <span id="onboarding-step1-error" class="onboarding-inline-error" style="display: none;"
+                                        data-i18n="onboarding.step1_required_error"></span>
+                                    <button type="button" class="btn btn--primary btn--step-next" id="btn-wizard-step1-next"
+                                        data-i18n="onboarding.btn_next"></button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- SLIDE 2: GROUNDING LEVEL VERTICAL CARDS (EQUAL WIDTH & VECTOR BOLTS) -->
+                        <!-- SLIDE 2: GROUNDING LEVEL VERTICAL CARDS -->
                         <div class="wizard-slide" id="wizard-slide-2" hidden>
                             <div class="slide-header">
                                 <h2 class="slide-title" data-i18n="onboarding.step2_title"></h2>
@@ -368,111 +419,128 @@
                 </div>
             </section>
 
-            <!-- 4. COMPASS & FOCUS HUB (MAIN ZEN DASHBOARD) -->
+            <!-- 5. MAIN ZEN DASHBOARD (2-STAGE: DISCOVERY -> FOCUS) -->
             <section class="view view--dashboard" id="view-dashboard" hidden aria-label="Curiosity Dashboard">
-                <div class="view__content">
+                <div class="view__content dashboard-container">
 
-                    <!-- Greeting & Vector Compass -->
-                    <div class="compass-section" id="compass-section">
-                        <div class="greeting-bar">
-                            <h2 class="greeting-title" id="greeting-title"></h2>
-                            <p class="greeting-subtitle" data-i18n="compass.subtitle"></p>
+                    <!-- STAGE 1: CONCEPT DISCOVERY (FLOATING HERO DESIGN) -->
+                    <div class="dashboard-stage dashboard-stage--discovery" id="dashboard-stage-discovery">
+                        <div class="discovery-hero">
+                            <div class="discovery-hero__badge-row">
+                                <span class="badge badge--glow" data-i18n="focus_card.proposal_badge"></span>
+                                <span class="domain-pill" id="discovery-concept-domain"></span>
+                            </div>
+
+                            <h1 class="discovery-hero__title" id="discovery-concept-title"></h1>
+
+                            <!-- Most Logiczny (Why this topic) -->
+                            <div class="discovery-reason-row">
+                                <span class="discovery-reason-icon" aria-hidden="true">🌱</span>
+                                <div class="discovery-reason-content">
+                                    <span class="discovery-reason-label" data-i18n="focus_card.why_label"></span>
+                                    <p class="discovery-reason-text" id="discovery-concept-reason"></p>
+                                </div>
+                            </div>
+
+                            <!-- Intuicja & Wprowadzenie -->
+                            <div class="discovery-model-row">
+                                <span class="discovery-model-icon" aria-hidden="true">💡</span>
+                                <div class="discovery-model-content">
+                                    <span class="discovery-model-label" data-i18n="focus_card.model_label"></span>
+                                    <p class="discovery-model-text" id="discovery-concept-model"></p>
+                                </div>
+                            </div>
+
+                            <!-- Primary Action Buttons -->
+                            <div class="discovery-actions">
+                                <button type="button" class="btn btn--primary btn--lg btn--explore" id="btn-discovery-explore">
+                                    <span class="btn__text" data-i18n="focus_card.accept_btn"></span>
+                                </button>
+                                <button type="button" class="btn btn--secondary btn--lg btn--reroll" id="btn-discovery-reroll">
+                                    <span class="btn__text" data-i18n="focus_card.skip_btn"></span>
+                                    <span class="btn__loader" aria-hidden="true"></span>
+                                </button>
+                            </div>
                         </div>
 
-                        <div class="compass-grid">
-                            <button class="compass-card compass-card--adjacent" data-vector="adjacent">
-                                <span class="compass-card__icon">🌿</span>
-                                <span class="compass-card__title" data-i18n="compass.adjacent"></span>
-                                <span class="compass-card__desc" data-i18n="compass.adjacent_desc"></span>
-                            </button>
-                            <button class="compass-card compass-card--deep" data-vector="deep_dive">
-                                <span class="compass-card__icon">🔬</span>
-                                <span class="compass-card__title" data-i18n="compass.deep_dive"></span>
-                                <span class="compass-card__desc" data-i18n="compass.deep_dive_desc"></span>
-                            </button>
-                            <button class="compass-card compass-card--spark" data-vector="spark">
-                                <span class="compass-card__icon">⚡</span>
-                                <span class="compass-card__title" data-i18n="compass.spark"></span>
-                                <span class="compass-card__desc" data-i18n="compass.spark_desc"></span>
-                            </button>
-                            <button class="compass-card compass-card--cross" data-vector="cross_domain">
-                                <span class="compass-card__icon">🌌</span>
-                                <span class="compass-card__title" data-i18n="compass.cross_domain"></span>
-                                <span class="compass-card__desc" data-i18n="compass.cross_domain_desc"></span>
-                            </button>
-                            <button class="compass-card compass-card--fog" data-vector="mental_fog">
-                                <span class="compass-card__icon">🌫️</span>
-                                <span class="compass-card__title" data-i18n="compass.mental_fog"></span>
-                                <span class="compass-card__desc" data-i18n="compass.mental_fog_desc"></span>
-                            </button>
-                        </div>
-
-                        <!-- Custom User Spark Input -->
-                        <div class="custom-spark-toggle">
-                            <div class="input-group">
-                                <input type="text" class="input" id="input-custom-vector"
-                                    data-i18n-placeholder="compass.input_placeholder">
-                                <button class="btn btn--secondary" id="btn-custom-vector-submit"
-                                    data-i18n="compass.input_submit"></button>
+                        <!-- Sleek Vector Switcher Bar (Unobtrusive secondary controls) -->
+                        <div class="vector-switcher-bar">
+                            <span class="vector-switcher-label" data-i18n="compass.subtitle"></span>
+                            <div class="vector-pills-row" id="dashboard-vector-pills">
+                                <button type="button" class="vector-pill active" data-vector="adjacent">
+                                    <span class="vector-pill__icon">🌿</span>
+                                    <span class="vector-pill__text" data-i18n="compass.adjacent"></span>
+                                </button>
+                                <button type="button" class="vector-pill" data-vector="deep_dive">
+                                    <span class="vector-pill__icon">🔬</span>
+                                    <span class="vector-pill__text" data-i18n="compass.deep_dive"></span>
+                                </button>
+                                <button type="button" class="vector-pill" data-vector="spark">
+                                    <span class="vector-pill__icon">⚡</span>
+                                    <span class="vector-pill__text" data-i18n="compass.spark"></span>
+                                </button>
+                                <button type="button" class="vector-pill" data-vector="cross_domain">
+                                    <span class="vector-pill__icon">🌌</span>
+                                    <span class="vector-pill__text" data-i18n="compass.cross_domain"></span>
+                                </button>
+                                <button type="button" class="vector-pill" data-vector="mental_fog">
+                                    <span class="vector-pill__icon">🌫️</span>
+                                    <span class="vector-pill__text" data-i18n="compass.mental_fog"></span>
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Focus Card (Suggested or Active Concept) -->
-                    <div class="focus-card-wrapper" id="focus-card-wrapper" hidden>
-                        <article class="focus-card">
-                            <div class="focus-card__header">
-                                <span class="badge" id="focus-card-badge"></span>
-                                <span class="domain-tag" id="focus-card-domain"></span>
+                    <!-- STAGE 2: FOCUS & ACTIVE EXPLORATION (WITH ELEVATED GRAYISH PROMPT BOX) -->
+                    <div class="dashboard-stage dashboard-stage--focus" id="dashboard-stage-focus" hidden>
+                        <div class="focus-hero">
+                            <div class="focus-hero__topbar">
+                                <button type="button" class="btn-back-link" id="btn-focus-back" data-i18n="focus_card.back_to_discovery_btn"></button>
+                                <span class="badge badge--active" data-i18n="focus_card.focus_badge"></span>
                             </div>
 
-                            <h1 class="focus-card__title" id="focus-card-title"></h1>
-
-                            <div class="focus-card__reason-box" id="focus-card-reason-box">
-                                <span class="focus-card__label" data-i18n="focus_card.why_label"></span>
-                                <p class="focus-card__reason" id="focus-card-reason"></p>
+                            <div class="focus-hero__header">
+                                <span class="domain-pill" id="focus-concept-domain"></span>
+                                <h1 class="focus-hero__title" id="focus-concept-title"></h1>
                             </div>
 
-                            <div class="focus-card__model-box" id="focus-card-model-box">
-                                <span class="focus-card__label" data-i18n="focus_card.model_label"></span>
-                                <p class="focus-card__model" id="focus-card-model"></p>
-                            </div>
-
-                            <!-- External Learning Prompt Box -->
-                            <div class="prompt-box" id="prompt-box">
-                                <div class="prompt-box__header">
-                                    <span class="prompt-box__label">Prompt do zewnętrznego LLM</span>
-                                    <button class="btn btn--ghost btn--small btn-copy" id="btn-copy-prompt">
-                                        <span class="icon">📋</span>
-                                        <span class="copy-text" data-i18n="focus_card.copy_prompt_btn"></span>
-                                    </button>
+                            <!-- Sleek Elevated Grayish Prompt Box (No Scroll, Minimal Copy Icon Button) -->
+                            <div class="prompt-card-elevated" id="prompt-card-elevated">
+                                <div class="prompt-card__header">
+                                    <div class="prompt-card__title-group">
+                                        <span class="prompt-card__spark-icon" aria-hidden="true">✦</span>
+                                        <span class="prompt-card__label" data-i18n="focus_card.prompt_box_label"></span>
+                                    </div>
+                                    <div class="prompt-copy-wrapper">
+                                        <span class="copy-feedback-toast" id="copy-feedback-toast" data-i18n="focus_card.prompt_copied" style="display: none;"></span>
+                                        <button type="button" class="btn-icon-copy" id="btn-copy-prompt" data-i18n-title="focus_card.copy_prompt_tooltip" aria-label="Copy prompt">
+                                            <svg class="copy-icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
-                                <pre class="prompt-box__text" id="prompt-box-text"></pre>
+                                <div class="prompt-card__body">
+                                    <p class="prompt-card__content" id="prompt-card-content"></p>
+                                </div>
                             </div>
 
-                            <!-- Actions Row -->
-                            <div class="focus-card__actions" id="focus-actions-suggested">
-                                <button class="btn btn--ghost" id="btn-concept-skip"
-                                    data-i18n="focus_card.skip_btn"></button>
-                                <button class="btn btn--primary" id="btn-concept-accept">
-                                    <span class="btn__text" data-i18n="focus_card.accept_btn"></span>
-                                    <span class="icon">➔</span>
-                                </button>
-                            </div>
-
-                            <div class="focus-card__actions" id="focus-actions-active" hidden>
-                                <button class="btn btn--success btn--lg" id="btn-concept-finish">
+                            <!-- Session Actions -->
+                            <div class="focus-session-actions">
+                                <button type="button" class="btn btn--success btn--lg btn--finish" id="btn-focus-finish">
                                     <span class="icon">✓</span>
                                     <span class="btn__text" data-i18n="focus_card.finish_btn"></span>
                                 </button>
+                                <button type="button" class="btn btn--secondary btn--lg" id="btn-focus-add-spark" data-i18n="focus_card.add_spark_btn"></button>
                             </div>
-                        </article>
+                        </div>
                     </div>
 
                 </div>
             </section>
 
-            <!-- 5. KNOWLEDGE CONSTELLATION VIEW -->
+            <!-- 6. KNOWLEDGE CONSTELLATION VIEW -->
             <section class="view view--constellation" id="view-constellation" hidden
                 aria-label="Knowledge Constellation">
                 <div class="constellation-header">

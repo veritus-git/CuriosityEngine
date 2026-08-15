@@ -64,6 +64,20 @@ def _get_grounding_instruction(level: str, language: str = "en") -> str:
             return "INTUITION LEVEL (Intermediate / Builder): Focus on system architecture, connecting dots, practical mental models, and why it exists."
 
 
+def _get_form_of_address_instruction(form: Optional[str], language: str = "en") -> str:
+    form = (form or "neutral").strip()
+    if language == "pl":
+        if form == "male":
+            return "FORMA ZWROTU DO UŻYTKOWNIKA: Używaj formy męskiej czasu przeszłego (np. 'Uczyłeś się...', 'Badałeś...', 'Zgłębiałeś...')."
+        elif form == "female":
+            return "FORMA ZWROTU DO UŻYTKOWNIKA: Używaj formy żeńskiej czasu przeszłego (np. 'Uczyłaś się...', 'Badałaś...', 'Zgłębiałaś...')."
+        elif form == "neutral":
+            return "FORMA ZWROTU DO UŻYTKOWNIKA: Używaj form neutralnych / bezosobowych (np. 'Nawiązując do wcześniejszego zgłębiania...', 'W odniesieniu do Twojej wiedzy o...')."
+        else:
+            return f"FORMA ZWROTU DO UŻYTKOWNIKA: Preferowane zwroty: {form}"
+    return ""
+
+
 def build_generation_prompts(
     vector: str,
     recent_concepts: List[Dict[str, Any]],
@@ -76,6 +90,7 @@ def build_generation_prompts(
     """
     lang = profile.get("language", "en") if profile else "en"
     level = profile.get("grounding_level", "builder") if profile else "builder"
+    form_of_address = profile.get("form_of_address", "neutral") if profile else "neutral"
     prompts = load_prompts(lang)
 
     # 1. Build Context
@@ -105,6 +120,9 @@ def build_generation_prompts(
         if profile.get("active_domains"):
             d_label = _get(labels, "preferred_areas", default="Active domains:")
             pref_lines.append(f"{d_label} {', '.join(profile['active_domains'])}")
+        address_inst = _get_form_of_address_instruction(form_of_address, lang)
+        if address_inst:
+            pref_lines.append(address_inst)
         if profile.get("custom_instructions"):
             c_label = _get(labels, "custom_notes", default="User notes:")
             pref_lines.append(f"{c_label} {profile['custom_instructions']}")
@@ -142,6 +160,7 @@ def build_direct_topic_prompts(
     """
     lang = profile.get("language", "en") if profile else "en"
     level = profile.get("grounding_level", "builder") if profile else "builder"
+    form_of_address = profile.get("form_of_address", "neutral") if profile else "neutral"
     prompts = load_prompts(lang)
 
     system_prompt = _get(prompts, "topic_generation", "system", default="")
@@ -149,14 +168,16 @@ def build_direct_topic_prompts(
     system_prompt = system_prompt.replace("{language_instruction}", lang_instruction)
 
     grounding = _get_grounding_instruction(level, lang)
+    address_inst = _get_form_of_address_instruction(form_of_address, lang)
 
     if lang == "pl":
         user_msg = (
             f"Użytkownik wybrał konkretny temat: \"{title}\" (Dziedzina: {domain}).\n"
             f"Krótki opis/pytanie wyjściowe: \"{summary}\"\n\n"
-            f"{grounding}\n\n"
+            f"{grounding}\n"
+            f"{address_inst}\n\n"
             f"Sformatuj odpowiedź JSON DOKŁADNIE dla tego wybranego pojęcia \"{title}\" "
-            f"tworząc zwięzłą intuicję (short_reason) i namacalny model mentalny / analogię (intuitive_model)."
+            f"tworząc zwięzły most logiczny (short_reason) i namacalny model mentalny / analogię (intuitive_model)."
         )
     else:
         user_msg = (
@@ -164,7 +185,7 @@ def build_direct_topic_prompts(
             f"Initial spark / description: \"{summary}\"\n\n"
             f"{grounding}\n\n"
             f"Format the JSON response specifically for this exact topic \"{title}\" "
-            f"providing a concise short_reason and a tangible intuitive_model / analogy."
+            f"providing a concise bridge reason (short_reason) and a tangible intuitive_model / analogy."
         )
 
     return system_prompt, user_msg
@@ -197,22 +218,29 @@ def build_external_learning_prompt(
     profile: Optional[Dict[str, Any]] = None
 ) -> str:
     """
-    Build the copyable prompt for external LLMs (ChatGPT/Claude/Gemini) adhering to the 4 Pillars of Intuition.
+    Build a dynamic, single-paragraph copyable prompt for external LLMs (ChatGPT/Claude/Gemini)
+    tailored to user's grounding level and intuition approach without rigid numbered boilerplate.
     """
     lang = profile.get("language", "en") if profile else "en"
+    level = profile.get("grounding_level", "builder") if profile else "builder"
     prompts = load_prompts(lang)
 
-    template = _get(prompts, "learning_prompt", "template", default="")
-    if not template:
-        return f"Explain {concept_title} top-down with intuitive analogies."
+    learning_prompts = prompts.get("learning_prompts", {})
+    template = learning_prompts.get(level) or learning_prompts.get("builder") or (
+        "Wytłumacz mi pojęcie \"{topic}\" ({domain}) w podejściu Top-Down i intuicyjnym.{known_context}"
+        if lang == "pl" else
+        "Explain \"{topic}\" ({domain}) using a Top-Down intuitive approach.{known_context}"
+    )
 
-    known_str = ", ".join(known_concepts[:5]) if known_concepts else _get(prompts, "learning_prompt", "no_prereqs", default="None yet (start from scratch)")
-    model_str = intuitive_model or ""
+    known_context = ""
+    if known_concepts:
+        prefix = learning_prompts.get("known_context_prefix", " (Nawiąż do: {known_concepts})")
+        known_str = ", ".join(known_concepts[:4])
+        known_context = prefix.replace("{known_concepts}", known_str)
 
     prompt = template.replace("{topic}", concept_title)
     prompt = prompt.replace("{domain}", domain)
-    prompt = prompt.replace("{known_concepts}", known_str)
-    prompt = prompt.replace("{intuitive_model}", model_str)
+    prompt = prompt.replace("{known_context}", known_context)
     return prompt.strip()
 
 

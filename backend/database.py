@@ -65,6 +65,7 @@ def init_db_schema(conn: sqlite3.Connection):
             active_domains TEXT DEFAULT '["math", "computer_science"]',
             custom_instructions TEXT DEFAULT '',
             language TEXT DEFAULT 'pl',
+            form_of_address TEXT DEFAULT 'neutral',
             onboarded INTEGER DEFAULT 0,
             starter_cards_json TEXT DEFAULT '[]',
             updated_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -73,7 +74,7 @@ def init_db_schema(conn: sqlite3.Connection):
         INSERT OR IGNORE INTO user_cognitive_profile (id) VALUES (1);
     """)
 
-    # Ensure onboarded and starter_cards_json columns exist for existing dbs
+    # Ensure onboarded, starter_cards_json, and form_of_address columns exist for existing dbs
     cursor = conn.cursor()
     cursor.execute("PRAGMA table_info(user_cognitive_profile)")
     columns = [row[1] for row in cursor.fetchall()]
@@ -81,6 +82,8 @@ def init_db_schema(conn: sqlite3.Connection):
         cursor.execute("ALTER TABLE user_cognitive_profile ADD COLUMN onboarded INTEGER DEFAULT 0")
     if "starter_cards_json" not in columns:
         cursor.execute("ALTER TABLE user_cognitive_profile ADD COLUMN starter_cards_json TEXT DEFAULT '[]'")
+    if "form_of_address" not in columns:
+        cursor.execute("ALTER TABLE user_cognitive_profile ADD COLUMN form_of_address TEXT DEFAULT 'neutral'")
 
     # Auto-migration from legacy tables if present
     _migrate_legacy_data(conn)
@@ -479,6 +482,7 @@ def get_profile() -> Dict[str, Any]:
         except Exception:
             d["starter_cards"] = []
         d["onboarded"] = bool(d.get("onboarded", 0))
+        d["form_of_address"] = d.get("form_of_address") or "neutral"
         return d
     return {
         "learning_style": "top-down_analogical",
@@ -486,6 +490,7 @@ def get_profile() -> Dict[str, Any]:
         "active_domains": [],
         "custom_instructions": "",
         "language": "pl",
+        "form_of_address": "neutral",
         "onboarded": False,
         "starter_cards": []
     }
@@ -497,6 +502,7 @@ def update_profile(
     active_domains: Optional[List[str]] = None,
     custom_instructions: Optional[str] = None,
     language: Optional[str] = None,
+    form_of_address: Optional[str] = None,
     onboarded: Optional[bool] = None,
     starter_cards: Optional[List[Dict[str, Any]]] = None
 ) -> Dict[str, Any]:
@@ -508,6 +514,7 @@ def update_profile(
     domains = json.dumps(active_domains if active_domains is not None else current.get("active_domains", []))
     instructions = custom_instructions if custom_instructions is not None else current.get("custom_instructions", "")
     lang = language if language is not None else current.get("language", "pl")
+    address = form_of_address if form_of_address is not None else current.get("form_of_address", "neutral")
     is_onboarded = int(onboarded) if onboarded is not None else int(current.get("onboarded", False))
     cards_json = json.dumps(starter_cards if starter_cards is not None else current.get("starter_cards", []))
 
@@ -518,11 +525,12 @@ def update_profile(
             active_domains = ?,
             custom_instructions = ?,
             language = ?,
+            form_of_address = ?,
             onboarded = ?,
             starter_cards_json = ?,
             updated_at = datetime('now')
         WHERE id = 1
-    """, (style, grounding, domains, instructions, lang, is_onboarded, cards_json))
+    """, (style, grounding, domains, instructions, lang, address, is_onboarded, cards_json))
     conn.commit()
     conn.close()
     return get_profile()
