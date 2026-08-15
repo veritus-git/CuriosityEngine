@@ -430,10 +430,12 @@
                             
                             <!-- LEFT COLUMN (~2/5 width, Left-Aligned Huge Title + Actions) -->
                             <div class="discovery-col discovery-col--left">
-                                <div class="discovery-badge-row">
-                                    <span class="domain-pill" id="discovery-concept-domain"></span>
+                                <div class="discovery-title-holder">
+                                    <div class="discovery-badge-row">
+                                        <span class="domain-pill" id="discovery-concept-domain"></span>
+                                    </div>
+                                    <h1 class="discovery-hero__title" id="discovery-concept-title"></h1>
                                 </div>
-                                <h1 class="discovery-hero__title" id="discovery-concept-title"></h1>
                                 
                                 <div class="discovery-actions">
                                     <button type="button" class="btn btn--primary btn--explore" id="btn-discovery-explore">
@@ -506,13 +508,28 @@
                     <div class="dashboard-stage dashboard-stage--focus" id="dashboard-stage-focus" hidden>
                         <div class="focus-hero">
                             <div class="focus-hero__topbar">
-                                <button type="button" class="btn-back-link" id="btn-focus-back" data-i18n="focus_card.back_to_discovery_btn"></button>
+                                <button type="button" class="btn-back-link" id="btn-focus-back">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                    <span data-i18n="focus_card.back_to_discovery_btn"></span>
+                                </button>
                                 <span class="badge badge--active" data-i18n="focus_card.focus_badge"></span>
                             </div>
 
                             <div class="focus-hero__header">
                                 <span class="domain-pill" id="focus-concept-domain"></span>
                                 <h1 class="focus-hero__title" id="focus-concept-title"></h1>
+                            </div>
+
+                            <!-- Context Recap: Intuicja (Model Mentalny) + Most Logiczny -->
+                            <div class="focus-context-grid">
+                                <div class="focus-context-card focus-context-card--model">
+                                    <span class="focus-context-label" data-i18n="focus_card.model_label"></span>
+                                    <p class="focus-context-text" id="focus-concept-model"></p>
+                                </div>
+                                <div class="focus-context-card focus-context-card--reason">
+                                    <span class="focus-context-label" data-i18n="focus_card.why_label"></span>
+                                    <p class="focus-context-text" id="focus-concept-reason"></p>
+                                </div>
                             </div>
 
                             <!-- Sleek Elevated Grayish Prompt Box (No Scroll, Minimal Copy Icon Button) -->
@@ -543,7 +560,10 @@
                                     <span class="icon">✓</span>
                                     <span class="btn__text" data-i18n="focus_card.finish_btn"></span>
                                 </button>
-                                <button type="button" class="btn btn--secondary btn--lg" id="btn-focus-add-spark" data-i18n="focus_card.add_spark_btn"></button>
+                                <button type="button" class="btn btn--secondary btn--lg btn--spark" id="btn-focus-add-spark">
+                                    <svg class="btn-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                    <span class="btn__text" data-i18n="focus_card.add_spark_btn"></span>
+                                </button>
                             </div>
                         </div>
                     </div>

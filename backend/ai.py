@@ -11,6 +11,9 @@ import hashlib
 import logging
 import httpx
 from typing import List, Dict, Any, Optional
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logger = logging.getLogger("curiosity.ai")
 
@@ -85,7 +88,7 @@ async def generate_embedding(text: str) -> List[float]:
                     return resp.json()["data"][0]["embedding"]
         elif provider in ("gemini", "google"):
             base_url = os.getenv("AI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta")
-            model = os.getenv("AI_EMBEDDING_MODEL", "embedding-001")
+            model = os.getenv("AI_EMBEDDING_MODEL", "gemini-embedding-001")
             async with httpx.AsyncClient(timeout=10.0) as client:
                 resp = await client.post(
                     f"{base_url}/models/{model}:embedContent",

@@ -598,13 +598,13 @@ body {
 }
 
 .dashboard-container {
-    width: 100%;
-    max-width: 1380px;
+    width: 95%;
+    max-width: 1620px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2.5rem 2rem 3rem 2rem;
+    padding: 1.5rem 1.5rem 3rem 1.5rem;
 }
 
 .dashboard-stage {
@@ -621,22 +621,33 @@ body {
 /* --- Stage 1: Discovery Split Hero --- */
 .discovery-split-hero {
     display: grid;
-    grid-template-columns: 1.15fr 1fr;
-    gap: 4.5rem;
+    grid-template-columns: 1.12fr 1fr;
+    gap: 3.5rem;
     align-items: start;
     width: 100%;
-    min-height: 380px;
+    min-height: 340px;
     margin-bottom: 2rem;
     animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Left Column: Big Topic Title + Actions (Rock-solid fixed dimensions) */
+/* Left Column: Big Topic Title + Actions (Rock-solid fixed dimensions & immovable buttons) */
 .discovery-col--left {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     text-align: left;
     width: 100%;
+    min-height: 280px;
+    justify-content: flex-start;
+}
+
+.discovery-title-holder {
+    width: 100%;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
 }
 
 .discovery-badge-row {
@@ -662,17 +673,14 @@ body {
 }
 
 .discovery-hero__title {
-    font-size: clamp(2.2rem, 3.4vw, 3.2rem);
+    font-size: clamp(2.3rem, 3.4vw, 3.4rem);
     font-weight: 800;
     color: #ffffff;
-    line-height: 1.18;
+    line-height: 1.16;
     letter-spacing: -0.03em;
-    margin: 0 0 2rem 0;
+    margin: 0;
     text-wrap: balance;
     word-break: break-word;
-    min-height: 130px;
-    display: flex;
-    align-items: flex-start;
     transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
@@ -692,6 +700,7 @@ body {
     align-items: center;
     gap: 0.85rem;
     width: 100%;
+    margin-top: 1.6rem;
 }
 
 .btn--explore {
@@ -965,14 +974,55 @@ body {
     color: #ffffff;
     line-height: 1.2;
     letter-spacing: -0.02em;
-    max-width: 760px;
+    max-width: 780px;
+    margin: 0;
+}
+
+/* Context Recap Grid: Intuicja & Most Logiczny */
+.focus-context-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    width: 100%;
+    max-width: 780px;
+    margin-top: 0.25rem;
+}
+
+.focus-context-card {
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-lg);
+    padding: 1.1rem 1.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    text-align: left;
+}
+
+.focus-context-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--vector-accent-light);
+}
+
+.focus-context-card--reason .focus-context-label {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.focus-context-text {
+    font-size: 0.94rem;
+    line-height: 1.56;
+    color: rgba(255, 255, 255, 0.85);
     margin: 0;
 }
 
 /* Prompt Card Elevated (Grayish, No Scroll, Minimal Top-Right Copy Button) */
 .prompt-card-elevated {
     width: 100%;
-    max-width: 760px;
+    max-width: 780px;
     background: #141424;
     border: 1px solid rgba(255, 255, 255, 0.11);
     border-radius: var(--radius-xl);

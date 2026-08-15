@@ -755,22 +755,22 @@
             const char = text[i];
             caret.insertAdjacentText('beforebegin', char);
 
-            // Organic non-linear timing with micro-pauses at punctuation
-            let delay = 9 + Math.floor(Math.random() * 15); // Fast base typing: 9-24ms
+            // 2x Faster organic non-linear timing with micro-pauses at punctuation
+            let delay = 4 + Math.floor(Math.random() * 8); // Fast base typing: 4-12ms
 
             if (char === '.' || char === '!' || char === '?') {
-                delay = 140 + Math.floor(Math.random() * 70); // 140-210ms at sentence end
+                delay = 70 + Math.floor(Math.random() * 35); // 70-105ms at sentence end
             } else if (char === ',' || char === ';' || char === ':') {
-                delay = 65 + Math.floor(Math.random() * 40); // 65-105ms at comma
+                delay = 30 + Math.floor(Math.random() * 20); // 30-50ms at comma
             } else if (char === ' ') {
-                delay = 15 + Math.floor(Math.random() * 12);
+                delay = 8 + Math.floor(Math.random() * 5);
             }
 
             await sleep(delay);
         }
 
         if (token === currentTypewriterToken) {
-            await sleep(80);
+            await sleep(40);
             caret.remove();
         }
     }
@@ -789,7 +789,7 @@
         if (token !== currentTypewriterToken) return;
 
         // Small breath pause between paragraphs
-        await sleep(90);
+        await sleep(50);
         if (token !== currentTypewriterToken) return;
 
         // 2. Stream Most Logiczny (BELOW)
@@ -803,7 +803,7 @@
         const stageDiscovery = $('#dashboard-stage-discovery');
         const stageFocus = $('#dashboard-stage-focus');
 
-        const isFocus = (mode === 'focus' || (state.concept && state.concept.status === 'active'));
+        const isFocus = (mode === 'focus');
 
         if (isFocus) {
             if (stageDiscovery) stageDiscovery.hidden = true;
@@ -812,10 +812,14 @@
             const fTitle = $('#focus-concept-title');
             const fDomain = $('#focus-concept-domain');
             const fPrompt = $('#prompt-card-content');
+            const fModel = $('#focus-concept-model');
+            const fReason = $('#focus-concept-reason');
 
             if (fTitle && state.concept) fTitle.textContent = state.concept.title;
             if (fDomain && state.concept) fDomain.textContent = state.concept.domain || 'General';
             if (fPrompt) fPrompt.textContent = state.prompt || '';
+            if (fModel && state.concept) fModel.textContent = state.concept.intuitive_model || '';
+            if (fReason && state.concept) fReason.textContent = state.concept.summary || '';
             document.body.setAttribute('data-vector-theme', state.concept?.source_mode || state.activeVector || 'adjacent');
         } else {
             if (stageDiscovery) stageDiscovery.hidden = false;
