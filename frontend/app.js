@@ -865,33 +865,48 @@
             const dTitle = $('#discovery-concept-title');
             const dDomain = $('#discovery-concept-domain');
             const dReason = $('#discovery-concept-reason');
+            const dReasonBox = $('.discovery-reason-box');
             const dModel = $('#discovery-concept-model');
 
+            // Track only external elements pushed by layout shift
             const trackElements = [
                 $('.discovery-actions'),
-                $('.vector-switcher-bar'),
-                $('.discovery-reason-box'),
-                $('.discovery-split-hero')
+                $('.vector-switcher-bar')
             ];
 
-            smoothFlipAnimate(trackElements, () => {
-                if (dDomain) dDomain.textContent = state.concept.domain || 'General';
-                if (dTitle) dTitle.textContent = state.concept.title;
-                if (dReason) dReason.textContent = state.concept.summary || '';
-            });
-
+            // 1. Soft fade-out
             if (dTitle) {
                 dTitle.style.opacity = '0';
-                setTimeout(() => { dTitle.style.opacity = '1'; }, 50);
+                dTitle.style.transform = 'translateY(-4px)';
+            }
+            if (dReasonBox) {
+                dReasonBox.style.opacity = '0';
+                dReasonBox.style.transform = 'translateY(-3px)';
             }
 
-            if (dReason) {
-                dReason.style.opacity = '0';
-                setTimeout(() => { dReason.style.opacity = '1'; }, 50);
-            }
+            // 2. Update DOM & FLIP glide
+            setTimeout(() => {
+                smoothFlipAnimate(trackElements, () => {
+                    if (dDomain) dDomain.textContent = state.concept.domain || 'General';
+                    if (dTitle) dTitle.textContent = state.concept.title;
+                    if (dReason) dReason.textContent = state.concept.summary || '';
+                });
 
-            // Stream Intuicja on the right with organic typewriter
-            runDiscoveryIntuitionTypewriter(dModel, state.concept.intuitive_model || '');
+                // 3. Ultra-smooth fade-in in 60-120fps
+                requestAnimationFrame(() => {
+                    if (dTitle) {
+                        dTitle.style.opacity = '1';
+                        dTitle.style.transform = 'translateY(0)';
+                    }
+                    if (dReasonBox) {
+                        dReasonBox.style.opacity = '1';
+                        dReasonBox.style.transform = 'translateY(0)';
+                    }
+                });
+
+                // 4. Stream Intuicja on the right with organic typewriter
+                runDiscoveryIntuitionTypewriter(dModel, state.concept.intuitive_model || '');
+            }, 60);
         }
     }
 

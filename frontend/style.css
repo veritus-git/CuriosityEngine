@@ -676,10 +676,10 @@ body {
     line-height: 1.15;
     letter-spacing: -0.03em;
     margin: 0;
-    min-height: 125px;
     text-wrap: balance;
     word-break: break-word;
-    transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+    transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .discovery-reason-box {
@@ -689,8 +689,8 @@ body {
     gap: 0.25rem;
     text-align: left;
     max-width: 80%;
-    min-height: 60px;
-    transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+    transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .discovery-reason-text {
@@ -698,7 +698,6 @@ body {
     line-height: 1.55;
     color: rgba(255, 255, 255, 0.72);
     margin: 0;
-    transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Right Column: Intuicja (ON TOP, Width Locked to Actions) & Bottom-Anchored Actions */
