@@ -174,9 +174,11 @@ body {
 #app {
     position: relative;
     z-index: 1;
-    min-height: 100dvh;
+    height: 100dvh;
+    max-height: 100dvh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 /* --- Topbar --- */
@@ -275,9 +277,11 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 1rem 1rem 2.5rem 1rem;
-    width: 70%;
+    padding: 0.5rem 1rem 1.25rem 1rem;
+    width: 78%;
+    max-width: 1480px;
     margin: 0 auto;
+    overflow-y: auto;
 }
 
 .view {
@@ -590,7 +594,6 @@ body {
 .view--dashboard {
     width: 100%;
     flex: 1;
-    min-height: calc(100dvh - 72px);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -605,7 +608,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 1rem 0 2rem 0;
+    padding: 0.25rem 0 1rem 0;
 }
 
 .dashboard-stage {
@@ -620,36 +623,34 @@ body {
     display: none !important;
 }
 
-/* --- Stage 1: Discovery Split Hero --- */
+/* --- Stage 1: Discovery Split Hero (Centered on Y-Axis, Expansive Topic Area) --- */
 .discovery-split-hero {
     display: grid;
-    grid-template-columns: 1.22fr 1fr;
-    gap: 3.5rem;
-    align-items: start;
+    grid-template-columns: 1.45fr 1fr;
+    gap: 3.2rem;
+    align-items: center;
     width: 100%;
-    min-height: 280px;
-    margin-bottom: 2rem;
+    min-height: 190px;
+    margin-bottom: 0.5rem;
     animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Left Column: Big Topic Title + Actions (Rock-solid fixed dimensions & immovable buttons) */
+/* Left Column: Big Topic Title + Domain Badge */
 .discovery-col--left {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     text-align: left;
     width: 100%;
-    min-height: 280px;
-    justify-content: flex-start;
+    justify-content: center;
 }
 
 .discovery-title-holder {
     width: 100%;
-    min-height: 180px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    justify-content: flex-start;
+    justify-content: center;
 }
 
 .discovery-badge-row {
@@ -657,7 +658,6 @@ body {
     align-items: center;
     gap: 0.75rem;
     margin-bottom: 0.85rem;
-    min-height: 28px;
 }
 
 .domain-pill {
@@ -696,13 +696,15 @@ body {
     transform: translateY(0);
 }
 
-.discovery-actions {
+/* Prominent Centered Actions Bar (Fixed & Stable) */
+.discovery-actions-bar {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 0.85rem;
+    justify-content: center;
+    gap: 1rem;
     width: 100%;
-    margin-top: 1.6rem;
+    margin: 1.5rem 0 1.8rem 0;
 }
 
 .btn--explore {
@@ -710,7 +712,7 @@ body {
     color: #ffffff;
     font-weight: 700;
     font-size: 1.02rem;
-    padding: 0.85rem 1.6rem;
+    padding: 0.85rem 1.8rem;
     border-radius: var(--radius-lg);
     border: none;
     box-shadow: 0 0 24px var(--vector-accent-glow);
@@ -718,6 +720,7 @@ body {
     transition: all 0.2s ease;
     display: inline-flex;
     align-items: center;
+    gap: 0.55rem;
     justify-content: center;
     white-space: nowrap;
 }
@@ -727,13 +730,21 @@ body {
     box-shadow: 0 0 32px var(--vector-accent-glow), 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
+.btn-arrow-svg {
+    transition: transform 0.2s ease;
+}
+
+.btn--explore:hover .btn-arrow-svg {
+    transform: translateX(3px);
+}
+
 .btn--save-spark {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.12);
     color: rgba(255, 255, 255, 0.85);
     font-weight: 600;
     font-size: 0.92rem;
-    padding: 0.85rem 1.25rem;
+    padding: 0.85rem 1.4rem;
     border-radius: var(--radius-lg);
     cursor: pointer;
     transition: all 0.2s ease;
@@ -932,7 +943,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%;
+    width: 60%;
     gap: 1.6rem;
     animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
