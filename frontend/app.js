@@ -15,7 +15,7 @@
             "brand": "CuriosityEngine",
             "compass": "Kompas",
             "constellation": "Konstelacja",
-            "sparks": "Dygresje ({n})",
+            "sparks": "Schowek ({n})",
             "history": "Historia",
             "settings": "Ustawienia",
             "logout": "Wyloguj",
@@ -51,9 +51,9 @@
             "f3_title": "Tryb Mental Fog",
             "f3_tag": "Czysta Intuicja",
             "f3_desc": "Gdy jesteś zmęczony i przytłoczony: proste, genialne analogie fizyczne dające natychmiastowe poczucie zrozumienia.",
-            "f4_title": "Spark Inbox",
-            "f4_tag": "Łapanie Dygresji",
-            "f4_desc": "Zapisuj przelotne myśli, by ich nie zapomnieć. Silnik połączy je w grafie i przypomni o nich we właściwym momencie."
+            "f4_title": "Schowek Myśli",
+            "f4_tag": "Schowek na Iskry",
+            "f4_desc": "Zapisuj przelotne myśli i skojarzenia, by ich nie zapomnieć. Silnik połączy je w grafie i przypomni o nich we właściwym momencie."
         },
         "greeting": {
             "late_night": "Nocne przemyślenia.",
@@ -143,8 +143,8 @@
             "adjacent_desc": "Pojęcie zazębiające się z Twoją ostatnią wiedzą",
             "deep_dive": "Nurkowanie Top-Down",
             "deep_dive_desc": "Zasady działania pod maską",
-            "spark": "Rozwiń Dygresję",
-            "spark_desc": "Sięgnij po zapisaną myśl z przeszłości",
+            "spark": "Zbadaj ze Schowka",
+            "spark_desc": "Sięgnij po zapisaną myśl ze Schowka",
             "cross_domain": "Inna Galaktyka",
             "cross_domain_desc": "Skok w zupełnie nową dziedzinę",
             "mental_fog": "Tryb Mental Fog",
@@ -162,14 +162,14 @@
             "accept_btn": "Zbadaj ten temat",
             "skip_btn": "Inna propozycja",
             "reroll_batch_btn": "Nowy zestaw 4 tematów",
-            "save_to_sparks_btn": "Zachowaj na później",
-            "saved_to_sparks_toast": "✓ Zapisano temat do pudełka dygresji!",
+            "save_to_sparks_btn": "Zapisz do Schowka",
+            "saved_to_sparks_toast": "✓ Zapisano do Schowka!",
             "reject_btn": "Pomiń ten temat",
             "prompt_box_label": "Gotowy Prompt do Twojego LLM",
             "copy_prompt_tooltip": "Kopiuj prompt do schowka",
             "prompt_copied": "✓ Skopiowano prompt do schowka!",
             "finish_btn": "Oznacz jako opanowane",
-            "add_spark_btn": "Zapisz Dygresję",
+            "add_spark_btn": "Zapisz Iskrę",
             "abandon_btn": "Porzuć temat",
             "abandon_toast": "Temat został porzucony.",
             "back_to_discovery_btn": "Wróć do wyboru tematu",
@@ -187,14 +187,14 @@
             "cancel_btn": "Anuluj"
         },
         "spark_box": {
-            "title": "Spark Inbox (Pudełko na Dygresje)",
-            "subtitle": "Zapisuj luźne myśli, które mignęły Ci w trakcie nauki — silnik zachowa je na później.",
-            "input_placeholder": "Wpisz dygresję i wciśnij Enter...",
+            "title": "Schowek Myśli (Spark Inbox)",
+            "subtitle": "Zapisuj nagłe myśli, które mignęły Ci w trakcie eksploracji — silnik zachowa je na później.",
+            "input_placeholder": "Wpisz myśl lub skojarzenie i wciśnij Enter...",
             "add_btn": "Zapisz Iskrę",
-            "empty": "Brak oczekujących dygresji. Możesz je dodawać w każdej chwili.",
+            "empty": "Schowek jest pusty. Wciskaj Spację w dowolnym momencie, by zachować nagłą myśl.",
             "explore_btn": "Zbadaj teraz",
             "dismiss_btn": "Usuń",
-            "quick_tip": "Skrót klawiszowy: wciśnij Spację na pulpicie, aby szybko zapisać dygresję."
+            "quick_tip": "Skrót klawiszowy: wciśnij Spację na pulpicie, aby szybko otworzyć Schowek."
         },
         "constellation": {
             "title": "Konstelacja Wiedzy",
@@ -512,6 +512,11 @@
         // Close user dropdown if open
         const userMenu = $('#user-dropdown-menu');
         if (userMenu) userMenu.hidden = true;
+
+        // Reset any custom onboarding accent hue when navigating to other views
+        if (viewName !== 'ONBOARDING') {
+            document.documentElement.style.removeProperty('--hue-primary');
+        }
 
         if (viewName === 'LANDING') {
             if (navLinks) navLinks.hidden = true;
@@ -1351,6 +1356,19 @@
             }
         });
 
+        // Dynamic Domain Hue Mapping for Onboarding
+        const ONBOARDING_DOMAIN_HUES = {
+            cs: 230,          // Tech Indigo
+            ai: 250,          // Electric Purple
+            physics: 195,     // Cosmic Cyan
+            biology: 145,     // Emerald Green
+            hardware: 32,     // Amber Orange
+            gamedev: 325,     // Neon Pink
+            philosophy: 275,  // Royal Violet
+            economics: 160,   // Mint Teal
+            linguistics: 15   // Sunset Coral
+        };
+
         // Dynamic Event Delegation for Chips List
         const chipsContainer = $('#onboarding-domains-chips');
         if (chipsContainer) {
@@ -1359,8 +1377,19 @@
                 if (chip) {
                     chip.classList.toggle('active');
                     const errBox = $('#onboarding-step1-error');
-                    if (errBox && $$('#onboarding-domains-chips .chip-row.active').length > 0) {
+                    const activeChips = $$('#onboarding-domains-chips .chip-row.active');
+                    if (errBox && activeChips.length > 0) {
                         errBox.style.display = 'none';
+                    }
+
+                    // Dynamically adapt onboarding accent color to selected category
+                    if (activeChips.length > 0) {
+                        const lastActive = activeChips[activeChips.length - 1];
+                        const domain = lastActive.dataset.domain;
+                        const hue = ONBOARDING_DOMAIN_HUES[domain] || 225;
+                        document.documentElement.style.setProperty('--hue-primary', hue);
+                    } else {
+                        document.documentElement.style.removeProperty('--hue-primary');
                     }
                 }
             });

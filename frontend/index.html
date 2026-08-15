@@ -16,7 +16,7 @@
 
     <link rel="icon" type="image/png" href="assets/favicon.png">
     <link rel="apple-touch-icon" href="assets/favicon.png">
-    <link rel="stylesheet" href="style.css?v=2.3.0">
+    <link rel="stylesheet" href="style.css?v=2.4.0">
 </head>
 
 <body>
@@ -700,15 +700,18 @@
         </div>
 
         <!-- Floating Quick Spark Trigger Button (Mobile & Desktop) -->
-        <button class="floating-spark-btn" id="btn-floating-spark" hidden aria-label="Złap Dygresję"
-            title="Złap dygresję (Spacja)">
-            <span class="icon">⚡</span>
+        <button class="floating-spark-btn" id="btn-floating-spark" hidden aria-label="Schowek na nagłe myśli"
+            title="Schowek na nagłe myśli (Spacja)">
+            <svg class="floating-spark-svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/>
+                <circle cx="12" cy="12" r="2.2" fill="#ffffff"/>
+            </svg>
         </button>
 
         <!-- Global Zen Loading Overlay -->
         <div class="loading-overlay" id="loading-overlay" hidden aria-live="polite">
             <div class="loading-content">
-                <img src="assets/logo.png" alt="Loading" class="loading-logo-spin" width="32" height="32" style="width: 32px; height: 32px; max-width: 32px; max-height: 32px;">
+                <img src="assets/logo.png" alt="Loading" class="loading-logo-spin" width="52" height="52" style="width: 52px; height: 52px; max-width: 52px; max-height: 52px;">
                 <p class="loading-text" id="loading-text" data-i18n="loading.generating"></p>
             </div>
         </div>
@@ -720,7 +723,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=2.3.0"></script>
+    <script src="app.js?v=2.4.0"></script>
 </body>
 
 </html>

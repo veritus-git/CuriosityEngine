@@ -1380,19 +1380,29 @@ body {
     border-radius: 50%;
     background: var(--accent);
     color: #ffffff;
-    border: none;
-    box-shadow: 0 10px 30px var(--accent-glow-strong);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 8px 24px var(--accent-glow-strong), 0 0 16px var(--accent-glow);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4rem;
     cursor: pointer;
     z-index: 40;
-    transition: all var(--duration-fast) var(--ease-out);
+    transition: transform var(--duration-fast) var(--ease-out), background 0.3s ease, box-shadow 0.3s ease, border-color var(--duration-fast);
+}
+
+.floating-spark-svg {
+    width: 24px;
+    height: 24px;
+    transition: transform var(--duration-fast) var(--ease-out);
 }
 
 .floating-spark-btn:hover {
-    transform: scale(1.08) translateY(-2px);
+    transform: scale(1.1) translateY(-2px);
+    box-shadow: 0 12px 30px var(--accent-glow-strong), 0 0 24px var(--accent-glow);
+}
+
+.floating-spark-btn:hover .floating-spark-svg {
+    transform: rotate(15deg) scale(1.05);
 }
 
 /* Sparks List */
@@ -2719,11 +2729,34 @@ html {
     justify-content: center;
 }
 
+/* --- Custom Sleek Dark Scrollbar --- */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+}
+
 /* --- Settings View (Clean Original Architecture) --- */
 .view--settings {
     padding: var(--space-xl) var(--space-lg);
-    overflow-y: auto;
-    max-height: calc(100dvh - 65px);
+    width: 100%;
 }
 
 .settings-section {
@@ -2799,15 +2832,15 @@ html {
 }
 
 .loading-logo-spin {
-    width: 32px !important;
-    height: 32px !important;
-    max-width: 32px !important;
-    max-height: 32px !important;
+    width: 52px !important;
+    height: 52px !important;
+    max-width: 52px !important;
+    max-height: 52px !important;
     object-fit: contain;
     display: block;
     margin: 0 auto;
-    animation: rotateLogoContinuous 1.2s linear infinite;
-    filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.7));
+    animation: rotateLogoContinuous 1.3s linear infinite;
+    filter: drop-shadow(0 0 16px rgba(99, 102, 241, 0.8));
 }
 
 .loading-overlay[hidden] {
@@ -2817,8 +2850,8 @@ html {
 .loading-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(7, 7, 12, 0.8);
-    backdrop-filter: blur(8px);
+    background: rgba(7, 7, 12, 0.82);
+    backdrop-filter: blur(10px);
     z-index: 999;
     display: flex;
     align-items: center;
@@ -2830,7 +2863,7 @@ html {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.9rem;
+    gap: 1.1rem;
     text-align: center;
 }
 
@@ -2842,12 +2875,44 @@ html {
     letter-spacing: -0.01em;
 }
 
-/* Targeted Element Loading */
-.discovery-split-hero.is-loading {
-    opacity: 0.4;
+/* Targeted Element Loading with Heavy Gaussian Blur & Centered Spinning Logo */
+.discovery-split-hero,
+.focus-session-card {
+    position: relative;
+}
+
+.discovery-split-hero.is-loading > *,
+.focus-session-card.is-loading > * {
+    filter: blur(10px) brightness(0.4);
     pointer-events: none;
-    filter: blur(1px);
-    transition: opacity 0.2s ease, filter 0.2s ease;
+    user-select: none;
+    transition: filter 0.25s ease;
+}
+
+.discovery-split-hero::after,
+.focus-session-card::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 48px;
+    height: 48px;
+    background-image: url('assets/logo.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    animation: rotateLogoContinuous 1.3s linear infinite;
+    filter: drop-shadow(0 0 16px rgba(99, 102, 241, 0.85));
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.discovery-split-hero.is-loading::after,
+.focus-session-card.is-loading::after {
+    opacity: 1;
 }
 
 /* --- Mobile Responsiveness --- */
