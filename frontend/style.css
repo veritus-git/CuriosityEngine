@@ -625,12 +625,12 @@ body {
 /* --- Stage 1: Discovery Split Hero (Centered on Y-Axis, Expansive Topic Area) --- */
 .discovery-split-hero {
     display: grid;
-    grid-template-columns: 1.35fr 1fr;
-    gap: 3.2rem;
+    grid-template-columns: 1.18fr 1fr;
+    gap: 4.5rem;
     align-items: center;
     width: 100%;
     min-height: 180px;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
     animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -689,11 +689,12 @@ body {
 }
 
 .discovery-reason-box {
-    margin-top: 0.75rem;
+    margin-top: 0.85rem;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
     text-align: left;
+    max-width: 70%;
 }
 
 .discovery-reason-text {
@@ -704,15 +705,32 @@ body {
     transition: opacity 0.2s ease;
 }
 
-/* Prominent Right-Aligned Actions Bar */
-.discovery-actions-bar {
+/* Right Column: Intuicja (ON TOP) & Actions (BELOW, Pixel-Perfect Left-Aligned with Intuition) */
+.discovery-col--right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    width: 100%;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.discovery-text-block--model {
+    min-height: 85px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+}
+
+.discovery-actions {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: flex-start;
     gap: 0.85rem;
     width: 100%;
-    margin: 1rem 0 0.5rem 0;
 }
 
 .btn--explore {
@@ -858,11 +876,11 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
-    margin-top: 3.5rem;
+    gap: 0.75rem;
+    margin-top: 1.8rem;
     width: 100%;
-    padding-top: 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 0;
+    border-top: none;
 }
 
 .vector-pills-row {
