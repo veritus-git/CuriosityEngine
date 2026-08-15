@@ -775,26 +775,12 @@
         }
     }
 
-    async function runSequentialDiscoveryTypewriter(modelEl, modelText, reasonEl, reasonText) {
+    async function runDiscoveryIntuitionTypewriter(modelEl, modelText) {
         const token = ++currentTypewriterToken;
-
         if (modelEl) modelEl.innerHTML = '';
-        if (reasonEl) reasonEl.innerHTML = '';
 
-        // 1. Stream Intuicja & Wprowadzenie (ON TOP)
         if (modelEl && modelText) {
             await streamTextNonLinear(modelEl, modelText, token);
-        }
-
-        if (token !== currentTypewriterToken) return;
-
-        // Small breath pause between paragraphs
-        await sleep(25);
-        if (token !== currentTypewriterToken) return;
-
-        // 2. Stream Most Logiczny (BELOW)
-        if (reasonEl && reasonText) {
-            await streamTextNonLinear(reasonEl, reasonText, token);
         }
     }
 
@@ -859,12 +845,16 @@
                 }, 90);
             }
 
-            runSequentialDiscoveryTypewriter(
-                dModel,
-                state.concept.intuitive_model || '',
-                dReason,
-                state.concept.summary || ''
-            );
+            if (dReason) {
+                dReason.style.opacity = '0';
+                setTimeout(() => {
+                    dReason.textContent = state.concept.summary || '';
+                    dReason.style.opacity = '1';
+                }, 90);
+            }
+
+            // Stream Intuicja on the right with organic typewriter
+            runDiscoveryIntuitionTypewriter(dModel, state.concept.intuitive_model || '');
         }
     }
 

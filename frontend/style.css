@@ -278,8 +278,7 @@ body {
     display: flex;
     flex-direction: column;
     padding: 0.5rem 1rem 1.25rem 1rem;
-    width: 78%;
-    max-width: 1480px;
+    width: 70%;
     margin: 0 auto;
     overflow-y: auto;
 }
@@ -626,16 +625,16 @@ body {
 /* --- Stage 1: Discovery Split Hero (Centered on Y-Axis, Expansive Topic Area) --- */
 .discovery-split-hero {
     display: grid;
-    grid-template-columns: 1.45fr 1fr;
+    grid-template-columns: 1.35fr 1fr;
     gap: 3.2rem;
     align-items: center;
     width: 100%;
-    min-height: 190px;
-    margin-bottom: 0.5rem;
+    min-height: 180px;
+    margin-bottom: 0.25rem;
     animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Left Column: Big Topic Title + Domain Badge */
+/* Left Column: Big Topic Title + Domain Badge + Most Logiczny */
 .discovery-col--left {
     display: flex;
     flex-direction: column;
@@ -643,21 +642,14 @@ body {
     text-align: left;
     width: 100%;
     justify-content: center;
-}
-
-.discovery-title-holder {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
+    gap: 0.4rem;
 }
 
 .discovery-badge-row {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    margin-bottom: 0.85rem;
+    margin-bottom: 0.45rem;
 }
 
 .domain-pill {
@@ -675,10 +667,10 @@ body {
 }
 
 .discovery-hero__title {
-    font-size: clamp(2.3rem, 3.4vw, 3.4rem);
+    font-size: clamp(2.1rem, 3.2vw, 3.2rem);
     font-weight: 800;
     color: #ffffff;
-    line-height: 1.16;
+    line-height: 1.15;
     letter-spacing: -0.03em;
     margin: 0;
     text-wrap: balance;
@@ -696,15 +688,31 @@ body {
     transform: translateY(0);
 }
 
-/* Prominent Centered Actions Bar (Fixed & Stable) */
+.discovery-reason-box {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: left;
+}
+
+.discovery-reason-text {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.72);
+    margin: 0;
+    transition: opacity 0.2s ease;
+}
+
+/* Prominent Right-Aligned Actions Bar */
 .discovery-actions-bar {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
-    gap: 1rem;
+    justify-content: flex-end;
+    gap: 0.85rem;
     width: 100%;
-    margin: 1.5rem 0 1.8rem 0;
+    margin: 1rem 0 0.5rem 0;
 }
 
 .btn--explore {

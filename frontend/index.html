@@ -428,36 +428,31 @@
                         
                         <div class="discovery-split-hero">
                             
-                            <!-- LEFT COLUMN (~1.38fr width, Left-Aligned Topic Title + Domain Pill) -->
+                            <!-- LEFT COLUMN (~1.3fr width, Topic Title + Domain Pill + Most Logiczny) -->
                             <div class="discovery-col discovery-col--left">
-                                <div class="discovery-title-holder">
-                                    <div class="discovery-badge-row">
-                                        <span class="domain-pill" id="discovery-concept-domain"></span>
-                                    </div>
-                                    <h1 class="discovery-hero__title" id="discovery-concept-title"></h1>
+                                <div class="discovery-badge-row">
+                                    <span class="domain-pill" id="discovery-concept-domain"></span>
+                                </div>
+                                <h1 class="discovery-hero__title" id="discovery-concept-title"></h1>
+                                
+                                <!-- Most Logiczny (Zaraz pod tematem po lewej stronie) -->
+                                <div class="discovery-reason-box">
+                                    <span class="discovery-text-label discovery-text-label--reason" data-i18n="focus_card.why_label"></span>
+                                    <p class="discovery-reason-text" id="discovery-concept-reason"></p>
                                 </div>
                             </div>
 
-                            <!-- RIGHT COLUMN (~3/5 width, Left-Aligned Clean Paragraphs: Intuicja ON TOP, Most Logiczny BELOW) -->
+                            <!-- RIGHT COLUMN (Intuicja & Wprowadzenie) -->
                             <div class="discovery-col discovery-col--right">
-                                
-                                <!-- Intuicja & Wprowadzenie (ON TOP) -->
                                 <div class="discovery-text-block discovery-text-block--model">
                                     <span class="discovery-text-label discovery-text-label--model" data-i18n="focus_card.model_label"></span>
                                     <p class="discovery-text-content" id="discovery-concept-model"></p>
                                 </div>
-
-                                <!-- Most Logiczny (BELOW INTUICJA) -->
-                                <div class="discovery-text-block discovery-text-block--reason">
-                                    <span class="discovery-text-label discovery-text-label--reason" data-i18n="focus_card.why_label"></span>
-                                    <p class="discovery-text-content" id="discovery-concept-reason"></p>
-                                </div>
-
                             </div>
 
                         </div>
 
-                        <!-- PROMINENT FIXED ACTIONS BAR (Centered below split hero) -->
+                        <!-- PROMINENT ACTIONS BAR (Right-Aligned) -->
                         <div class="discovery-actions-bar">
                             <button type="button" class="btn btn--primary btn--explore" id="btn-discovery-explore">
                                 <span class="btn__text" data-i18n="focus_card.accept_btn"></span>
