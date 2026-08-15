@@ -150,7 +150,7 @@ body {
 .ambient-orb--2 {
     width: 500px;
     height: 500px;
-    background: radial-gradient(circle, var(--accent-glow), transparent 70%);
+    background: radial-gradient(circle, var(--accent-glow), transparent);
     bottom: -10%;
     right: -10%;
     animation-delay: -15s;
@@ -622,26 +622,24 @@ body {
     display: none !important;
 }
 
-/* --- Stage 1: Discovery Split Hero (Centered on Y-Axis, Expansive Topic Area) --- */
+/* --- Stage 1: Discovery Split Hero (Expansive Layout, Top-Aligned & Rock-Solid) --- */
 .discovery-split-hero {
     display: grid;
-    grid-template-columns: 1.18fr 1fr;
-    gap: 4.5rem;
-    align-items: center;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 3.5rem;
+    align-items: start;
     width: 100%;
-    min-height: 180px;
-    margin-bottom: 0.5rem;
+    min-height: 230px;
     animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Left Column: Big Topic Title + Domain Badge + Most Logiczny */
+/* Left Column: Big Topic Title + Domain Badge + Most Logiczny (80% Max Width) */
 .discovery-col--left {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     text-align: left;
     width: 100%;
-    justify-content: center;
     gap: 0.4rem;
 }
 
@@ -694,7 +692,7 @@ body {
     flex-direction: column;
     gap: 0.25rem;
     text-align: left;
-    max-width: 70%;
+    max-width: 80%;
 }
 
 .discovery-reason-text {
@@ -705,22 +703,22 @@ body {
     transition: opacity 0.2s ease;
 }
 
-/* Right Column: Intuicja (ON TOP) & Actions (BELOW, Pixel-Perfect Left-Aligned with Intuition) */
+/* Right Column: Intuicja (ON TOP, Flowing Downwards) & Stable Fixed Action Buttons */
 .discovery-col--right {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     text-align: left;
     width: 100%;
-    justify-content: center;
-    gap: 1.5rem;
+    gap: 1.6rem;
 }
 
 .discovery-text-block--model {
-    min-height: 85px;
+    min-height: 130px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
+    align-items: flex-start;
     width: 100%;
 }
 
@@ -876,10 +874,10 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.75rem;
-    margin-top: 1.8rem;
+    gap: 1rem;
+    margin-top: 3.5rem;
     width: 100%;
-    padding-top: 0;
+    padding-top: 2rem;
     border-top: none;
 }
 
