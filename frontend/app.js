@@ -784,6 +784,40 @@
         }
     }
 
+    // ─── FLIP Smooth Motion Helper (Zero-Jump Fluid Layout Shifts) ───
+    function smoothFlipAnimate(elementsToTrack, updateDomFn) {
+        const snapshots = elementsToTrack.map(el => {
+            if (!el) return null;
+            return { el, rect: el.getBoundingClientRect() };
+        }).filter(Boolean);
+
+        updateDomFn();
+
+        requestAnimationFrame(() => {
+            snapshots.forEach(({ el, rect: firstRect }) => {
+                const lastRect = el.getBoundingClientRect();
+                const deltaX = firstRect.left - lastRect.left;
+                const deltaY = firstRect.top - lastRect.top;
+
+                if (Math.abs(deltaY) > 0.5 || Math.abs(deltaX) > 0.5) {
+                    el.style.transition = 'none';
+                    el.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+
+                    requestAnimationFrame(() => {
+                        el.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+                        el.style.transform = 'translate(0, 0)';
+                        setTimeout(() => {
+                            if (el.style.transform === 'translate(0px, 0px)' || el.style.transform === 'translate(0, 0)') {
+                                el.style.transform = '';
+                                el.style.transition = '';
+                            }
+                        }, 420);
+                    });
+                }
+            });
+        });
+    }
+
     // ─── Dashboard 2-Stage Rendering (Discovery vs Focus) ───
     function renderDashboard(mode = 'discovery') {
         const stageDiscovery = $('#dashboard-stage-discovery');
@@ -833,26 +867,27 @@
             const dReason = $('#discovery-concept-reason');
             const dModel = $('#discovery-concept-model');
 
-            if (dDomain) dDomain.textContent = state.concept.domain || 'General';
+            const trackElements = [
+                $('.discovery-actions'),
+                $('.vector-switcher-bar'),
+                $('.discovery-reason-box'),
+                $('.discovery-split-hero')
+            ];
+
+            smoothFlipAnimate(trackElements, () => {
+                if (dDomain) dDomain.textContent = state.concept.domain || 'General';
+                if (dTitle) dTitle.textContent = state.concept.title;
+                if (dReason) dReason.textContent = state.concept.summary || '';
+            });
 
             if (dTitle) {
                 dTitle.style.opacity = '0';
-                dTitle.style.transform = 'translateY(-4px)';
-                setTimeout(() => {
-                    dTitle.textContent = state.concept.title;
-                    dTitle.style.opacity = '1';
-                    dTitle.style.transform = 'translateY(0)';
-                }, 110);
+                setTimeout(() => { dTitle.style.opacity = '1'; }, 50);
             }
 
             if (dReason) {
                 dReason.style.opacity = '0';
-                dReason.style.transform = 'translateY(-3px)';
-                setTimeout(() => {
-                    dReason.textContent = state.concept.summary || '';
-                    dReason.style.opacity = '1';
-                    dReason.style.transform = 'translateY(0)';
-                }, 110);
+                setTimeout(() => { dReason.style.opacity = '1'; }, 50);
             }
 
             // Stream Intuicja on the right with organic typewriter
