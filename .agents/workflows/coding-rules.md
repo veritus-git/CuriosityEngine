@@ -62,11 +62,9 @@ The engine supports distinct cognitive directions:
   * Mobile: Full-width stacked buttons (`flex-direction: column-reverse; width: 100%; height: 48px;`) and horizontal card rows to prevent any horizontal overflow.
 * **Tactile Feedback**: Every AI-driven or network action must display immediate, smooth loading indicators.
 
----
-
 ## 3. Git & Workflow Standards
 
-1. **Commit Message Format**: Every commit message must contain **exactly 2 short, descriptive sentences**.
+1. **Commit Message Language & Format**: Every commit message must be written in **English** and contain **exactly 2 short, descriptive sentences**.
 2. **Dual-Remote Push**: Every commit must be pushed to both remotes:
    ```bash
    git push github main && git push gitea main

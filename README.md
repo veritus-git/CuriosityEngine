@@ -1,4 +1,4 @@
-# ⚡ CuriosityEngine
+# <img src="frontend/assets/logo.png" alt="CuriosityEngine Logo" width="32" height="32" valign="middle" /> CuriosityEngine
 
 **One interesting thing at a time.**
 
