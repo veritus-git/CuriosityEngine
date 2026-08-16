@@ -262,17 +262,31 @@ async def _call_gemini(system_prompt: str, user_prompt: str, model_name: str) ->
 
 
 def _parse_json_response(content: str) -> dict:
-    """Parse and clean JSON response."""
-    if "```json" in content:
-        content = content.split("```json")[1].split("```")[0].strip()
-    elif "```" in content:
-        content = content.split("```")[1].split("```")[0].strip()
+    """Parse and clean JSON response with robust substring extraction."""
+    clean = content.strip()
+    if "```json" in clean:
+        clean = clean.split("```json")[1].split("```")[0].strip()
+    elif "```" in clean:
+        clean = clean.split("```")[1].split("```")[0].strip()
 
+    # 1. Direct parse attempt
     try:
-        return json.loads(content)
+        return json.loads(clean)
     except json.JSONDecodeError:
-        logger.error(f"AI returned invalid JSON: {content[:500]}")
-        raise AIError("AI returned an invalid JSON response. Please try again.")
+        pass
+
+    # 2. Extract outermost { ... } block
+    start = clean.find("{")
+    end = clean.rfind("}")
+    if start != -1 and end != -1 and end > start:
+        candidate = clean[start:end+1].strip()
+        try:
+            return json.loads(candidate)
+        except json.JSONDecodeError:
+            pass
+
+    logger.error(f"AI returned invalid JSON: {content[:500]}")
+    raise AIError("AI returned an invalid JSON response. Please try again.")
 
 
 def get_ai_status() -> dict:
