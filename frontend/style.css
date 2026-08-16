@@ -2799,37 +2799,38 @@ html {
     animation: fadeIn 0.4s var(--ease-out);
 }
 
-/* Full-Width Search Bar (Aligned 1:1 to 920px Grid & Card Geometry) */
+/* Full-Width Search Bar (Distinguished Elevated Slate/Indigo Surface) */
 .cold-start-search-wrap {
     width: 100%;
     max-width: 920px;
-    margin: 1.8rem 0 1.25rem 0;
+    margin: 1.8rem 0 1.35rem 0;
 }
 
 .thought-search-bar {
     display: flex;
     align-items: center;
     width: 100%;
-    background: #101020;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(180deg, #13132a 0%, #0e0e20 100%);
+    border: 1px solid rgba(99, 102, 241, 0.22);
     border-radius: var(--radius-lg);
-    padding: 0.4rem 0.5rem 0.4rem 1.4rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    padding: 0.45rem 0.6rem 0.45rem 1.4rem;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.32), 0 0 24px rgba(99, 102, 241, 0.08);
     transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-    height: 54px;
+    height: 56px;
     box-sizing: border-box;
 }
 
 .thought-search-bar:focus-within {
-    border-color: rgba(99, 102, 241, 0.4);
-    background: #141428;
-    box-shadow: 0 0 28px rgba(99, 102, 241, 0.2), 0 14px 40px rgba(0, 0, 0, 0.35);
+    border-color: #6366f1;
+    background: linear-gradient(180deg, #181836 0%, #111126 100%);
+    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.45), 0 0 32px rgba(99, 102, 241, 0.25);
 }
 
 .search-bar-icon {
     color: #38bdf8;
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
     font-size: 1.15rem;
-    margin-right: 0.75rem;
+    margin-right: 0.8rem;
     flex-shrink: 0;
 }
 
@@ -2852,7 +2853,7 @@ html {
 
 .btn--thought-submit {
     border-radius: var(--radius-md);
-    padding: 0.5rem 1.3rem;
+    padding: 0.55rem 1.35rem;
     font-size: 0.88rem;
     font-weight: 600;
     white-space: nowrap;
@@ -2863,7 +2864,7 @@ html {
     justify-content: center;
 }
 
-/* 4 Tailored Concept Cards Grid with Local Card Loader Overlay */
+/* 4 Tailored Concept Cards Grid with Borderless Pure Blur Loader */
 .spark-grid-wrap {
     position: relative;
     width: 100%;
@@ -2877,25 +2878,17 @@ html {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(10, 10, 22, 0.82);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    background: rgba(7, 7, 14, 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border-radius: var(--radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: none;
+    box-shadow: none;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.9rem;
     z-index: 10;
     animation: fadeIn 0.2s var(--ease-out);
-}
-
-.spark-grid-loader__text {
-    font-size: 0.9rem;
-    color: #cbd5e1;
-    font-weight: 500;
-    letter-spacing: -0.01em;
 }
 
 .spark-grid {

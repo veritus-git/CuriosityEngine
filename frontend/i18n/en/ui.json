@@ -126,7 +126,7 @@
         "badge": "Cold Start",
         "title": "Choose Your First Topic",
         "subtitle": "Enter your own thought or select from topics tailored to your passions:",
-        "search_placeholder": "Type any question, idea, or concept...",
+        "search_placeholder": "Enter your own topic or choose one of the suggestions below...",
         "search_submit": "Explore ➔",
         "or_divider": "or choose from generated suggestions",
         "reroll_btn": "Suggest 4 different topics"
