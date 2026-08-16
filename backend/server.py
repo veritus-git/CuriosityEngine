@@ -6,6 +6,7 @@ Provides the reactive REST API for the Zen Curiosity Dashboard.
 import os
 import json
 import logging
+import asyncio
 from pathlib import Path
 from contextlib import asynccontextmanager
 
@@ -14,9 +15,9 @@ load_dotenv()
 
 from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 from .database import (
     init_db, get_active_concept, get_suggested_concept, get_concept,
@@ -508,6 +509,55 @@ async def general_exception_handler(request: Request, exc: Exception):
 # ─── Static Frontend Serving ───
 
 FRONTEND_DIR = Path(__file__).parent.parent / "frontend"
+
+
+def get_frontend_mtimes() -> Dict[str, float]:
+    """Scan all files in frontend directory and record modification timestamps."""
+    mtimes = {}
+    if not FRONTEND_DIR.exists():
+        return mtimes
+    for p in FRONTEND_DIR.rglob("*"):
+        if p.is_file() and not p.name.startswith("."):
+            try:
+                mtimes[str(p.relative_to(FRONTEND_DIR))] = p.stat().st_mtime
+            except OSError:
+                pass
+    return mtimes
+
+
+@app.get("/api/dev/live-reload")
+async def live_reload_sse(request: Request):
+    """Server-Sent Events endpoint for instant CSS hot-swapping & auto-reload during development."""
+    async def event_generator():
+        last_mtimes = get_frontend_mtimes()
+        yield "event: connected\ndata: {}\n\n"
+        while True:
+            if await request.is_disconnected():
+                break
+            await asyncio.sleep(0.35)
+            current_mtimes = get_frontend_mtimes()
+            changes = []
+            for file_path, mtime in current_mtimes.items():
+                if file_path not in last_mtimes or mtime > last_mtimes[file_path]:
+                    changes.append(file_path)
+
+            if changes:
+                last_mtimes = current_mtimes
+                only_css = all(f.endswith(".css") for f in changes)
+                event_type = "css" if only_css else "reload"
+                payload = json.dumps({"type": event_type, "files": changes})
+                yield f"event: change\ndata: {payload}\n\n"
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        }
+    )
+
 
 @app.middleware("http")
 async def add_no_cache_header(request: Request, call_next):

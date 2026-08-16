@@ -1144,6 +1144,7 @@
         applyTranslations();
         updateGreetingAndDates();
         bindGlobalEvents();
+        initDevLiveReload();
 
         const token = localStorage.getItem('curiosity_token');
         const savedLang = localStorage.getItem('curiosity_lang') || 'pl';
@@ -1897,6 +1898,48 @@
         const p = document.createElement('p');
         p.textContent = str;
         return p.innerHTML;
+    }
+
+    // ─── Instant Dev Hot-Reload & CSS Hot-Swap ───
+    function initDevLiveReload() {
+        if (!window.EventSource) return;
+        let es = null;
+        let retryTimeout = null;
+
+        function connect() {
+            try {
+                es = new EventSource('/api/dev/live-reload');
+                es.addEventListener('change', (e) => {
+                    try {
+                        const data = JSON.parse(e.data);
+                        if (data.type === 'css') {
+                            // Instant CSS hot-swap without page reload or loss of state
+                            const links = document.querySelectorAll('link[rel="stylesheet"]');
+                            links.forEach(link => {
+                                const url = new URL(link.href, window.location.origin);
+                                url.searchParams.set('_hot', Date.now());
+                                link.href = url.toString();
+                            });
+                        } else {
+                            // Full page reload for JS/HTML/JSON changes
+                            window.location.reload();
+                        }
+                    } catch (err) {
+                        window.location.reload();
+                    }
+                });
+
+                es.onerror = () => {
+                    es.close();
+                    clearTimeout(retryTimeout);
+                    retryTimeout = setTimeout(connect, 2000);
+                };
+            } catch (err) {
+                // Ignore in offline / production modes
+            }
+        }
+
+        connect();
     }
 
     // Start App immediately or upon DOM ready
