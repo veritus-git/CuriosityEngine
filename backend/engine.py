@@ -18,7 +18,7 @@ from .prompts import (
     build_generation_prompts, build_batch_generation_prompts,
     build_dynamic_prompt_synthesis_prompts, build_multiconcept_parse_prompts,
     build_external_learning_prompt, build_cold_start_generation_prompts,
-    build_direct_topic_prompts, build_cold_start_from_thought_prompts,
+    build_direct_topic_prompts, build_thought_to_concept_prompts,
     load_prompts
 )
 
@@ -209,36 +209,55 @@ async def select_starter_topic(
     return concept
 
 
-async def generate_starter_cards_from_thought(
+async def create_concept_from_user_thought(
     thought: str,
     language: Optional[str] = None
-) -> List[Dict[str, Any]]:
+) -> Dict[str, Any]:
     """
-    Generate 4 direct starter cards / branches rooted specifically in what the user typed.
+    Directly transform a user's custom thought/query into an active concept on the dashboard.
     """
+    reject_all_suggested_concepts(new_status="skipped")
     profile = get_profile()
     lang = language or profile.get("language", "pl")
-    level = profile.get("grounding_level", "builder")
+
+    title = thought.strip()
+    domain = "General"
+    summary = thought.strip()
+    intuitive_model = ""
 
     try:
-        sys_prompt, user_prompt = build_cold_start_from_thought_prompts(
+        sys_prompt, user_prompt = build_thought_to_concept_prompts(
             thought=thought,
-            level=level,
-            language=lang
+            profile=profile
         )
         parsed = await generate_ai_json(sys_prompt, user_prompt)
-        cards = parsed.get("cards", [])
-        if len(cards) >= 4:
-            return cards[:4]
+        if parsed.get("topic"):
+            title = parsed["topic"].strip()
+        if parsed.get("domain"):
+            domain = parsed["domain"].strip()
+        if parsed.get("short_reason"):
+            summary = parsed["short_reason"].strip()
+        intuitive_model = parsed.get("intuitive_model") or ""
     except Exception as e:
-        logger.warning(f"Thought-based starter cards generation notice ({e}), falling back to dynamic generator.")
+        logger.warning(f"AI parsing notice for thought '{thought}': {e}")
+        if len(title) > 60:
+            title = title[:60].strip()
 
-    return await generate_dynamic_starter_cards(
-        interests=[thought],
-        level=level,
-        recent_thought=thought,
-        language=lang
+    emb = await generate_embedding(f"{title} {domain} {summary}")
+
+    concept = create_concept(
+        title=title,
+        domain=domain,
+        summary=summary,
+        intuitive_model=intuitive_model,
+        difficulty=profile.get("grounding_level", "builder"),
+        status="active",
+        embedding=emb,
+        source_mode="user_thought"
     )
+
+    logger.info(f"Directly activated concept from user thought: {title}")
+    return concept
 
 
 async def generate_concept_suggestion(

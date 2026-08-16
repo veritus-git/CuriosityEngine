@@ -32,7 +32,7 @@ from .engine import (
     generate_dynamic_learning_prompt, save_topic_as_spark,
     complete_session_with_coexplored, get_learning_prompt,
     generate_dynamic_starter_cards, select_starter_topic,
-    generate_starter_cards_from_thought
+    create_concept_from_user_thought
 )
 from .prompts import load_prompts
 
@@ -457,13 +457,28 @@ async def regenerate_cold_start_route(req: RegenerateColdStartRequest, username:
     return {"cards": cards}
 
 
+@app.post("/api/topics/from-thought")
 @app.post("/api/cold-start/from-thought")
-async def cold_start_from_thought(req: CustomThoughtColdStartRequest, username: str = Depends(get_current_user_token)):
-    profile = get_profile()
-    target_lang = req.language or profile.get("language", "pl")
-    cards = await generate_starter_cards_from_thought(req.thought, language=target_lang)
-    update_profile(starter_cards=cards)
-    return {"cards": cards}
+async def create_topic_from_thought_route(req: CustomThoughtColdStartRequest, username: str = Depends(get_current_user_token)):
+    ai_status = get_ai_status()
+    if not ai_status["configured"]:
+        raise HTTPException(
+            status_code=400,
+            detail="AI is not configured. Please set AI_API_KEY in .env and restart."
+        )
+    try:
+        profile = get_profile()
+        target_lang = req.language or profile.get("language", "pl")
+        concept = await create_concept_from_user_thought(req.thought, language=target_lang)
+        prompt = await generate_dynamic_learning_prompt(concept["id"])
+        return {
+            "concept": concept,
+            "prompt": prompt,
+            "state": "CONCEPT_ACTIVE"
+        }
+    except Exception as e:
+        logger.exception("Error creating concept from thought")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/languages")

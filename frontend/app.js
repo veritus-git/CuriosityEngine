@@ -1608,7 +1608,7 @@
             });
         }
 
-        // Submit Custom Thought in Unified Cold Start (Local Cards Spinner)
+        // Submit Custom Thought in Unified Cold Start (Directly Activates Concept & Enters Dashboard)
         const formColdStartThought = $('#form-cold-start-thought');
         const inputThought = $('#input-cold-start-thought');
         if (formColdStartThought) {
@@ -1617,20 +1617,23 @@
                 const thought = (inputThought?.value || '').trim();
                 if (!thought) return;
 
-                setColdStartCardsLoading(true);
+                setGlobalLoading(true, 'loading.generating');
                 try {
-                    const res = await api('POST', '/api/cold-start/from-thought', {
+                    const res = await api('POST', '/api/topics/from-thought', {
                         thought: thought,
                         language: langCode
                     });
 
-                    state.coldStartCards = res.cards || [];
-                    renderColdStartCards();
+                    state.concept = res.concept;
+                    state.prompt = res.prompt;
+                    state.coldStartActive = false;
+                    renderDashboard('focus');
+                    showView('DASHBOARD');
                     if (inputThought) inputThought.value = '';
                 } catch (err) {
                     showToast(err.message || t('errors.server_down'));
                 } finally {
-                    setColdStartCardsLoading(false);
+                    setGlobalLoading(false);
                 }
             });
         }

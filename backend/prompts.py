@@ -461,34 +461,44 @@ def build_cold_start_generation_prompts(
     return system_prompt, user_msg
 
 
-def build_cold_start_from_thought_prompts(
+def build_thought_to_concept_prompts(
     thought: str,
-    level: str = "builder",
-    language: str = "en"
+    profile: Optional[Dict[str, Any]] = None
 ) -> tuple[str, str]:
     """
-    Build prompts to generate 4 direct associative branches from user's custom thought input.
+    Build prompts to transform user's raw thought/query into a single, concrete, captivating concept topic.
     """
-    prompts = load_prompts(language)
-    system_prompt = _get(prompts, "cold_start_generation", "system", default="")
+    lang = profile.get("language", "en") if profile else "en"
+    level = profile.get("grounding_level", "builder") if profile else "builder"
+    form_of_address = profile.get("form_of_address", "neutral") if profile else "neutral"
+    prompts = load_prompts(lang)
+
+    system_prompt = _get(prompts, "topic_generation", "system", default="")
     lang_instruction = _get(prompts, "language_instruction", default="")
     system_prompt = system_prompt.replace("{language_instruction}", lang_instruction)
 
-    grounding = _get_grounding_instruction(level, language)
+    grounding = _get_grounding_instruction(level, lang)
+    address_inst = _get_form_of_address_instruction(form_of_address, lang)
 
-    if language == "pl":
+    if lang == "pl":
         user_msg = (
-            f"Użytkownik wpisał swoją własną myśl / pytanie / impuls ciekawości:\n\"{thought}\"\n\n"
-            f"{grounding}\n\n"
-            f"Wygeneruj dokładnie 4 BEZPOŚREDNIE, konkretne odnogi / tematy zgłębiające ten pomysł pod różnymi kątami. "
-            f"Każda karta musi zawierać konkretny mechanizm związany z tą myślą."
+            f"Użytkownik wpisał swoją własną myśl, pytanie lub zjawisko, które chce natychmiast zbadać:\n"
+            f"\"{thought}\"\n\n"
+            f"{grounding}\n"
+            f"{address_inst}\n\n"
+            f"Przekształć tę myśl w JEDNO konkretne, elegancko i precyzyjnie nazwane pojęcie/temat (np. zamiast całego zdania zdefiniuj zwięzły tytuł pojęcia jak 'Macierze w modelach AI' lub 'Mechanizm uwagi i wektory'), "
+            f"określ jego dziedzinę, zwięzły powód dlaczego warto to zbadać (short_reason) oraz intuicyjny, 1-2 zdaniowy model mentalny (intuitive_model).\n"
+            f"Odpowiedz WYŁĄCZNIE poprawnym JSON."
         )
     else:
         user_msg = (
-            f"The user entered their own thought / question / spark:\n\"{thought}\"\n\n"
-            f"{grounding}\n\n"
-            f"Generate exactly 4 DIRECT, specific branches / topics exploring this idea from different angles. "
-            f"Each card must feature a specific mechanism directly related to this thought."
+            f"The user entered their own thought, question, or phenomenon to explore:\n"
+            f"\"{thought}\"\n\n"
+            f"{grounding}\n"
+            f"{address_inst}\n\n"
+            f"Transform this thought into ONE concrete, cleanly named concept topic (e.g. define a crisp title like 'Matrices in AI Models' or 'Attention Mechanism & Vectors'), "
+            f"specify its domain, a concise reason to explore it (short_reason), and a tangible 1-2 sentence intuitive model (intuitive_model).\n"
+            f"Respond ONLY with valid JSON."
         )
 
     return system_prompt, user_msg
