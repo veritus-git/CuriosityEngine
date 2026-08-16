@@ -570,9 +570,9 @@
                 <div class="cold-start-wrapper">
                     <span class="badge" data-i18n="cold_start.badge"></span>
                     <h1 class="page-title" data-i18n="cold_start.title"></h1>
-                    <p class="page-subtitle" data-i18n="cold_start.subtitle"></p>
+                    <p class="page-subtitle-coldstart" data-i18n="cold_start.subtitle"></p>
 
-                    <!-- Prominent Unified Search Bar -->
+                    <!-- Prominent Full-Width Search Bar (Aligned to 920px Grid) -->
                     <form id="form-cold-start-thought" class="cold-start-search-wrap">
                         <div class="thought-search-bar">
                             <span class="search-bar-icon" aria-hidden="true">✦</span>
@@ -586,16 +586,16 @@
                         </div>
                     </form>
 
-                    <!-- Elegant Divider -->
-                    <div class="cold-start-divider">
-                        <span class="cold-start-divider__line"></span>
-                        <span class="cold-start-divider__text" data-i18n="cold_start.or_divider"></span>
-                        <span class="cold-start-divider__line"></span>
-                    </div>
-
-                    <!-- 4 Tailored Concept Cards (2x2 Grid) -->
-                    <div class="spark-grid" id="cold-start-cards-container">
-                        <!-- Populated dynamically via JS -->
+                    <!-- 4 Tailored Concept Cards (2x2 Grid with Local Spinner Overlay) -->
+                    <div class="spark-grid-wrap">
+                        <div class="spark-grid" id="cold-start-cards-container">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                        <div class="spark-grid-loader" id="cold-start-cards-loader" hidden aria-live="polite">
+                            <img src="assets/logo.png" alt="Loading" class="loading-logo-spin" width="46" height="46"
+                                style="width: 46px; height: 46px; max-width: 46px; max-height: 46px;">
+                            <span class="spark-grid-loader__text" data-i18n="loading.generating"></span>
+                        </div>
                     </div>
 
                     <!-- Actions Row -->

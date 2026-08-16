@@ -1571,12 +1571,28 @@
             });
         }
 
-        // Cold Start Actions
+        // Local Loader for Cold Start Cards
+        function setColdStartCardsLoading(isLoading) {
+            const loader = $('#cold-start-cards-loader');
+            const rerollBtn = $('#btn-cold-start-reroll');
+            const submitBtn = $('#btn-submit-cold-start-thought');
+            if (loader) loader.hidden = !isLoading;
+            if (rerollBtn) {
+                rerollBtn.disabled = isLoading;
+                rerollBtn.style.opacity = isLoading ? '0.5' : '1';
+                rerollBtn.style.pointerEvents = isLoading ? 'none' : 'auto';
+            }
+            if (submitBtn) {
+                submitBtn.disabled = isLoading;
+            }
+        }
+
+        // Cold Start Reroll Action (Local Cards Spinner)
         const btnColdStartReroll = $('#btn-cold-start-reroll');
         if (btnColdStartReroll) {
             btnColdStartReroll.addEventListener('click', async () => {
                 const rejected = (state.coldStartCards || []).map(c => c.title);
-                setGlobalLoading(true, 'loading.generating');
+                setColdStartCardsLoading(true);
                 try {
                     const res = await api('POST', '/api/cold-start/regenerate', {
                         rejected_topics: rejected,
@@ -1587,12 +1603,12 @@
                 } catch (err) {
                     showToast(err.message || t('errors.server_down'));
                 } finally {
-                    setGlobalLoading(false);
+                    setColdStartCardsLoading(false);
                 }
             });
         }
 
-        // Submit Custom Thought in Unified Cold Start
+        // Submit Custom Thought in Unified Cold Start (Local Cards Spinner)
         const formColdStartThought = $('#form-cold-start-thought');
         const inputThought = $('#input-cold-start-thought');
         if (formColdStartThought) {
@@ -1601,7 +1617,7 @@
                 const thought = (inputThought?.value || '').trim();
                 if (!thought) return;
 
-                setGlobalLoading(true, 'loading.generating');
+                setColdStartCardsLoading(true);
                 try {
                     const res = await api('POST', '/api/cold-start/from-thought', {
                         thought: thought,
@@ -1614,7 +1630,7 @@
                 } catch (err) {
                     showToast(err.message || t('errors.server_down'));
                 } finally {
-                    setGlobalLoading(false);
+                    setColdStartCardsLoading(false);
                 }
             });
         }

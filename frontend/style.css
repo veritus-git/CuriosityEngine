@@ -347,6 +347,12 @@ body {
     margin-bottom: var(--space-xl);
 }
 
+.page-subtitle-coldstart {
+    font-size: var(--fs-base);
+    color: var(--text-secondary);
+    max-width: 580px;
+}
+
 .badge {
     display: inline-flex;
     align-items: center;
@@ -2778,7 +2784,7 @@ html {
     justify-content: center;
     width: 100%;
     min-height: 100%;
-    padding: 2.5rem 1.5rem;
+    padding: 2rem 1.5rem 2.5rem 1.5rem;
     box-sizing: border-box;
 }
 
@@ -2793,35 +2799,36 @@ html {
     animation: fadeIn 0.4s var(--ease-out);
 }
 
-/* Prominent Unified Search Bar */
+/* Full-Width Search Bar (Aligned 1:1 to 920px Grid & Card Geometry) */
 .cold-start-search-wrap {
     width: 100%;
-    max-width: 620px;
-    margin: 1.6rem auto 1.2rem auto;
+    max-width: 920px;
+    margin: 1.8rem 0 1.25rem 0;
 }
 
 .thought-search-bar {
     display: flex;
     align-items: center;
-    background: #0d0d1e;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 999px;
-    padding: 0.35rem 0.45rem 0.35rem 1.25rem;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 0 20px rgba(99, 102, 241, 0.1);
-    transition: all var(--duration-fast) var(--ease-out);
-    height: 50px;
+    width: 100%;
+    background: #101020;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-lg);
+    padding: 0.4rem 0.5rem 0.4rem 1.4rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    height: 54px;
     box-sizing: border-box;
 }
 
 .thought-search-bar:focus-within {
-    border-color: #6366f1;
-    background: #111126;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), 0 0 28px rgba(99, 102, 241, 0.3);
+    border-color: rgba(99, 102, 241, 0.4);
+    background: #141428;
+    box-shadow: 0 0 28px rgba(99, 102, 241, 0.2), 0 14px 40px rgba(0, 0, 0, 0.35);
 }
 
 .search-bar-icon {
     color: #38bdf8;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     margin-right: 0.75rem;
     flex-shrink: 0;
 }
@@ -2833,56 +2840,64 @@ html {
     outline: none;
     color: #ffffff;
     font-family: var(--font-sans);
-    font-size: 0.94rem;
+    font-size: 0.95rem;
     padding: 0.3rem 0;
     min-width: 0;
 }
 
 .thought-search-input::placeholder {
     color: #64748b;
-    font-size: 0.9rem;
+    font-size: 0.92rem;
 }
 
 .btn--thought-submit {
-    border-radius: 999px;
-    padding: 0.45rem 1.2rem;
-    font-size: 0.86rem;
+    border-radius: var(--radius-md);
+    padding: 0.5rem 1.3rem;
+    font-size: 0.88rem;
     font-weight: 600;
     white-space: nowrap;
-    height: 38px;
+    height: 40px;
     flex-shrink: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
 }
 
-/* Elegant Divider */
-.cold-start-divider {
+/* 4 Tailored Concept Cards Grid with Local Card Loader Overlay */
+.spark-grid-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 920px;
+    margin: 0 auto;
+}
+
+.spark-grid-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 10, 22, 0.82);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
-    width: 100%;
-    max-width: 620px;
-    margin: 0.3rem auto 1.4rem auto;
+    gap: 0.9rem;
+    z-index: 10;
+    animation: fadeIn 0.2s var(--ease-out);
 }
 
-.cold-start-divider__line {
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+.spark-grid-loader__text {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    font-weight: 500;
+    letter-spacing: -0.01em;
 }
 
-.cold-start-divider__text {
-    font-size: 0.76rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text-tertiary);
-    white-space: nowrap;
-}
-
-/* 4 Tailored Concept Cards (2x2 Grid) */
 .spark-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -2897,7 +2912,7 @@ html {
     flex-direction: column;
     align-items: flex-start;
     text-align: left;
-    padding: 1.6rem 2rem;
+    padding: 1.8rem 2.2rem;
     background: #101020;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: var(--radius-lg);
@@ -2917,27 +2932,27 @@ html {
 
 .spark-card__tag {
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.74rem;
     font-weight: 600;
     color: #38bdf8;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    margin-bottom: 0.45rem;
+    margin-bottom: 0.5rem;
 }
 
 .spark-card__title {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: #ffffff;
     letter-spacing: -0.01em;
     line-height: 1.3;
-    margin-bottom: 0.45rem;
+    margin-bottom: 0.5rem;
 }
 
 .spark-card__desc {
-    font-size: 0.92rem;
+    font-size: 0.94rem;
     color: #cbd5e1;
-    line-height: 1.5;
+    line-height: 1.52;
 }
 
 /* Actions Row */
