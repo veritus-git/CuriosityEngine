@@ -59,13 +59,16 @@
 
                 <!-- Unauthenticated Auth Links (Shown on Landing Page when logged out) -->
                 <div class="topbar__auth-links" id="topbar-auth-links">
-                    <button class="topbar__btn topbar__btn--auth-login" id="btn-topbar-login" data-i18n="nav.login_btn"></button>
-                    <button class="topbar__btn topbar__btn--auth-register" id="btn-topbar-register" data-i18n="nav.register_btn"></button>
+                    <button class="topbar__btn topbar__btn--auth-login" id="btn-topbar-login"
+                        data-i18n="nav.login_btn"></button>
+                    <button class="topbar__btn topbar__btn--auth-register" id="btn-topbar-register"
+                        data-i18n="nav.register_btn"></button>
                 </div>
 
                 <!-- Authenticated User Avatar & Dropdown Menu -->
                 <div class="topbar__user-profile" id="topbar-user-profile" hidden>
-                    <button type="button" class="user-avatar-btn" id="btn-user-avatar" aria-label="User Menu" aria-expanded="false">
+                    <button type="button" class="user-avatar-btn" id="btn-user-avatar" aria-label="User Menu"
+                        aria-expanded="false">
                         <span class="user-avatar-initial" id="user-avatar-initial">U</span>
                     </button>
                     <div class="user-dropdown-menu" id="user-dropdown-menu" hidden>
@@ -73,10 +76,13 @@
                             <span class="user-dropdown-name" id="user-dropdown-name">User</span>
                         </div>
                         <div class="user-dropdown-divider"></div>
-                        <button type="button" class="user-dropdown-item" id="btn-user-menu-dashboard" data-i18n="nav.user_dashboard"></button>
-                        <button type="button" class="user-dropdown-item" id="btn-user-menu-settings" data-i18n="nav.user_settings"></button>
+                        <button type="button" class="user-dropdown-item" id="btn-user-menu-dashboard"
+                            data-i18n="nav.user_dashboard"></button>
+                        <button type="button" class="user-dropdown-item" id="btn-user-menu-settings"
+                            data-i18n="nav.user_settings"></button>
                         <div class="user-dropdown-divider"></div>
-                        <button type="button" class="user-dropdown-item user-dropdown-item--danger" id="btn-user-menu-logout" data-i18n="nav.user_logout"></button>
+                        <button type="button" class="user-dropdown-item user-dropdown-item--danger"
+                            id="btn-user-menu-logout" data-i18n="nav.user_logout"></button>
                     </div>
                 </div>
 
@@ -99,11 +105,15 @@
                             <span class="hero-cursor" aria-hidden="true">|</span>
                         </span>
                     </h1>
-                    <p class="landing-hero-subtitle" data-i18n="landing.subtitle"></p>
+
                     <div class="landing-cta-group">
-                        <button type="button" class="btn btn--primary btn--lg landing-cta-btn" id="btn-landing-cta" data-i18n="landing.cta_start"></button>
-                        <a href="#landing-features" class="btn btn--ghost btn--lg landing-how-btn" id="btn-landing-how" data-i18n="landing.cta_how"></a>
+                        <p class="landing-hero-subtitle" data-i18n="landing.subtitle"></p>
+                        <a href="#landing-features" class="btn btn--ghost btn--lg landing-how-btn" id="btn-landing-how"
+                            data-i18n="landing.cta_how"></a>
+                        <button type="button" class="btn btn--primary btn--lg landing-cta-btn" id="btn-landing-cta"
+                            data-i18n="landing.cta_start"></button>
                     </div>
+                    
                 </div>
 
                 <!-- Features Showcase Section -->
@@ -142,7 +152,8 @@
             <!-- 2. AUTH MODAL (LOGIN / REGISTER / FIRST ADMIN SETUP) -->
             <div class="auth-modal-backdrop" id="auth-modal-backdrop" hidden>
                 <div class="auth-card">
-                    <button type="button" class="modal-close auth-modal-close" id="btn-close-auth-modal" aria-label="Close">&times;</button>
+                    <button type="button" class="modal-close auth-modal-close" id="btn-close-auth-modal"
+                        aria-label="Close">&times;</button>
                     <div class="auth-hero">
                         <img src="assets/logo.png" alt="CuriosityEngine" class="auth-hero-img">
                         <h2 class="auth-title" id="auth-card-title" data-i18n="auth.login_title"></h2>
@@ -166,7 +177,8 @@
                             </button>
                         </div>
                         <div class="auth-switch-box">
-                            <button type="button" class="btn-link" id="btn-auth-switch" data-i18n="auth.switch_to_register"></button>
+                            <button type="button" class="btn-link" id="btn-auth-switch"
+                                data-i18n="auth.switch_to_register"></button>
                         </div>
                     </form>
                 </div>
@@ -177,50 +189,51 @@
                 <div class="view__content onboarding-container">
 
                     <!-- Slide Card Container -->
-                    <div class="wizard-card">
-
-                        <!-- SLIDE 0: LANGUAGE & PERSONALIZATION / FORM OF ADDRESS -->
+                    <div class="wizard-card">                        <!-- SLIDE 0: LANGUAGE & PERSONALIZATION / FORM OF ADDRESS -->
                         <div class="wizard-slide" id="wizard-slide-0">
-                            <div class="slide-header">
-                                <h2 class="slide-title" data-i18n="onboarding.step0_title"></h2>
-                                <p class="slide-subtitle" data-i18n="onboarding.step0_subtitle"></p>
-                            </div>
-
-                            <div class="slide-content-spacious">
-                                <div class="step0-section">
-                                    <span class="step0-label" data-i18n="onboarding.step0_lang_label"></span>
-                                    <div class="step0-lang-pills" id="onboarding-lang-pills">
-                                        <button type="button" class="lang-pill" data-lang="en">🇬🇧 English</button>
-                                        <button type="button" class="lang-pill active" data-lang="pl">🇵🇱 Polski</button>
-                                    </div>
+                            <div class="wizard-slide__content">
+                                <div class="slide-header">
+                                    <h2 class="slide-title" data-i18n="onboarding.step0_title"></h2>
+                                    <p class="slide-subtitle" data-i18n="onboarding.step0_subtitle"></p>
                                 </div>
 
-                                <div class="step0-section">
-                                    <span class="step0-label" data-i18n="onboarding.step0_address_label"></span>
-                                    <div class="step0-gender-grid" id="onboarding-gender-grid">
-                                        <button type="button" class="gender-pill active" data-gender="male">
-                                            <span data-i18n="onboarding.gender_male"></span>
-                                        </button>
-                                        <button type="button" class="gender-pill" data-gender="female">
-                                            <span data-i18n="onboarding.gender_female"></span>
-                                        </button>
-                                        <button type="button" class="gender-pill" data-gender="neutral">
-                                            <span data-i18n="onboarding.gender_neutral"></span>
-                                        </button>
-                                        <button type="button" class="gender-pill" data-gender="custom">
-                                            <span data-i18n="onboarding.gender_custom"></span>
-                                        </button>
+                                <div class="slide-content-spacious">
+                                    <div class="step0-section">
+                                        <span class="step0-label" data-i18n="onboarding.step0_lang_label"></span>
+                                        <div class="step0-lang-pills" id="onboarding-lang-pills">
+                                            <button type="button" class="lang-pill" data-lang="en">English</button>
+                                            <button type="button" class="lang-pill active" data-lang="pl">Polski</button>
+                                        </div>
                                     </div>
-                                    <div class="step0-custom-input-wrap" id="step0-custom-gender-wrap" style="display: none;">
-                                        <input type="text" class="input input--compact" id="input-custom-gender"
-                                            data-i18n-placeholder="onboarding.gender_custom_placeholder">
-                                    </div>
-                                </div>
 
-                                <p class="step0-disclaimer" data-i18n="onboarding.step0_disclaimer"></p>
+                                    <div class="step0-section">
+                                        <span class="step0-label" data-i18n="onboarding.step0_address_label"></span>
+                                        <div class="step0-gender-grid" id="onboarding-gender-grid">
+                                            <button type="button" class="gender-pill active" data-gender="male">
+                                                <span data-i18n="onboarding.gender_male"></span>
+                                            </button>
+                                            <button type="button" class="gender-pill" data-gender="female">
+                                                <span data-i18n="onboarding.gender_female"></span>
+                                            </button>
+                                            <button type="button" class="gender-pill" data-gender="neutral">
+                                                <span data-i18n="onboarding.gender_neutral"></span>
+                                            </button>
+                                            <button type="button" class="gender-pill" data-gender="custom">
+                                                <span data-i18n="onboarding.gender_custom"></span>
+                                            </button>
+                                        </div>
+                                        <div class="step0-custom-input-wrap" id="step0-custom-gender-wrap"
+                                            style="display: none;">
+                                            <input type="text" class="input input--compact" id="input-custom-gender"
+                                                data-i18n-placeholder="onboarding.gender_custom_placeholder">
+                                        </div>
+                                    </div>
+
+                                    <p class="step0-disclaimer" data-i18n="onboarding.step0_disclaimer"></p>
+                                </div>
                             </div>
 
-                            <div class="wizard-actions wizard-actions--step1">
+                            <div class="wizard-actions wizard-actions--step0">
                                 <button type="button" class="btn btn--primary btn--step-next" id="btn-wizard-step0-next"
                                     data-i18n="onboarding.btn_next"></button>
                             </div>
@@ -228,111 +241,289 @@
 
                         <!-- SLIDE 1: DOMAINS & PASSIONS -->
                         <div class="wizard-slide" id="wizard-slide-1" hidden>
-                            <div class="slide-header">
-                                <h2 class="slide-title" data-i18n="onboarding.step1_title"></h2>
-                                <p class="slide-subtitle" data-i18n="onboarding.step1_subtitle"></p>
-                            </div>
+                            <div class="wizard-slide__content">
+                                <div class="slide-header">
+                                    <h2 class="slide-title" data-i18n="onboarding.step1_title"></h2>
+                                    <p class="slide-subtitle" data-i18n="onboarding.step1_subtitle"></p>
+                                </div>
 
-                            <div class="chips-column" id="onboarding-domains-chips">
-                                <button type="button" class="chip-row" data-domain="math"
-                                    data-i18n="onboarding.domains.math"></button>
-                                <button type="button" class="chip-row" data-domain="cs"
-                                    data-i18n="onboarding.domains.cs"></button>
-                                <button type="button" class="chip-row" data-domain="physics"
-                                    data-i18n="onboarding.domains.physics"></button>
-                                <button type="button" class="chip-row" data-domain="biology"
-                                    data-i18n="onboarding.domains.biology"></button>
-                                <button type="button" class="chip-row" data-domain="hardware"
-                                    data-i18n="onboarding.domains.hardware"></button>
-                                <button type="button" class="chip-row" data-domain="gamedev"
-                                    data-i18n="onboarding.domains.gamedev"></button>
-                                <button type="button" class="chip-row" data-domain="ai"
-                                    data-i18n="onboarding.domains.ai"></button>
-                                <button type="button" class="chip-row" data-domain="philosophy"
-                                    data-i18n="onboarding.domains.philosophy"></button>
-                                <button type="button" class="chip-row" data-domain="economics"
-                                    data-i18n="onboarding.domains.economics"></button>
-                                <button type="button" class="chip-row" data-domain="linguistics"
-                                    data-i18n="onboarding.domains.linguistics"></button>
-                            </div>
+                                <div class="chips-column" id="onboarding-domains-chips">
+                                    <!-- 1. Matematyka -->
+                                    <button type="button" class="chip-row" data-domain="math">
+                                        <div class="chip-row__bg" aria-hidden="true">
+                                            <svg class="chip-bg-icon pos-1" viewBox="0 0 24 24"><path d="M4 18l4-12 4 14 3-8h5"/></svg>
+                                            <svg class="chip-bg-icon pos-2" viewBox="0 0 24 24"><path d="M4 7h16M7 7v10M17 7v10"/></svg>
+                                            <svg class="chip-bg-icon pos-3" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg>
+                                            <svg class="chip-bg-icon pos-4" viewBox="0 0 24 24"><path d="M6 18c0-3.3 2.7-6 6-6s6 2.7 6 6-2.7 6-6 6-6-2.7-6-6zM18 18c0-3.3-2.7-6-6-6"/></svg>
+                                        </div>
+                                        <div class="chip-row__content">
+                                            <svg class="chip-row__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M4 17l4-10 4 14 3-7h5"></path>
+                                            </svg>
+                                            <span class="chip-row__label" data-i18n="onboarding.domains.math"></span>
+                                        </div>
+                                    </button>
 
-                            <!-- Custom Tag Input -->
-                            <div class="custom-chip-builder">
-                                <input type="text" class="input input--compact" id="input-custom-chip"
-                                    data-i18n-placeholder="onboarding.custom_chip_placeholder">
-                                <button type="button" class="btn btn--secondary btn--compact" id="btn-add-custom-chip"
-                                    data-i18n="onboarding.add_chip_btn"></button>
+                                    <!-- 2. Informatyka -->
+                                    <button type="button" class="chip-row" data-domain="cs">
+                                        <div class="chip-row__bg" aria-hidden="true">
+                                            <svg class="chip-bg-icon pos-1" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                                            <svg class="chip-bg-icon pos-2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/></svg>
+                                            <svg class="chip-bg-icon pos-3" viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                                            <svg class="chip-bg-icon pos-4" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                                        </div>
+                                        <div class="chip-row__content">
+                                            <svg class="chip-row__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="16 18 22 12 16 6"></polyline>
+                                                <polyline points="8 6 2 12 8 18"></polyline>
+                                            </svg>
+                                            <span class="chip-row__label" data-i18n="onboarding.domains.cs"></span>
+                                        </div>
+                                    </button>
+
+                                    <!-- 3. Fizyka -->
+                                    <button type="button" class="chip-row" data-domain="physics">
+                                        <div class="chip-row__bg" aria-hidden="true">
+                                            <svg class="chip-bg-icon pos-1" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="3" transform="rotate(30 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3" transform="rotate(-30 12 12)"/></svg>
+                                            <svg class="chip-bg-icon pos-2" viewBox="0 0 24 24"><path d="M2 12c3-4 6-4 9 0s6 4 9 0"/><circle cx="12" cy="12" r="2"/></svg>
+                                            <svg class="chip-bg-icon pos-3" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16"/></svg>
+                                            <svg class="chip-bg-icon pos-4" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="10" ry="4"/></svg>
+                                        </div>
+                                        <div class="chip-row__content">
+                                            <svg class="chip-row__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="12" cy="12" r="2"></circle>
+                                                <ellipse cx="12" cy="12" rx="9" ry="3" transform="rotate(30 12 12)"></ellipse>
+                                                <ellipse cx="12" cy="12" rx="9" ry="3" transform="rotate(-30 12 12)"></ellipse>
+                                            </svg>
+                                            <span class="chip-row__label" data-i18n="onboarding.domains.physics"></span>
+                                        </div>
+                                    </button>
+
+                                    <!-- 4. Biologia -->
+                                    <button type="button" class="chip-row" data-domain="biology">
+                                        <div class="chip-row__bg" aria-hidden="true">
+                                            <svg class="chip-bg-icon pos-1" viewBox="0 0 24 24"><path d="M2 15c6.6-6 13.3 0 20-6M2 9c6.6 6 13.3 0 20 6"/></svg>
+                                            <svg class="chip-bg-icon pos-2" viewBox="0 0 24 24"><path d="M12 2a9 9 0 0 1 9 9c0 5-4 9-9 9s-9-4-9-9a9 9 0 0 1 9-9z"/><path d="M12 2v20"/></svg>
+                                            <svg class="chip-bg-icon pos-3" viewBox="0 0 24 24"><path d="M4 18l3 3M17 6l3-3M9 22c1.8-2 2.5-4 2.8-6M15 2c-1.8 2-2.5 4-2.8 6"/></svg>
+                                            <svg class="chip-bg-icon pos-4" viewBox="0 0 24 24"><path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/></svg>
+                                        </div>
+                                        <div class="chip-row__content">
+                                            <svg class="chip-row__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M2 15c6.6-6 13.3 0 20-6"></path>
+                                                <path d="M9 22c1.8-2 2.5-4 2.8-6"></path>
+                                                <path d="M15 2c-1.8 2-2.5 4-2.8 6"></path>
+                                                <path d="M17 6l3-3"></path>
+                                                <path d="M4 18l3 3"></path>
+                                                <path d="M12 12l2-2"></path>
+                                            </svg>
+                                            <span class="chip-row__label" data-i18n="onboarding.domains.biology"></span>
+                                        </div>
+                                    </button>
+
+                                    <!-- 5. Inżynieria -->
+                                    <button type="button" class="chip-row" data-domain="engineering">
+                                        <div class="chip-row__bg" aria-hidden="true">
+                                            <svg class="chip-bg-icon pos-1" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                                            <svg class="chip-bg-icon pos-2" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                                            <svg class="chip-bg-icon pos-3" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+                                            <svg class="chip-bg-icon pos-4" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                                        </div>
+                                        <div class="chip-row__content">
+                                            <svg class="chip-row__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="12" cy="12" r="3"></circle>
+                                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                                            </svg>
+                                            <span class="chip-row__label" data-i18n="onboarding.domains.engineering"></span>
+                                        </div>
+                                    </button>
+
+                                    <!-- 6. Psychologia -->
+                                    <button type="button" class="chip-row" data-domain="psychology">
+                                        <div class="chip-row__bg" aria-hidden="true">
+                                            <svg class="chip-bg-icon pos-1" viewBox="0 0 24 24"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.04z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.04z"/></svg>
+                                            <svg class="chip-bg-icon pos-2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>
+                                            <svg class="chip-bg-icon pos-3" viewBox="0 0 24 24"><path d="M12 2a8 8 0 0 0-8 8c0 3.4 2.1 6.3 5 7.4V20a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2.6c2.9-1.1 5-4 5-7.4a8 8 0 0 0-8-8z"/></svg>
+                                            <svg class="chip-bg-icon pos-4" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 3-2 5.5 2.5 0 4.24-.5 5.5-2"/></svg>
+                                        </div>
+                                        <div class="chip-row__content">
+                                            <svg class="chip-row__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.04z"></path>
+                                                <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.04z"></path>
+                                            </svg>
+                                            <span class="chip-row__label" data-i18n="onboarding.domains.psychology"></span>
+                                        </div>
+                                    </button>
+
+                                    <!-- 7. Filozofia -->
+                                    <button type="button" class="chip-row" data-domain="philosophy">
+                                        <div class="chip-row__bg" aria-hidden="true">
+                                            <svg class="chip-bg-icon pos-1" viewBox="0 0 24 24"><path d="M4 4h16M4 20h16M6 4v16M10 4v16M14 4v16M18 4v16"/></svg>
+                                            <svg class="chip-bg-icon pos-2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18"/></svg>
+                                            <svg class="chip-bg-icon pos-3" viewBox="0 0 24 24"><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                                            <svg class="chip-bg-icon pos-4" viewBox="0 0 24 24"><polygon points="12 2 15 8 22 9 17 14 18 21 12 17 6 21 7 14 2 9 9 8 12 2"/></svg>
+                                        </div>
+                                        <div class="chip-row__content">
+                                            <svg class="chip-row__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M4 4h16M4 20h16M7 4v16M12 4v16M17 4v16M3 2h18M3 22h18"></path>
+                                            </svg>
+                                            <span class="chip-row__label" data-i18n="onboarding.domains.philosophy"></span>
+                                        </div>
+                                    </button>
+
+                                    <!-- 8. Ekonomia -->
+                                    <button type="button" class="chip-row" data-domain="economics">
+                                        <div class="chip-row__bg" aria-hidden="true">
+                                            <svg class="chip-bg-icon pos-1" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                                            <svg class="chip-bg-icon pos-2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                            <svg class="chip-bg-icon pos-3" viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="8"/><rect x="10" y="8" width="4" height="12"/><rect x="17" y="4" width="4" height="16"/></svg>
+                                            <svg class="chip-bg-icon pos-4" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>
+                                        </div>
+                                        <div class="chip-row__content">
+                                            <svg class="chip-row__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                                <polyline points="17 6 23 6 23 12"></polyline>
+                                            </svg>
+                                            <span class="chip-row__label" data-i18n="onboarding.domains.economics"></span>
+                                        </div>
+                                    </button>
+
+                                    <!-- 9. Historia -->
+                                    <button type="button" class="chip-row" data-domain="history">
+                                        <div class="chip-row__bg" aria-hidden="true">
+                                            <svg class="chip-bg-icon pos-1" viewBox="0 0 24 24"><path d="M5 22h14M5 2h14M17 22v-4.1a2 2 0 0 0-.6-1.4L12 12l-4.4 4.5A2 2 0 0 0 7 17.9V22M7 2v4.1a2 2 0 0 0 .6 1.4L12 12l4.4-4.5A2 2 0 0 0 17 6.1V2"/></svg>
+                                            <svg class="chip-bg-icon pos-2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                            <svg class="chip-bg-icon pos-3" viewBox="0 0 24 24"><polygon points="12 2 19 21 12 17 5 21 12 2"/></svg>
+                                            <svg class="chip-bg-icon pos-4" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5v-15z"/></svg>
+                                        </div>
+                                        <div class="chip-row__content">
+                                            <svg class="chip-row__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path>
+                                            </svg>
+                                            <span class="chip-row__label" data-i18n="onboarding.domains.history"></span>
+                                        </div>
+                                    </button>
+
+                                    <!-- 10. Sztuka -->
+                                    <button type="button" class="chip-row" data-domain="art">
+                                        <div class="chip-row__bg" aria-hidden="true">
+                                            <svg class="chip-bg-icon pos-1" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.6-.7 1.6-1.7 0-.4-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1 0-.9.7-1.7 1.7-1.7h2c3 0 5.5-2.5 5.5-5.5C22 6 17.5 2 12 2z"/></svg>
+                                            <svg class="chip-bg-icon pos-2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                            <svg class="chip-bg-icon pos-3" viewBox="0 0 24 24"><path d="M18.37 2.63a2.12 2.12 0 0 1 3 3L7.5 19.5 2 21l1.5-5.5L18.37 2.63z"/></svg>
+                                            <svg class="chip-bg-icon pos-4" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>
+                                        </div>
+                                        <div class="chip-row__content">
+                                            <svg class="chip-row__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle>
+                                                <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle>
+                                                <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle>
+                                                <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle>
+                                                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path>
+                                            </svg>
+                                            <span class="chip-row__label" data-i18n="onboarding.domains.art"></span>
+                                        </div>
+                                    </button>
+                                </div>
+
+                                <!-- Custom Tag Input & Zero-Shift Error Container -->
+                                <div class="custom-chip-builder-wrap">
+                                    <div class="custom-chip-builder">
+                                        <input type="text" class="input input--compact" id="input-custom-chip"
+                                            data-i18n-placeholder="onboarding.custom_chip_placeholder">
+                                        <button type="button" class="btn btn--secondary btn--compact" id="btn-add-custom-chip"
+                                            data-i18n="onboarding.add_chip_btn"></button>
+                                    </div>
+                                    <span id="onboarding-step1-error" class="onboarding-inline-error"
+                                        data-i18n="onboarding.step1_required_error"></span>
+                                </div>
                             </div>
 
                             <div class="wizard-actions">
                                 <button type="button" class="btn btn--ghost" id="btn-wizard-step1-prev"
                                     data-i18n="onboarding.btn_prev"></button>
-                                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                    <span id="onboarding-step1-error" class="onboarding-inline-error" style="display: none;"
-                                        data-i18n="onboarding.step1_required_error"></span>
-                                    <button type="button" class="btn btn--primary btn--step-next" id="btn-wizard-step1-next"
-                                        data-i18n="onboarding.btn_next"></button>
-                                </div>
+                                <button type="button" class="btn btn--primary btn--step-next"
+                                    id="btn-wizard-step1-next" data-i18n="onboarding.btn_next"></button>
                             </div>
                         </div>
 
                         <!-- SLIDE 2: GROUNDING LEVEL VERTICAL CARDS -->
                         <div class="wizard-slide" id="wizard-slide-2" hidden>
-                            <div class="slide-header">
-                                <h2 class="slide-title" data-i18n="onboarding.step2_title"></h2>
-                                <p class="slide-subtitle" data-i18n="onboarding.step2_subtitle"></p>
-                            </div>
+                            <div class="wizard-slide__content--wizard-slide-2">
+                                <div class="slide-header">
+                                    <h2 class="slide-title" data-i18n="onboarding.step2_title"></h2>
+                                    <p class="slide-subtitle" data-i18n="onboarding.step2_subtitle"></p>
+                                </div>
 
-                            <div class="level-cards-vertical">
-                                <div class="level-card-v" data-level="ground_zero">
-                                    <div class="level-card-v__top">
-                                        <div class="level-bolts" aria-label="Level 1 of 3">
-                                            <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                                            <svg class="bolt-svg empty" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                                            <svg class="bolt-svg empty" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                <div class="level-cards-vertical">
+                                    <div class="level-card-v" data-level="ground_zero">
+                                        <div class="level-card-v__top">
+                                            <div class="level-bolts" aria-label="Level 1 of 3">
+                                                <svg class="bolt-svg filled" viewBox="0 0 24 24">
+                                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                                </svg>
+                                                <svg class="bolt-svg empty" viewBox="0 0 24 24">
+                                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                                </svg>
+                                                <svg class="bolt-svg empty" viewBox="0 0 24 24">
+                                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                                </svg>
+                                            </div>
+                                            <span class="level-card-v__tag"
+                                                data-i18n="onboarding.level_ground_zero_tag"></span>
                                         </div>
-                                        <span class="level-card-v__tag" data-i18n="onboarding.level_ground_zero_tag"></span>
-                                    </div>
-                                    <div class="level-card-v__body">
-                                        <h3 class="level-card-v__title" data-i18n="onboarding.level_ground_zero_title"></h3>
-                                        <p class="level-card-v__desc" data-i18n="onboarding.level_ground_zero_desc"></p>
-                                    </div>
-                                    <div class="level-card-v__footer">
-                                        <div class="level-card-v__check" aria-hidden="true"></div>
-                                    </div>
-                                </div>
-                                <div class="level-card-v active" data-level="builder">
-                                    <div class="level-card-v__top">
-                                        <div class="level-bolts" aria-label="Level 2 of 3">
-                                            <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                                            <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                                            <svg class="bolt-svg empty" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                        <div class="level-card-v__body">
+                                            <h3 class="level-card-v__title" data-i18n="onboarding.level_ground_zero_title">
+                                            </h3>
+                                            <p class="level-card-v__desc" data-i18n="onboarding.level_ground_zero_desc"></p>
                                         </div>
-                                        <span class="level-card-v__tag" data-i18n="onboarding.level_builder_tag"></span>
-                                    </div>
-                                    <div class="level-card-v__body">
-                                        <h3 class="level-card-v__title" data-i18n="onboarding.level_builder_title"></h3>
-                                        <p class="level-card-v__desc" data-i18n="onboarding.level_builder_desc"></p>
-                                    </div>
-                                    <div class="level-card-v__footer">
-                                        <div class="level-card-v__check" aria-hidden="true"></div>
-                                    </div>
-                                </div>
-                                <div class="level-card-v" data-level="deep">
-                                    <div class="level-card-v__top">
-                                        <div class="level-bolts" aria-label="Level 3 of 3">
-                                            <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                                            <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                                            <svg class="bolt-svg filled" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                        <div class="level-card-v__footer">
+                                            <div class="level-card-v__check" aria-hidden="true"></div>
                                         </div>
-                                        <span class="level-card-v__tag" data-i18n="onboarding.level_deep_tag"></span>
                                     </div>
-                                    <div class="level-card-v__body">
-                                        <h3 class="level-card-v__title" data-i18n="onboarding.level_deep_title"></h3>
-                                        <p class="level-card-v__desc" data-i18n="onboarding.level_deep_desc"></p>
+                                    <div class="level-card-v active" data-level="builder">
+                                        <div class="level-card-v__top">
+                                            <div class="level-bolts" aria-label="Level 2 of 3">
+                                                <svg class="bolt-svg filled" viewBox="0 0 24 24">
+                                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                                </svg>
+                                                <svg class="bolt-svg filled" viewBox="0 0 24 24">
+                                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                                </svg>
+                                                <svg class="bolt-svg empty" viewBox="0 0 24 24">
+                                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                                </svg>
+                                            </div>
+                                            <span class="level-card-v__tag" data-i18n="onboarding.level_builder_tag"></span>
+                                        </div>
+                                        <div class="level-card-v__body">
+                                            <h3 class="level-card-v__title" data-i18n="onboarding.level_builder_title"></h3>
+                                            <p class="level-card-v__desc" data-i18n="onboarding.level_builder_desc"></p>
+                                        </div>
+                                        <div class="level-card-v__footer">
+                                            <div class="level-card-v__check" aria-hidden="true"></div>
+                                        </div>
                                     </div>
-                                    <div class="level-card-v__footer">
-                                        <div class="level-card-v__check" aria-hidden="true"></div>
+                                    <div class="level-card-v" data-level="deep">
+                                        <div class="level-card-v__top">
+                                            <div class="level-bolts" aria-label="Level 3 of 3">
+                                                <svg class="bolt-svg filled" viewBox="0 0 24 24">
+                                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                                </svg>
+                                                <svg class="bolt-svg filled" viewBox="0 0 24 24">
+                                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                                </svg>
+                                                <svg class="bolt-svg filled" viewBox="0 0 24 24">
+                                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                                </svg>
+                                            </div>
+                                            <span class="level-card-v__tag" data-i18n="onboarding.level_deep_tag"></span>
+                                        </div>
+                                        <div class="level-card-v__body">
+                                            <h3 class="level-card-v__title" data-i18n="onboarding.level_deep_title"></h3>
+                                            <p class="level-card-v__desc" data-i18n="onboarding.level_deep_desc"></p>
+                                        </div>
+                                        <div class="level-card-v__footer">
+                                            <div class="level-card-v__check" aria-hidden="true"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -347,15 +538,17 @@
 
                         <!-- SLIDE 3: RECENT INTRIGUES -->
                         <div class="wizard-slide" id="wizard-slide-3" hidden>
-                            <div class="slide-header">
-                                <h2 class="slide-title" data-i18n="onboarding.step3_title"></h2>
-                                <p class="slide-subtitle" data-i18n="onboarding.step3_subtitle"></p>
-                            </div>
+                            <div class="wizard-slide__content">
+                                <div class="slide-header">
+                                    <h2 class="slide-title" data-i18n="onboarding.step3_title"></h2>
+                                    <p class="slide-subtitle" data-i18n="onboarding.step3_subtitle"></p>
+                                </div>
 
-                            <div class="slide-content-spacious">
-                                <textarea class="textarea textarea--spacious-clean" id="onboarding-recent-input"
-                                    data-i18n-placeholder="onboarding.recent_placeholder"></textarea>
-                                <p class="step3-hint" data-i18n="onboarding.step3_hint"></p>
+                                <div class="slide-content-spacious">
+                                    <textarea class="textarea textarea--spacious-clean" id="onboarding-recent-input"
+                                        data-i18n-placeholder="onboarding.recent_placeholder"></textarea>
+                                    <p class="step3-hint" data-i18n="onboarding.step3_hint"></p>
+                                </div>
                             </div>
 
                             <div class="wizard-actions">
@@ -372,49 +565,43 @@
                 </div>
             </section>
 
-            <!-- 4. COLD START (SCALED + DYNAMIC 2x2 CARDS & SLIDING SEARCH) -->
+            <!-- 4. COLD START (UNIFIED SEARCH + 2x2 CARDS GRID) -->
             <section class="view view--cold-start" id="view-cold-start" hidden aria-label="Cold Start">
                 <div class="cold-start-wrapper">
-                    <!-- Cards Grid Screen -->
-                    <div class="cold-start-cards-view" id="cold-start-cards-view">
-                        <span class="badge" data-i18n="cold_start.badge"></span>
-                        <h1 class="page-title" data-i18n="cold_start.title"></h1>
-                        <p class="page-subtitle" data-i18n="cold_start.subtitle"></p>
+                    <span class="badge" data-i18n="cold_start.badge"></span>
+                    <h1 class="page-title" data-i18n="cold_start.title"></h1>
+                    <p class="page-subtitle" data-i18n="cold_start.subtitle"></p>
 
-                        <div class="spark-grid" id="cold-start-cards-container">
-                            <!-- Populated dynamically via JS -->
+                    <!-- Prominent Unified Search Bar -->
+                    <form id="form-cold-start-thought" class="cold-start-search-wrap">
+                        <div class="thought-search-bar">
+                            <span class="search-bar-icon" aria-hidden="true">✦</span>
+                            <input type="text" class="thought-search-input" id="input-cold-start-thought"
+                                data-i18n-placeholder="cold_start.search_placeholder" autocomplete="off">
+                            <button type="submit" class="btn btn--primary btn--thought-submit"
+                                id="btn-submit-cold-start-thought">
+                                <span class="btn__text" data-i18n="cold_start.search_submit"></span>
+                                <span class="btn__loader" aria-hidden="true"></span>
+                            </button>
                         </div>
+                    </form>
 
-                        <div class="cold-start-actions-row">
-                            <button type="button" class="btn-text-action btn-text-action--custom" id="btn-cold-start-open-custom"
-                                data-i18n="cold_start.custom_thought_btn"></button>
-                            <button type="button" class="btn-text-action btn-text-action--reroll" id="btn-cold-start-reroll"
-                                data-i18n="cold_start.reroll_btn"></button>
-                        </div>
+                    <!-- Elegant Divider -->
+                    <div class="cold-start-divider">
+                        <span class="cold-start-divider__line"></span>
+                        <span class="cold-start-divider__text" data-i18n="cold_start.or_divider"></span>
+                        <span class="cold-start-divider__line"></span>
                     </div>
 
-                    <!-- Slide-Up Google-Style Search View -->
-                    <div class="cold-start-custom-view" id="cold-start-custom-view" hidden>
-                        <div class="cold-start-custom-topbar">
-                            <button type="button" class="btn-back-link" id="btn-cold-start-custom-back" data-i18n="cold_start.custom_view_back"></button>
-                        </div>
-                        <div class="cold-start-custom-content">
-                            <span class="badge" data-i18n="cold_start.badge"></span>
-                            <h2 class="cold-start-custom-title" data-i18n="cold_start.custom_view_title"></h2>
-                            <p class="cold-start-custom-subtitle" data-i18n="cold_start.custom_view_subtitle"></p>
+                    <!-- 4 Tailored Concept Cards (2x2 Grid) -->
+                    <div class="spark-grid" id="cold-start-cards-container">
+                        <!-- Populated dynamically via JS -->
+                    </div>
 
-                            <form id="form-cold-start-thought" class="thought-search-bar-wrap">
-                                <div class="thought-search-bar">
-                                    <span class="search-bar-icon" aria-hidden="true">✦</span>
-                                    <input type="text" class="thought-search-input" id="input-cold-start-thought"
-                                        data-i18n-placeholder="cold_start.custom_placeholder" autocomplete="off">
-                                    <button type="submit" class="btn btn--primary btn--thought-submit" id="btn-submit-cold-start-thought">
-                                        <span class="btn__text" data-i18n="cold_start.custom_submit"></span>
-                                        <span class="btn__loader" aria-hidden="true"></span>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                    <!-- Actions Row -->
+                    <div class="cold-start-actions-row">
+                        <button type="button" class="btn-text-action btn-text-action--reroll"
+                            id="btn-cold-start-reroll" data-i18n="cold_start.reroll_btn"></button>
                     </div>
                 </div>
             </section>
@@ -425,19 +612,20 @@
 
                     <!-- STAGE 1: CONCEPT DISCOVERY (ASYMMETRIC SPLIT LAYOUT) -->
                     <div class="dashboard-stage dashboard-stage--discovery" id="dashboard-stage-discovery">
-                        
+
                         <div class="discovery-split-hero">
-                            
+
                             <!-- LEFT COLUMN (~1.3fr width, Topic Title + Domain Pill + Most Logiczny) -->
                             <div class="discovery-col discovery-col--left">
                                 <div class="discovery-badge-row">
                                     <span class="domain-pill" id="discovery-concept-domain"></span>
                                 </div>
                                 <h1 class="discovery-hero__title" id="discovery-concept-title"></h1>
-                                
+
                                 <!-- Most Logiczny (Zaraz pod tematem po lewej stronie) -->
                                 <div class="discovery-reason-box">
-                                    <span class="discovery-text-label discovery-text-label--reason" data-i18n="focus_card.why_label"></span>
+                                    <span class="discovery-text-label discovery-text-label--reason"
+                                        data-i18n="focus_card.why_label"></span>
                                     <p class="discovery-reason-text" id="discovery-concept-reason"></p>
                                 </div>
                             </div>
@@ -445,18 +633,30 @@
                             <!-- RIGHT COLUMN (Intuicja & Wprowadzenie + Przyciski akcji wyrównane do lewej krawędzi wstępu) -->
                             <div class="discovery-col discovery-col--right">
                                 <div class="discovery-text-block discovery-text-block--model">
-                                    <span class="discovery-text-label discovery-text-label--model" data-i18n="focus_card.model_label"></span>
+                                    <span class="discovery-text-label discovery-text-label--model"
+                                        data-i18n="focus_card.model_label"></span>
                                     <p class="discovery-text-content" id="discovery-concept-model"></p>
                                 </div>
 
                                 <div class="discovery-actions">
-                                    <button type="button" class="btn btn--ghost btn--save-spark" id="btn-discovery-save-spark" data-i18n-title="focus_card.save_to_sparks_btn">
-                                        <svg class="btn-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                    <button type="button" class="btn btn--ghost btn--save-spark"
+                                        id="btn-discovery-save-spark" data-i18n-title="focus_card.save_to_sparks_btn">
+                                        <svg class="btn-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                                        </svg>
                                         <span class="btn__text" data-i18n="focus_card.save_to_sparks_btn"></span>
                                     </button>
-                                    <button type="button" class="btn btn--primary btn--explore" id="btn-discovery-explore">
+                                    <button type="button" class="btn btn--primary btn--explore"
+                                        id="btn-discovery-explore">
                                         <span class="btn__text" data-i18n="focus_card.accept_btn"></span>
-                                        <svg class="btn-arrow-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                        <svg class="btn-arrow-svg" width="16" height="16" viewBox="0 0 24 24"
+                                            fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                            <polyline points="12 5 19 12 12 19"></polyline>
+                                        </svg>
                                     </button>
                                 </div>
                             </div>
@@ -468,31 +668,57 @@
                             <div class="vector-pills-row" id="dashboard-vector-pills">
                                 <button type="button" class="vector-pill active" data-vector="adjacent">
                                     <span class="vector-pill__icon">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"></circle><circle cx="18" cy="18" r="3"></circle><path d="M8.59 13.51l6.83 3.98"></path><path d="M15.41 6.51l-6.82 3.98"></path></svg>
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <circle cx="6" cy="6" r="3"></circle>
+                                            <circle cx="18" cy="18" r="3"></circle>
+                                            <path d="M8.59 13.51l6.83 3.98"></path>
+                                            <path d="M15.41 6.51l-6.82 3.98"></path>
+                                        </svg>
                                     </span>
                                     <span class="vector-pill__text" data-i18n="compass.adjacent"></span>
                                 </button>
                                 <button type="button" class="vector-pill" data-vector="deep_dive">
                                     <span class="vector-pill__icon">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 13 12 18 17 13"></polyline><polyline points="7 6 12 11 17 6"></polyline></svg>
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <polyline points="7 13 12 18 17 13"></polyline>
+                                            <polyline points="7 6 12 11 17 6"></polyline>
+                                        </svg>
                                     </span>
                                     <span class="vector-pill__text" data-i18n="compass.deep_dive"></span>
                                 </button>
                                 <button type="button" class="vector-pill" data-vector="cross_domain">
                                     <span class="vector-pill__icon">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+                                            <path d="M2 12h20"></path>
+                                        </svg>
                                     </span>
                                     <span class="vector-pill__text" data-i18n="compass.cross_domain"></span>
                                 </button>
                                 <button type="button" class="vector-pill" data-vector="mental_fog">
                                     <span class="vector-pill__icon">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+                                        </svg>
                                     </span>
                                     <span class="vector-pill__text" data-i18n="compass.mental_fog"></span>
                                 </button>
                             </div>
                             <button type="button" class="btn-text-reroll-batch" id="btn-dashboard-reroll-batch">
-                                <svg class="btn-reroll__icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                                <svg class="btn-reroll__icon" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                                </svg>
                                 <span class="btn-text-reroll__label" data-i18n="focus_card.reroll_batch_btn"></span>
                                 <span class="btn__loader" aria-hidden="true"></span>
                             </button>
@@ -532,11 +758,16 @@
                                         <span class="prompt-card__label" data-i18n="focus_card.prompt_box_label"></span>
                                     </div>
                                     <div class="prompt-copy-wrapper">
-                                        <span class="copy-feedback-toast" id="copy-feedback-toast" data-i18n="focus_card.prompt_copied" style="display: none;"></span>
-                                        <button type="button" class="btn-icon-copy" id="btn-copy-prompt" data-i18n-title="focus_card.copy_prompt_tooltip" aria-label="Copy prompt">
-                                            <svg class="copy-icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <span class="copy-feedback-toast" id="copy-feedback-toast"
+                                            data-i18n="focus_card.prompt_copied" style="display: none;"></span>
+                                        <button type="button" class="btn-icon-copy" id="btn-copy-prompt"
+                                            data-i18n-title="focus_card.copy_prompt_tooltip" aria-label="Copy prompt">
+                                            <svg class="copy-icon-svg" viewBox="0 0 24 24" width="18" height="18"
+                                                fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
                                                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1">
+                                                </path>
                                             </svg>
                                         </button>
                                     </div>
@@ -548,16 +779,26 @@
 
                             <!-- Session Actions -->
                             <div class="focus-session-actions">
-                                <button type="button" class="btn btn--success btn--lg btn--finish" id="btn-focus-finish">
+                                <button type="button" class="btn btn--success btn--lg btn--finish"
+                                    id="btn-focus-finish">
                                     <span class="icon">✓</span>
                                     <span class="btn__text" data-i18n="focus_card.finish_btn"></span>
                                 </button>
-                                <button type="button" class="btn btn--secondary btn--lg btn--spark" id="btn-focus-add-spark">
-                                    <svg class="btn-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                <button type="button" class="btn btn--secondary btn--lg btn--spark"
+                                    id="btn-focus-add-spark">
+                                    <svg class="btn-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                                    </svg>
                                     <span class="btn__text" data-i18n="focus_card.add_spark_btn"></span>
                                 </button>
                                 <button type="button" class="btn btn--ghost btn--abandon" id="btn-focus-abandon">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
                                     <span class="btn__text" data-i18n="focus_card.abandon_btn"></span>
                                 </button>
                             </div>
@@ -703,15 +944,16 @@
         <button class="floating-spark-btn" id="btn-floating-spark" hidden aria-label="Schowek na nagłe myśli"
             title="Schowek na nagłe myśli (Spacja)">
             <svg class="floating-spark-svg" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/>
-                <circle cx="12" cy="12" r="2.2" fill="#ffffff"/>
+                <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
+                <circle cx="12" cy="12" r="2.2" fill="#ffffff" />
             </svg>
         </button>
 
         <!-- Global Zen Loading Overlay -->
         <div class="loading-overlay" id="loading-overlay" hidden aria-live="polite">
             <div class="loading-content">
-                <img src="assets/logo.png" alt="Loading" class="loading-logo-spin" width="52" height="52" style="width: 52px; height: 52px; max-width: 52px; max-height: 52px;">
+                <img src="assets/logo.png" alt="Loading" class="loading-logo-spin" width="52" height="52"
+                    style="width: 52px; height: 52px; max-width: 52px; max-height: 52px;">
                 <p class="loading-text" id="loading-text" data-i18n="loading.generating"></p>
             </div>
         </div>

@@ -513,9 +513,14 @@
         const userMenu = $('#user-dropdown-menu');
         if (userMenu) userMenu.hidden = true;
 
-        // Reset any custom onboarding accent hue when navigating to other views
-        if (viewName !== 'ONBOARDING') {
-            document.documentElement.style.removeProperty('--hue-primary');
+        // Reset any inline accent hue override
+        document.documentElement.style.removeProperty('--hue-primary');
+
+        // Dynamic vector theme accents are strictly isolated to DASHBOARD
+        if (viewName === 'DASHBOARD') {
+            document.body.setAttribute('data-vector-theme', state.concept?.source_mode || state.activeVector || 'adjacent');
+        } else {
+            document.body.removeAttribute('data-vector-theme');
         }
 
         if (viewName === 'LANDING') {
@@ -690,18 +695,58 @@
         }
     }
 
-    // ─── Onboarding Slide Wizard Controller ───
-    function setWizardStep(step) {
-        wizardCurrentStep = step;
-        const slide0 = $('#wizard-slide-0');
-        const slide1 = $('#wizard-slide-1');
-        const slide2 = $('#wizard-slide-2');
-        const slide3 = $('#wizard-slide-3');
+    // ─── Onboarding Slide Wizard Controller (Fluid Motion Engine) ───
+    let isWizardTransitioning = false;
 
-        if (slide0) slide0.hidden = (step !== 0);
-        if (slide1) slide1.hidden = (step !== 1);
-        if (slide2) slide2.hidden = (step !== 2);
-        if (slide3) slide3.hidden = (step !== 3);
+    function setWizardStep(targetStep) {
+        const prevStep = (wizardCurrentStep !== undefined) ? wizardCurrentStep : targetStep;
+        wizardCurrentStep = targetStep;
+
+        const slides = [
+            $('#wizard-slide-0'),
+            $('#wizard-slide-1'),
+            $('#wizard-slide-2'),
+            $('#wizard-slide-3')
+        ];
+
+        const outgoingSlide = slides[prevStep];
+        const incomingSlide = slides[targetStep];
+
+        if (!incomingSlide) {
+            updateWizardProgress();
+            return;
+        }
+
+        const isForward = targetStep >= prevStep;
+        const enterAnimClass = isForward ? 'slide-enter-forward' : 'slide-enter-backward';
+        const exitAnimClass = isForward ? 'slide-exit-forward' : 'slide-exit-backward';
+
+        if (outgoingSlide && outgoingSlide !== incomingSlide && !outgoingSlide.hidden) {
+            isWizardTransitioning = true;
+
+            // Prepare outgoing slide animation
+            outgoingSlide.classList.remove('slide-enter-forward', 'slide-enter-backward', 'slide-exit-forward', 'slide-exit-backward');
+            outgoingSlide.classList.add(exitAnimClass);
+
+            // Prepare incoming slide animation
+            incomingSlide.classList.remove('slide-enter-forward', 'slide-enter-backward', 'slide-exit-forward', 'slide-exit-backward');
+            incomingSlide.classList.add(enterAnimClass);
+            incomingSlide.hidden = false;
+
+            setTimeout(() => {
+                outgoingSlide.hidden = true;
+                outgoingSlide.classList.remove(exitAnimClass);
+                isWizardTransitioning = false;
+            }, 300);
+        } else {
+            slides.forEach((slide, idx) => {
+                if (slide) {
+                    slide.hidden = (idx !== targetStep);
+                    slide.classList.remove('slide-enter-forward', 'slide-enter-backward', 'slide-exit-forward', 'slide-exit-backward');
+                }
+            });
+            incomingSlide.classList.add(enterAnimClass);
+        }
 
         updateWizardProgress();
     }
@@ -1357,19 +1402,6 @@
             }
         });
 
-        // Dynamic Domain Hue Mapping for Onboarding
-        const ONBOARDING_DOMAIN_HUES = {
-            cs: 230,          // Tech Indigo
-            ai: 250,          // Electric Purple
-            physics: 195,     // Cosmic Cyan
-            biology: 145,     // Emerald Green
-            hardware: 32,     // Amber Orange
-            gamedev: 325,     // Neon Pink
-            philosophy: 275,  // Royal Violet
-            economics: 160,   // Mint Teal
-            linguistics: 15   // Sunset Coral
-        };
-
         // Dynamic Event Delegation for Chips List
         const chipsContainer = $('#onboarding-domains-chips');
         if (chipsContainer) {
@@ -1380,17 +1412,7 @@
                     const errBox = $('#onboarding-step1-error');
                     const activeChips = $$('#onboarding-domains-chips .chip-row.active');
                     if (errBox && activeChips.length > 0) {
-                        errBox.style.display = 'none';
-                    }
-
-                    // Dynamically adapt onboarding accent color to selected category
-                    if (activeChips.length > 0) {
-                        const lastActive = activeChips[activeChips.length - 1];
-                        const domain = lastActive.dataset.domain;
-                        const hue = ONBOARDING_DOMAIN_HUES[domain] || 225;
-                        document.documentElement.style.setProperty('--hue-primary', hue);
-                    } else {
-                        document.documentElement.style.removeProperty('--hue-primary');
+                        errBox.classList.remove('visible');
                     }
                 }
             });
@@ -1407,14 +1429,27 @@
             newChip.type = 'button';
             newChip.className = 'chip-row active';
             newChip.dataset.domain = text.toLowerCase().replace(/\s+/g, '_');
-            newChip.textContent = `✨ ${text}`;
+            newChip.innerHTML = `
+                <div class="chip-row__bg" aria-hidden="true">
+                    <svg class="chip-bg-icon pos-1" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <svg class="chip-bg-icon pos-2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <svg class="chip-bg-icon pos-3" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <svg class="chip-bg-icon pos-4" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </div>
+                <div class="chip-row__content">
+                    <svg class="chip-row__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    <span class="chip-row__label">${escapeHtml(text)}</span>
+                </div>
+            `;
 
             chipsContainer.appendChild(newChip);
             input.value = '';
             input.focus();
 
             const errBox = $('#onboarding-step1-error');
-            if (errBox) errBox.style.display = 'none';
+            if (errBox) errBox.classList.remove('visible');
         }
 
         const btnAddCustomChip = $('#btn-add-custom-chip');
@@ -1480,17 +1515,11 @@
                 const chipsEl = $('#onboarding-domains-chips');
 
                 if (selectedChips.length === 0) {
-                    if (errBox) errBox.style.display = 'inline';
-                    if (chipsEl) {
-                        chipsEl.classList.remove('shake-anim');
-                        void chipsEl.offsetWidth;
-                        chipsEl.classList.add('shake-anim');
-                    }
+                    if (errBox) errBox.classList.add('visible');
                     return;
                 }
 
-                if (errBox) errBox.style.display = 'none';
-                if (chipsEl) chipsEl.classList.remove('shake-anim');
+                if (errBox) errBox.classList.remove('visible');
                 setWizardStep(2);
             });
         }
@@ -1514,7 +1543,7 @@
         if (btnOnboardingSubmit) {
             btnOnboardingSubmit.addEventListener('click', async (e) => {
                 e.preventDefault();
-                const activeChips = Array.from($$('#onboarding-domains-chips .chip-row.active')).map(c => c.textContent.trim().replace(/^✨\s*/, ''));
+                const activeChips = Array.from($$('#onboarding-domains-chips .chip-row.active')).map(c => (c.querySelector('.chip-row__label')?.textContent || c.textContent).trim().replace(/^✨\s*/, ''));
                 const recentThought = ($('#onboarding-recent-input')?.value || '').trim();
                 const formOfAddress = selectedGender === 'custom'
                     ? ($('#input-custom-gender')?.value.trim() || 'neutral')
@@ -1563,51 +1592,9 @@
             });
         }
 
-        // Cold Start Custom Thought Slide-Up Search Bar & Symmetrical Slide-Down
-        const btnOpenCustomThought = $('#btn-cold-start-open-custom');
-        const cardsView = $('#cold-start-cards-view');
-        const customThoughtView = $('#cold-start-custom-view');
-        const btnCustomBack = $('#btn-cold-start-custom-back');
-        const inputThought = $('#input-cold-start-thought');
-
-        if (btnOpenCustomThought) {
-            btnOpenCustomThought.addEventListener('click', () => {
-                if (cardsView) {
-                    cardsView.classList.remove('fade-in');
-                    cardsView.classList.add('fade-out');
-                }
-                setTimeout(() => {
-                    if (cardsView) cardsView.hidden = true;
-                    if (customThoughtView) {
-                        customThoughtView.classList.remove('slide-down');
-                        customThoughtView.hidden = false;
-                        if (inputThought) inputThought.focus();
-                    }
-                }, 160);
-            });
-        }
-
-        if (btnCustomBack) {
-            btnCustomBack.addEventListener('click', () => {
-                if (customThoughtView) {
-                    customThoughtView.classList.add('slide-down');
-                }
-                setTimeout(() => {
-                    if (customThoughtView) {
-                        customThoughtView.hidden = true;
-                        customThoughtView.classList.remove('slide-down');
-                    }
-                    if (cardsView) {
-                        cardsView.hidden = false;
-                        cardsView.classList.remove('fade-out');
-                        cardsView.classList.add('fade-in');
-                    }
-                }, 180);
-            });
-        }
-
-        // Submit Custom Thought in Cold Start
+        // Submit Custom Thought in Unified Cold Start
         const formColdStartThought = $('#form-cold-start-thought');
+        const inputThought = $('#input-cold-start-thought');
         if (formColdStartThought) {
             formColdStartThought.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -1623,13 +1610,6 @@
 
                     state.coldStartCards = res.cards || [];
                     renderColdStartCards();
-
-                    if (customThoughtView) customThoughtView.hidden = true;
-                    if (cardsView) {
-                        cardsView.hidden = false;
-                        cardsView.classList.remove('fade-out');
-                        cardsView.classList.add('fade-in');
-                    }
                     if (inputThought) inputThought.value = '';
                 } catch (err) {
                     showToast(err.message || t('errors.server_down'));

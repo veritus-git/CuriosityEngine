@@ -28,7 +28,7 @@
             "intuition from zero.",
             "connecting ideas."
         ],
-        "subtitle": "CuriosityEngine removes the cognitive friction of choice and prompt crafting. It connects ideas into an associative web of knowledge, delivering concise mental models and copy-ready prompts for instant exploration.",
+        "subtitle": "Your curiosity doesn't need a plan. CuriosityEngine leads you from one fascinating discovery to the another.",
         "cta_start": "Start Exploring",
         "cta_login": "Log In",
         "cta_how": "See how it works ↓",
@@ -91,16 +91,16 @@
         "custom_chip_placeholder": "Type custom interest (e.g. game theory, cryptography)...",
         "add_chip_btn": "+ Add",
         "domains": {
-            "math": "📐 Mathematics",
-            "cs": "💻 Computer Science & Coding",
-            "physics": "🌌 Physics & Cosmology",
-            "biology": "🧬 Biology & Neuroscience",
-            "hardware": "⚡ Electronics & Hardware",
-            "gamedev": "🎮 GameDev & 3D Graphics",
-            "ai": "🧠 Artificial Intelligence",
-            "philosophy": "🏛️ Philosophy & Epistemology",
-            "economics": "📈 Economics & Game Theory",
-            "linguistics": "🗣️ Linguistics & Semiotics"
+            "math": "Mathematics",
+            "cs": "Informatics",
+            "physics": "Physics",
+            "biology": "Biology",
+            "engineering": "Engineering",
+            "psychology": "Psychology",
+            "philosophy": "Philosophy",
+            "economics": "Economics",
+            "history": "History",
+            "art": "Art"
         },
         "step1_required_error": "Please select at least one domain",
         "step2_title": "Your baseline intuition",
@@ -117,22 +117,19 @@
         "step3_title": "What's on your mind lately?",
         "step3_subtitle": "Type any recent question, rabbit hole, or spark (or leave empty):",
         "recent_placeholder": "e.g. how do GPUs work, why video compression loses quality, how chess engines evaluate positions...",
-        "step3_hint": "💡 You can leave this blank - engine will propose topics based on your interests from step 1.",
+        "step3_hint": "You can leave this blank - engine will propose topics based on your interests from step 1.",
         "btn_next": "Next ➔",
         "btn_prev": "← Back",
-        "btn_submit": "Generate My Starter Sparks ✨"
+        "btn_submit": "Begin exploration"
     },
     "cold_start": {
-        "badge": "Starter Sparks",
+        "badge": "Cold Start",
         "title": "Choose Your First Topic",
-        "subtitle": "Here are 4 topics generated specifically for your interests. Pick one to begin:",
-        "reroll_btn": "Suggest 4 different topics",
-        "custom_thought_btn": "Own thought? Idea? Question?",
-        "custom_view_title": "Enter your thought or question:",
-        "custom_view_subtitle": "The engine will generate 4 direct branches rooted in your idea.",
-        "custom_view_back": "← Back to suggestions",
-        "custom_placeholder": "Type any thought or question...",
-        "custom_submit": "Explore ➔"
+        "subtitle": "Enter your own thought or select from topics tailored to your passions:",
+        "search_placeholder": "Type any question, idea, or concept...",
+        "search_submit": "Explore ➔",
+        "or_divider": "or choose from generated suggestions",
+        "reroll_btn": "Suggest 4 different topics"
     },
     "loading": {
         "generating": "CuriosityEngine is synthesizing your concept...",

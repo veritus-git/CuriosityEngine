@@ -1,7 +1,7 @@
 {
     "meta": {
         "code": "pl",
-        "name": "Polish",
+        "name": "Polski",
         "native_name": "Polski"
     },
     "nav": {
@@ -28,7 +28,7 @@
             "zrozumienie od zera.",
             "połączenia idei."
         ],
-        "subtitle": "CuriosityEngine zdejmuje z Ciebie ciężar wyboru i pisania promptów. Łączy pojęcia w asocjacyjną sieć wiedzy, dostarczając zwięzłe modele mentalne i precyzyjne prompty do natychmiastowej eksploracji.",
+        "subtitle": "Twoja ciekawość nie potrzebuje planu. CuriosityEngine prowadzi Cię od jednego fascynującego odkrycia do następnego.",
         "cta_start": "Rozpocznij Eksplorację",
         "cta_login": "Zaloguj się",
         "cta_how": "Zobacz jak to działa ↓",
@@ -91,16 +91,16 @@
         "custom_chip_placeholder": "Wpisz własną pasję (np. teoria gier, kryptografia)...",
         "add_chip_btn": "+ Dodaj",
         "domains": {
-            "math": "📐 Matematyka",
-            "cs": "💻 Informatyka & Programowanie",
-            "physics": "🌌 Fizyka & Kosmologia",
-            "biology": "🧬 Biologia & Neuronauka",
-            "hardware": "⚡ Elektronika & Sprzęt",
-            "gamedev": "🎮 Tworzenie Gier & Grafika 3D",
-            "ai": "🧠 Sztuczna Inteligencja",
-            "philosophy": "🏛️ Filozofia & Teoria Poznania",
-            "economics": "📈 Ekonomia & Teoria Gier",
-            "linguistics": "🗣️ Językoznawstwo & Komunikacja"
+            "math": "Matematyka",
+            "cs": "Informatyka",
+            "physics": "Fizyka",
+            "biology": "Biologia",
+            "engineering": "Inżynieria",
+            "psychology": "Psychologia",
+            "philosophy": "Filozofia",
+            "economics": "Ekonomia",
+            "history": "Historia",
+            "art": "Sztuka"
         },
         "step1_required_error": "Wybierz przynajmniej jedną dziedzinę",
         "step2_title": "Twój punkt wyjścia",
@@ -117,22 +117,19 @@
         "step3_title": "O czym ostatnio myślałeś?",
         "step3_subtitle": "Wpisz dowolne pytanie lub myśl z ostatnich dni (lub zostaw puste):",
         "recent_placeholder": "np. jak działają GPU, dlaczego kompresja wideo gubi jakość, jak silnik szachowy ocenia pozycję...",
-        "step3_hint": "💡 Możesz zostawić to pole puste - silnik zaproponuje tematy na podstawie Twoich zainteresowań z kroku 1.",
+        "step3_hint": "Możesz zostawić to pole puste - silnik zaproponuje tematy na podstawie Twoich zainteresowań z kroku 1.",
         "btn_next": "Dalej ➔",
         "btn_prev": "← Wstecz",
-        "btn_submit": "Wygeneruj moje tematy startowe ✨"
+        "btn_submit": "Rozpocznij eksplorację"
     },
     "cold_start": {
         "badge": "Zimny Start",
         "title": "Wybierz Swój Pierwszy Temat",
-        "subtitle": "Oto 4 tematy wygenerowane specjalnie pod Twoje zainteresowania. Wybierz jeden, by zacząć:",
-        "reroll_btn": "Zaproponuj inne 4 tematy",
-        "custom_thought_btn": "Własna myśl? Pomysł? Pytanie?",
-        "custom_view_title": "Wpisz swoją myśl lub pytanie:",
-        "custom_view_subtitle": "Silnik wygeneruje 4 bezpośrednie odnogi do Twojego pomysłu.",
-        "custom_view_back": "← Wróć do propozycji",
-        "custom_placeholder": "Wpisz dowolne pytanie lub myśl...",
-        "custom_submit": "Zbadaj ➔"
+        "subtitle": "Wpisz własną myśl lub wybierz jeden z tematów dobranych pod Twoje pasje:",
+        "search_placeholder": "Wpisz dowolne pytanie, myśl lub zjawisko...",
+        "search_submit": "Zbadaj ➔",
+        "or_divider": "lub wybierz z wygenerowanych propozycji",
+        "reroll_btn": "Zaproponuj inne 4 tematy"
     },
     "loading": {
         "generating": "CuriosityEngine syntezuje propozycję...",
