@@ -89,6 +89,7 @@ def _get_knowledge_depth_instruction(mastered_count: int, language: str = "en") 
                 "(np. dla Generatywnego AI: 'Jak model przewiduje następne słowo (Next-Token Prediction)' lub 'Wektory cech i embeddingi'; "
                 "dla CS: 'Bramki logiczne i sumator binarny' lub 'Kompilator vs Interpreter'; "
                 "dla Fizyki: 'Zasada zachowania pędu' lub 'Fale elektromagnetyczne'). "
+                "ZASADA ANTY-KOPIOWANIA: Powyższe przykłady to wyłącznie ilustracja stylu — NIE KOPIUJ ich dosłownie, generuj świeże i unikalne pojęcia! "
                 "BEZWZGLĘDNIE UNIKAJ na tym etapie niszowych, hyper-szczegółowych zagadnień czy formalnych teorii (np. Reguła 110, kwantyzacja NF4, formalne twierdzenia zupełności)."
             )
         elif mastered_count <= 9:
@@ -110,6 +111,7 @@ def _get_knowledge_depth_instruction(mastered_count: int, language: str = "en") 
                 "The user is just starting their journey. CRITICAL: Suggest ACCESSIBLE, BROAD, AND HIGH-IMPACT "
                 "GATEWAY CONCEPTS in the domains — establishing core mental models (e.g. for AI: 'Next-Token Prediction in LLMs' "
                 "or 'Feature Vectors and Embeddings'; for CS: 'Logic Gates and Binary Adders'). "
+                "ANTI-VERBATIM RULE: Examples are for tone illustration only — do NOT copy them literally. Generate fresh concepts. "
                 "STRICTLY AVOID hyper-niche or overly specialized sub-theorems (like Rule 110 or deep formal sub-proofs) at this early stage."
             )
         elif mastered_count <= 9:
@@ -482,22 +484,41 @@ def build_thought_to_concept_prompts(
 
     if lang == "pl":
         user_msg = (
-            f"Użytkownik wpisał swoją własną myśl, pytanie lub zjawisko, które chce natychmiast zbadać:\n"
+            f"Użytkownik wpisał swoją własną myśl / pytanie / impuls ciekawości:\n"
             f"\"{thought}\"\n\n"
             f"{grounding}\n"
             f"{address_inst}\n\n"
-            f"Przekształć tę myśl w JEDNO konkretne, elegancko i precyzyjnie nazwane pojęcie/temat (np. zamiast całego zdania zdefiniuj zwięzły tytuł pojęcia jak 'Macierze w modelach AI' lub 'Mechanizm uwagi i wektory'), "
-            f"określ jego dziedzinę, zwięzły powód dlaczego warto to zbadać (short_reason) oraz intuicyjny, 1-2 zdaniowy model mentalny (intuitive_model).\n"
+            f"ZASADY TYTUŁOWANIA:\n"
+            f"- Tytuł (topic) ma mieć 2 do 5 słów, być naturalny, prosty i konkretny (jak tytuł dobrego artykułu technologicznego, a NIE pracy akademickiej!).\n"
+            f"- NEGATYWNE PRZYKŁADY (ZAKAZ ZBYTNIEGO FORMALIZMU I NADĘCIA):\n"
+            f"  ❌ Myśl: 'chciałbym zgłębić temat macierzy w kontekście AI' -> BŁĄD: 'Transformacje liniowe macierzy wag w sieciach neuronowych'\n"
+            f"  ❌ Myśl: 'jak działa kompresja wideo' -> BŁĄD: 'Algorytmy transformaty kosinusowej w kodekach MPEG'\n"
+            f"  ❌ Myśl: 'dlaczego ludzie boją się straty' -> BŁĄD: 'Psychologiczne ujęcie asymetrii awersji do ryzyka w teorii perspektywy'\n"
+            f"- POZYTYWNE PRZYKŁADY NATURALNEJ SYNTEZY:\n"
+            f"  ✔️ Myśl: 'chciałbym zgłębić temat macierzy w kontekście AI' -> Tytuł: 'Macierze w modelach AI'\n"
+            f"  ✔️ Myśl: 'jak działa kompresja wideo' -> Tytuł: 'Kompresja wideo i klatki kluczowe'\n"
+            f"  ✔️ Myśl: 'dlaczego ludzie boją się straty' -> Tytuł: 'Teoria perspektywy i awersja do straty'\n"
+            f"  ✔️ Myśl: 'jak silnik szachowy ocenia pozycję' -> Tytuł: 'Ocena pozycji w szachach'\n"
+            f"  ✔️ Myśl: 'dlaczego niebo jest niebieskie' -> Tytuł: 'Rozpraszanie Rayleigha i błękit nieba'\n\n"
+            f"Przekształć wpisaną myśl użytkownika w JEDNO konkretne pojęcie według powyższego standardu.\n"
             f"Odpowiedz WYŁĄCZNIE poprawnym JSON."
         )
     else:
         user_msg = (
-            f"The user entered their own thought, question, or phenomenon to explore:\n"
+            f"The user entered their own thought / question / curiosity spark:\n"
             f"\"{thought}\"\n\n"
             f"{grounding}\n"
             f"{address_inst}\n\n"
-            f"Transform this thought into ONE concrete, cleanly named concept topic (e.g. define a crisp title like 'Matrices in AI Models' or 'Attention Mechanism & Vectors'), "
-            f"specify its domain, a concise reason to explore it (short_reason), and a tangible 1-2 sentence intuitive model (intuitive_model).\n"
+            f"TITLE NAMING RULES:\n"
+            f"- Title (topic) must be 2 to 5 words, natural, crisp, and direct (like a great tech article title, NOT a dry PhD thesis!).\n"
+            f"- NEGATIVE EXAMPLES (AVOID OVERLY FORMAL / BLOATED TITLES):\n"
+            f"  ❌ Input: 'explore matrices in AI' -> BAD: 'Linear Transformations of Weight Matrices in Deep Neural Networks'\n"
+            f"  ❌ Input: 'how video compression works' -> BAD: 'Discrete Cosine Transform Algorithms in MPEG Standards'\n"
+            f"- POSITIVE EXAMPLES OF CRISP TITLES:\n"
+            f"  ✔️ Input: 'explore matrices in AI' -> Title: 'Matrices in AI Models'\n"
+            f"  ✔️ Input: 'how video compression works' -> Title: 'Video Compression & Keyframes'\n"
+            f"  ✔️ Input: 'how chess engines evaluate moves' -> Title: 'Position Evaluation in Chess'\n\n"
+            f"Transform the user's input thought into ONE concrete concept following this standard.\n"
             f"Respond ONLY with valid JSON."
         )
 
