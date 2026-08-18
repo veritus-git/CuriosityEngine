@@ -29,7 +29,7 @@ from .ai import get_ai_status, AIError, generate_embedding
 from .auth import register_user, login_user, get_current_user_token, get_user_count
 from .engine import (
     generate_concept_suggestion, generate_batch_concept_suggestions,
-    generate_dynamic_learning_prompt, save_topic_as_spark,
+    generate_dynamic_learning_prompt, generate_active_session_package, save_topic_as_spark,
     complete_session_with_coexplored, get_learning_prompt,
     generate_dynamic_starter_cards, select_starter_topic,
     create_concept_from_user_thought
@@ -144,7 +144,16 @@ async def get_app_state(username: str = Depends(get_current_user_token)):
     if active:
         state = "CONCEPT_ACTIVE"
         concept = active
-        prompt = get_learning_prompt(active["id"])
+        # Auto-expand into full multi-section Markdown introduction if still short
+        if not concept.get("intuitive_model") or len(concept.get("intuitive_model", "").strip()) < 350:
+            try:
+                pkg = await generate_active_session_package(active["id"])
+                concept = pkg.get("concept") or concept
+                prompt = pkg.get("prompt") or get_learning_prompt(active["id"])
+            except Exception:
+                prompt = get_learning_prompt(active["id"])
+        else:
+            prompt = get_learning_prompt(active["id"])
     elif batch_proposals:
         state = "CONCEPT_SUGGESTED"
         concept = batch_proposals.get("adjacent") or list(batch_proposals.values())[0]
@@ -276,11 +285,10 @@ async def accept_concept(concept_id: int, username: str = Depends(get_current_us
 
     update_concept_status(concept_id, "active")
     archive_unselected_batch_proposals(exclude_id=concept_id)
-    updated = get_concept(concept_id)
-    prompt = await generate_dynamic_learning_prompt(concept_id)
+    pkg = await generate_active_session_package(concept_id)
     return {
-        "concept": updated,
-        "prompt": prompt,
+        "concept": pkg.get("concept") or get_concept(concept_id),
+        "prompt": pkg.get("prompt", ""),
         "state": "CONCEPT_ACTIVE"
     }
 

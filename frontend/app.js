@@ -166,6 +166,7 @@
             "saved_to_sparks_toast": "✓ Zapisano do Schowka!",
             "reject_btn": "Pomiń ten temat",
             "prompt_box_label": "Gotowy Prompt do Twojego LLM",
+            "prompt_header_label": "AI Prompt",
             "copy_prompt_tooltip": "Kopiuj prompt do schowka",
             "prompt_copied": "✓ Skopiowano prompt do schowka!",
             "finish_btn": "Oznacz jako opanowane",
@@ -292,6 +293,126 @@
             return val.replace(/\{(\w+)\}/g, (_, k) => vars[k] !== undefined ? vars[k] : `{${k}}`);
         }
         return val;
+    }
+
+    // ─── Lightweight Safe Markdown Renderer ───
+    function renderMarkdown(md) {
+        if (!md || typeof md !== 'string') return '';
+
+        // Replace any em-dash or en-dash with standard hyphen
+        let text = md.replace(/[—–]/g, '-').trim();
+
+        // Escape raw HTML entities for safety
+        text = text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
+        const lines = text.split(/\r?\n/);
+        const out = [];
+        let inList = false;
+        let inOrderedList = false;
+        let listItems = [];
+        let pBuffer = [];
+
+        function flushP() {
+            if (pBuffer.length > 0) {
+                out.push(`<p class="article-p">${pBuffer.map(l => inlineMarkdown(l)).join('<br>')}</p>`);
+                pBuffer = [];
+            }
+        }
+
+        function flushList() {
+            if (listItems.length > 0) {
+                if (inOrderedList) {
+                    out.push(`<ol class="article-list">${listItems.map(li => `<li>${inlineMarkdown(li)}</li>`).join('')}</ol>`);
+                } else {
+                    out.push(`<ul class="article-list">${listItems.map(li => `<li>${inlineMarkdown(li)}</li>`).join('')}</ul>`);
+                }
+                listItems = [];
+            }
+            inList = false;
+            inOrderedList = false;
+        }
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const trimmed = line.trim();
+
+            if (!trimmed) {
+                flushP();
+                flushList();
+                continue;
+            }
+
+            // Headings (###, ##, #)
+            if (trimmed.startsWith('### ')) {
+                flushP();
+                flushList();
+                out.push(`<h3 class="article-h3">${inlineMarkdown(trimmed.slice(4).trim())}</h3>`);
+                continue;
+            }
+            if (trimmed.startsWith('## ')) {
+                flushP();
+                flushList();
+                out.push(`<h2 class="article-h2">${inlineMarkdown(trimmed.slice(3).trim())}</h2>`);
+                continue;
+            }
+            if (trimmed.startsWith('# ')) {
+                flushP();
+                flushList();
+                out.push(`<h2 class="article-h2">${inlineMarkdown(trimmed.slice(2).trim())}</h2>`);
+                continue;
+            }
+
+            // Blockquotes
+            if (trimmed.startsWith('&gt; ') || trimmed.startsWith('> ')) {
+                flushP();
+                flushList();
+                const content = trimmed.replace(/^(&gt;|>)\s*/, '');
+                out.push(`<blockquote class="article-quote">${inlineMarkdown(content)}</blockquote>`);
+                continue;
+            }
+
+            // Unordered list items (- or *)
+            const uListMatch = trimmed.match(/^[-*]\s+(.*)$/);
+            if (uListMatch) {
+                flushP();
+                if (inOrderedList) flushList();
+                inList = true;
+                listItems.push(uListMatch[1]);
+                continue;
+            }
+
+            // Ordered list items (1. 2. etc)
+            const oListMatch = trimmed.match(/^\d+\.\s+(.*)$/);
+            if (oListMatch) {
+                flushP();
+                if (inList && !inOrderedList) flushList();
+                inList = true;
+                inOrderedList = true;
+                listItems.push(oListMatch[1]);
+                continue;
+            }
+
+            // Regular paragraph line
+            flushList();
+            pBuffer.push(trimmed);
+        }
+
+        flushP();
+        flushList();
+
+        return out.join('');
+    }
+
+    function inlineMarkdown(str) {
+        return str
+            .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+            .replace(/_([^_]+)_/g, '<em>$1</em>')
+            .replace(/`([^`]+)`/g, '<code>$1</code>');
     }
 
     function applyTranslations() {
@@ -945,14 +1066,18 @@
             const fDomain = $('#focus-concept-domain');
             const fPrompt = $('#prompt-card-content');
             const fModel = $('#focus-concept-model');
-            const fReason = $('#focus-concept-reason');
 
             if (fTitle && state.concept) fTitle.textContent = state.concept.title;
             if (fDomain && state.concept) fDomain.textContent = state.concept.domain || 'General';
             if (fPrompt) fPrompt.textContent = state.prompt || '';
-            if (fModel && state.concept) fModel.textContent = state.concept.intuitive_model || '';
-            if (fReason && state.concept) fReason.textContent = state.concept.summary || '';
+            if (fModel && state.concept) fModel.innerHTML = renderMarkdown(state.concept.intuitive_model || '');
+
             document.body.setAttribute('data-vector-theme', state.concept?.source_mode || state.activeVector || 'adjacent');
+
+            // Reset scroll position and initialize scroll-driven hero shrink
+            const mainEl = $('#main');
+            if (mainEl) mainEl.scrollTop = 0;
+            initFocusHeroScroll();
         } else {
             if (stageDiscovery) stageDiscovery.hidden = false;
             if (stageFocus) stageFocus.hidden = true;
@@ -1003,6 +1128,133 @@
             // Stream Intuicja on the right with organic typewriter
             runDiscoveryIntuitionTypewriter(dModel, state.concept.intuitive_model || '');
         }
+    }
+
+    // ─── Focus Hero: Scroll-Driven Cinematic Shrink Effect ───
+    let _focusScrollCleanup = null;
+
+    function initFocusHeroScroll() {
+        // Clean up previous listener if any
+        if (_focusScrollCleanup) {
+            _focusScrollCleanup();
+            _focusScrollCleanup = null;
+        }
+
+        const mainEl = $('#main');
+        const heroHeader = $('#focus-hero-header');
+        const blurOverlay = $('#focus-hero-blur-overlay');
+        const scrollCue = $('#focus-scroll-cue');
+        const cockpit = $('.focus-cockpit');
+
+        if (!mainEl || !heroHeader) return;
+
+        // Scroll threshold in px — how far to scroll before title reaches compact size
+        const SHRINK_THRESHOLD = 300;
+
+        let ticking = false;
+        let lastProgress = -1;
+
+        function lerp(a, b, t) {
+            return a + (b - a) * t;
+        }
+
+        function updateHeroOnScroll() {
+            const scrollTop = mainEl.scrollTop;
+            const progress = Math.min(Math.max(scrollTop / SHRINK_THRESHOLD, 0), 1);
+
+            if (Math.abs(progress - lastProgress) < 0.002) return;
+            lastProgress = progress;
+
+            // Ease out deceleration
+            const eased = 1 - Math.pow(1 - progress, 2);
+
+            // Interpolate title font-size: from 7.5vw -> 2.2rem
+            const titleSizeVw = lerp(7.5, 0, eased);
+            const titleSizeRem = lerp(0, 2.2, eased);
+            const titleSize = `calc(${titleSizeRem}rem + ${titleSizeVw}vw)`;
+
+            // Interpolate domain font-size: from 2.2vw -> 0.82rem
+            const domainSizeVw = lerp(2.2, 0, eased);
+            const domainSizeRem = lerp(0, 0.82, eased);
+            const domainSize = `calc(${domainSizeRem}rem + ${domainSizeVw}vw)`;
+
+            // Hero vertical padding: shrinks seamlessly from 24vh -> 1.5rem (top) and 0.5rem (bottom)
+            const padTopVh = lerp(24, 0, eased);
+            const padTopRem = lerp(0, 1.5, eased);
+            const padTop = `calc(${padTopRem}rem + ${padTopVh}vh)`;
+
+            const padBotVh = lerp(24, 0, eased);
+            const padBotRem = lerp(0, 0.5, eased);
+            const padBot = `calc(${padBotRem}rem + ${padBotVh}vh)`;
+
+            // Blur: from 20px -> 0px
+            const blur = lerp(20, 0, eased);
+
+            // Dark overlay opacity: from 0.6 -> 0
+            const overlayOpacity = lerp(0.6, 0, eased);
+
+            // Scroll cue opacity (fades out within the first 70px)
+            const cueOpacity = Math.max(1 - progress * 4.5, 0);
+
+            if (cockpit) {
+                cockpit.style.setProperty('--hero-title-size', titleSize);
+                cockpit.style.setProperty('--hero-domain-size', domainSize);
+                cockpit.style.setProperty('--hero-pad-top', padTop);
+                cockpit.style.setProperty('--hero-pad-bottom', padBot);
+                cockpit.style.setProperty('--hero-blur', `${blur}px`);
+                cockpit.style.setProperty('--hero-overlay-opacity', overlayOpacity);
+                cockpit.style.setProperty('--hero-cue-opacity', cueOpacity);
+            }
+
+            // Hide blur overlay completely when progress reaches 1
+            if (blurOverlay) {
+                if (progress >= 0.99) {
+                    blurOverlay.setAttribute('data-collapsed', '');
+                } else {
+                    blurOverlay.removeAttribute('data-collapsed');
+                }
+            }
+
+            // Hide scroll cue when faded
+            if (scrollCue) {
+                if (cueOpacity <= 0.01) {
+                    scrollCue.setAttribute('data-hidden', '');
+                } else {
+                    scrollCue.removeAttribute('data-hidden');
+                }
+            }
+        }
+
+        function onScroll() {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    updateHeroOnScroll();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }
+
+        // Initial render at scroll=0
+        updateHeroOnScroll();
+
+        mainEl.addEventListener('scroll', onScroll, { passive: true });
+
+        // Cleanup function
+        _focusScrollCleanup = () => {
+            mainEl.removeEventListener('scroll', onScroll);
+            if (cockpit) {
+                cockpit.style.removeProperty('--hero-title-size');
+                cockpit.style.removeProperty('--hero-domain-size');
+                cockpit.style.removeProperty('--hero-pad-top');
+                cockpit.style.removeProperty('--hero-pad-bottom');
+                cockpit.style.removeProperty('--hero-blur');
+                cockpit.style.removeProperty('--hero-overlay-opacity');
+                cockpit.style.removeProperty('--hero-cue-opacity');
+            }
+            if (blurOverlay) blurOverlay.removeAttribute('data-collapsed');
+            if (scrollCue) scrollCue.removeAttribute('data-hidden');
+        };
     }
 
     // ─── Knowledge Constellation Canvas ───
@@ -1754,9 +2006,9 @@
             }
         });
 
-        $('#btn-copy-prompt')?.addEventListener('click', async () => {
+        async function copyPromptToClipboard() {
             const text = $('#prompt-card-content')?.textContent || '';
-            if (!text) return;
+            if (!text) return false;
             try {
                 if (navigator.clipboard && window.isSecureContext) {
                     await navigator.clipboard.writeText(text);
@@ -1776,9 +2028,33 @@
                     toast.style.display = 'inline-block';
                     setTimeout(() => { toast.style.display = 'none'; }, 2200);
                 }
+                return true;
             } catch (err) {
                 showToast(t('errors.copy_failed'));
+                return false;
             }
+        }
+
+        $('#btn-copy-prompt')?.addEventListener('click', copyPromptToClipboard);
+
+        $('#btn-launch-chatgpt')?.addEventListener('click', async () => {
+            const text = $('#prompt-card-content')?.textContent || '';
+            await copyPromptToClipboard();
+            const url = text ? `https://chatgpt.com/?q=${encodeURIComponent(text)}` : 'https://chatgpt.com/';
+            window.open(url, '_blank', 'noopener,noreferrer');
+        });
+
+        $('#btn-launch-claude')?.addEventListener('click', async () => {
+            const text = $('#prompt-card-content')?.textContent || '';
+            await copyPromptToClipboard();
+            const url = text ? `https://claude.ai/new?q=${encodeURIComponent(text)}` : 'https://claude.ai/';
+            window.open(url, '_blank', 'noopener,noreferrer');
+        });
+
+        $('#btn-launch-gemini')?.addEventListener('click', async () => {
+            const text = $('#prompt-card-content')?.textContent || '';
+            await copyPromptToClipboard();
+            window.open('https://gemini.google.com/app', '_blank', 'noopener,noreferrer');
         });
 
         $('#btn-focus-finish')?.addEventListener('click', () => {
@@ -1788,12 +2064,6 @@
                 subtitle.textContent = t('complete_modal.subtitle', { topic: state.concept.title });
             }
             $('#complete-modal-backdrop').hidden = false;
-        });
-
-        $('#btn-focus-add-spark')?.addEventListener('click', () => {
-            loadSparksList();
-            $('#spark-modal-backdrop').hidden = false;
-            setTimeout(() => $('#input-spark-text')?.focus(), 50);
         });
 
         // Complete Session Modal Trigger

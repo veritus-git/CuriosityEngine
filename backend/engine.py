@@ -7,7 +7,7 @@ import logging
 from typing import Dict, Any, Optional, List
 from .database import (
     create_concept, get_concept, get_active_concept, get_suggested_concept,
-    update_concept_status, reject_all_suggested_concepts, get_mastered_concepts,
+    update_concept_status, update_concept_intuitive_model, reject_all_suggested_concepts, get_mastered_concepts,
     get_recent_concepts, get_all_concept_titles, get_sparks, update_spark_status,
     create_spark, create_bridge, complete_multiconcept_session, get_profile,
     get_all_concepts_with_embeddings, get_sparks_with_embeddings,
@@ -16,10 +16,10 @@ from .database import (
 from .ai import generate_ai_json, generate_embedding, cosine_similarity, AIError
 from .prompts import (
     build_generation_prompts, build_batch_generation_prompts,
-    build_dynamic_prompt_synthesis_prompts, build_multiconcept_parse_prompts,
-    build_external_learning_prompt, build_cold_start_generation_prompts,
-    build_direct_topic_prompts, build_thought_to_concept_prompts,
-    load_prompts
+    build_dynamic_prompt_synthesis_prompts, build_active_session_synthesis_prompts,
+    build_multiconcept_parse_prompts, build_external_learning_prompt,
+    build_cold_start_generation_prompts, build_direct_topic_prompts,
+    build_thought_to_concept_prompts, load_prompts
 )
 
 logger = logging.getLogger("curiosity.engine")
@@ -94,41 +94,66 @@ async def generate_batch_concept_suggestions(
     return results
 
 
-async def generate_dynamic_learning_prompt(concept_id: int) -> str:
+async def generate_active_session_package(concept_id: int) -> Dict[str, Any]:
     """
-    Synthesize a tailored, dynamic, 1-paragraph prompt for external LLMs using AI.
-    Falls back gracefully to domain-aware universal prompt builder.
+    Synthesize both a captivating rich introduction (story/analogy/problem genesis)
+    and a clean, natural external LLM prompt for the active learning session.
+    Updates the concept in database with the rich introduction.
     """
     concept = get_concept(concept_id)
     if not concept:
-        return ""
+        return {"concept": None, "prompt": ""}
 
     mastered = get_mastered_concepts(limit=6)
     known = [m["title"] for m in mastered if m["id"] != concept_id]
     profile = get_profile()
-    lang = profile.get("language", "pl")
+
+    rich_intro = concept.get("intuitive_model") or ""
+    prompt_text = ""
 
     try:
-        sys_prompt, user_prompt = build_dynamic_prompt_synthesis_prompts(
+        sys_prompt, user_prompt = build_active_session_synthesis_prompts(
             concept_title=concept["title"],
             domain=concept.get("domain", "General"),
+            summary=concept.get("summary", ""),
             known_concepts=known,
             profile=profile
         )
         parsed = await generate_ai_json(sys_prompt, user_prompt)
-        prompt_text = parsed.get("prompt") or parsed.get("text") or ""
-        if prompt_text and len(prompt_text.strip()) > 15:
-            return prompt_text.strip()
-    except Exception as e:
-        logger.warning(f"Dynamic prompt synthesis notice ({e}), using fallback builder.")
+        ai_rich_intro = parsed.get("rich_intro") or parsed.get("intro") or ""
+        ai_prompt = parsed.get("prompt") or parsed.get("text") or ""
 
-    return build_external_learning_prompt(
-        concept_title=concept["title"],
-        domain=concept.get("domain", "General"),
-        intuitive_model=concept.get("intuitive_model"),
-        known_concepts=known,
-        profile=profile
-    )
+        if ai_rich_intro and len(ai_rich_intro.strip()) > 30:
+            rich_intro = ai_rich_intro.strip().replace("—", "-").replace("–", "-")
+            update_concept_intuitive_model(concept_id, rich_intro)
+
+        if ai_prompt and len(ai_prompt.strip()) > 15:
+            prompt_text = ai_prompt.strip().replace("—", "-").replace("–", "-")
+    except Exception as e:
+        logger.warning(f"Active session package synthesis notice ({e}), using fallback builder.")
+
+    if not prompt_text:
+        prompt_text = build_external_learning_prompt(
+            concept_title=concept["title"],
+            domain=concept.get("domain", "General"),
+            intuitive_model=rich_intro,
+            known_concepts=known,
+            profile=profile
+        )
+
+    updated_concept = get_concept(concept_id)
+    return {
+        "concept": updated_concept,
+        "prompt": prompt_text
+    }
+
+
+async def generate_dynamic_learning_prompt(concept_id: int) -> str:
+    """
+    Synthesize a tailored prompt for external LLMs using AI.
+    """
+    pkg = await generate_active_session_package(concept_id)
+    return pkg.get("prompt") or ""
 
 
 def save_topic_as_spark(title: str, domain: str, summary: str, concept_id: Optional[int] = None) -> Dict[str, Any]:

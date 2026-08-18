@@ -269,6 +269,13 @@ def update_concept_status(concept_id: int, status: str):
     conn.close()
 
 
+def update_concept_intuitive_model(concept_id: int, intuitive_model: str):
+    conn = get_connection()
+    conn.execute("UPDATE concepts SET intuitive_model = ? WHERE id = ?", (intuitive_model, concept_id))
+    conn.commit()
+    conn.close()
+
+
 def archive_unselected_batch_proposals(exclude_id: Optional[int] = None):
     """
     Transition any remaining suggested concepts to 'proposed_unselected'.

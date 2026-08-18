@@ -334,6 +334,42 @@ def build_dynamic_prompt_synthesis_prompts(
     return system_prompt, user_msg
 
 
+def build_active_session_synthesis_prompts(
+    concept_title: str,
+    domain: str = "General",
+    summary: str = "",
+    known_concepts: Optional[List[str]] = None,
+    profile: Optional[Dict[str, Any]] = None
+) -> tuple[str, str]:
+    """
+    Build prompts to synthesize both a captivating, rich introduction (story/analogy/problem genesis)
+    and a natural prompt for external LLMs for the active learning session.
+    """
+    lang = profile.get("language", "en") if profile else "en"
+    level = profile.get("grounding_level", "builder") if profile else "builder"
+    prompts = load_prompts(lang)
+
+    system_prompt = _get(prompts, "active_session_synthesis", "system", default="")
+    if not system_prompt:
+        system_prompt = _get(prompts, "prompt_synthesis", "system", default="")
+    lang_instruction = _get(prompts, "language_instruction", default="")
+    system_prompt = system_prompt.replace("{language_instruction}", lang_instruction)
+
+    user_template = _get(prompts, "active_session_synthesis", "user", default="")
+    if not user_template:
+        user_template = _get(prompts, "prompt_synthesis", "user", default="")
+
+    known_str = ", ".join(known_concepts[:4]) if known_concepts else ("Brak" if lang == "pl" else "None")
+
+    user_msg = user_template.replace("{topic}", concept_title)
+    user_msg = user_msg.replace("{domain}", domain)
+    user_msg = user_msg.replace("{level}", level)
+    user_msg = user_msg.replace("{summary}", summary or "")
+    user_msg = user_msg.replace("{known_concepts}", known_str)
+
+    return system_prompt, user_msg
+
+
 def build_direct_topic_prompts(
     title: str,
     domain: str,
