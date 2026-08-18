@@ -1031,7 +1031,7 @@ body[data-focus-active] .ambient-focus-blur {
     flex-direction: column;
     align-items: stretch;
     width: 100%;
-    max-width: 1040px;
+    max-width: 820px;
     margin: 0 auto;
     gap: 0;
     text-align: left;
@@ -1040,32 +1040,34 @@ body[data-focus-active] .ambient-focus-blur {
     z-index: 15;
 }
 
-/* Sticky Scroll Pinning Track — gives 380px of pure scroll travel to shrink title */
-.focus-hero-scroll-track {
-    width: 100%;
-    height: calc(100vh - 50px + 380px);
-    position: relative;
-    margin-bottom: 0;
-}
-
-/* Pinned Sticky Hero — stays pinned in view while scrolling the track */
-.focus-hero-sticky {
-    position: sticky;
-    top: 0;
-    height: calc(100vh - 50px);
-    width: 100%;
+/* ─── Hero Stage (Fixed Over Viewport at start, Morphs on Scroll) ─── */
+.focus-hero-stage {
+    position: fixed;
+    top: 45px;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
+    padding: 0 2rem 3rem 2rem;
     box-sizing: border-box;
-    padding-top: var(--hero-pad-top, 0);
-    padding-bottom: 2rem;
     pointer-events: none;
+    z-index: 25;
+    opacity: var(--hero-stage-opacity, 1);
+    transform: translateY(var(--hero-stage-ty, 0px));
+    will-change: transform, opacity;
 }
 
-.focus-hero-content {
+.focus-hero-stage[data-hidden] {
+    display: none !important;
+}
+
+.focus-hero-inner {
     width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -1080,26 +1082,26 @@ body[data-focus-active] .ambient-focus-blur {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding-top: var(--title-wrap-pt, 3.2rem);
+    padding-top: var(--hero-title-pt, 3.5rem);
 }
 
-/* Domain/Category tag — Glued to the top-left corner of the title block with gradient fade */
+/* Category Tag in Hero (Green Box) — Glued to top-left of title with gradient fade */
 .focus-domain-tag {
     position: absolute;
-    top: var(--domain-top, 0);
-    left: var(--domain-left, 0);
+    top: 0;
+    left: 0;
     display: inline-block;
     font-family: var(--font-mono);
-    font-size: var(--hero-domain-size, clamp(1.4rem, 2.8vw, 2.2rem));
+    font-size: var(--hero-domain-size, clamp(1.4rem, 2.8vw, 2.4rem));
     font-weight: 850;
     text-transform: uppercase;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.18em;
     white-space: nowrap;
     background: linear-gradient(
         90deg,
         var(--vector-accent-light, #818cf8) 0%,
         var(--vector-accent-light, #818cf8) 25%,
-        rgba(129, 140, 248, 0.4) 60%,
+        rgba(129, 140, 248, 0.45) 55%,
         transparent 95%
     );
     -webkit-background-clip: text;
@@ -1110,11 +1112,12 @@ body[data-focus-active] .ambient-focus-blur {
     z-index: 2;
 }
 
+/* Massive Title in Hero (Red Box) */
 .focus-hero__title {
-    font-size: var(--hero-title-size, clamp(4rem, 9.5vw, 8rem));
+    font-size: var(--hero-title-size, clamp(3.8rem, 9.5vw, 8.5rem));
     font-weight: 900;
     color: #ffffff;
-    line-height: 0.98;
+    line-height: 0.96;
     letter-spacing: -0.045em;
     text-align: left;
     margin: 0;
@@ -1155,6 +1158,54 @@ body[data-focus-active] .ambient-focus-blur {
     }
 }
 
+/* ─── Normal Page Flow (Destination State) ─── */
+.focus-scroll-spacer {
+    width: 100%;
+    height: 360px; /* Pure scroll travel to morph from Hero to Normal page */
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
+.focus-normal-header {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 1rem;
+    margin-bottom: 1.25rem;
+    opacity: var(--normal-header-opacity, 1);
+}
+
+.focus-normal-domain {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--vector-accent-light, #818cf8);
+    margin-bottom: 0.5rem;
+}
+
+.focus-normal-title {
+    font-size: 2.3rem;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin: 0 0 0.8rem 0;
+    text-align: left;
+}
+
+.focus-bridge-subtitle {
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: #888888;
+    margin: 0;
+    text-align: left;
+    font-weight: 400;
+}
+
 /* Borderless Fluid Markdown Document */
 .focus-article {
     width: 100%;
@@ -1167,7 +1218,7 @@ body[data-focus-active] .ambient-focus-blur {
     font-size: 1.08rem;
     line-height: 1.85;
     text-align: left;
-    padding-top: 2rem;
+    padding-top: 0.5rem;
     margin-top: 0;
 }
 

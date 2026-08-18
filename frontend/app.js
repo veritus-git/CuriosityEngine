@@ -1062,15 +1062,30 @@
             if (stageDiscovery) stageDiscovery.hidden = true;
             if (stageFocus) stageFocus.hidden = false;
 
-            const fTitle = $('#focus-concept-title');
-            const fDomain = $('#focus-concept-domain');
+            const fHeroTitle = $('#focus-concept-title');
+            const fHeroDomain = $('#focus-concept-domain');
+            const fNormalTitle = $('#focus-normal-title');
+            const fNormalDomain = $('#focus-normal-domain');
+            const fReason = $('#focus-concept-reason');
             const fPrompt = $('#prompt-card-content');
             const fModel = $('#focus-concept-model');
 
-            if (fTitle && state.concept) fTitle.textContent = state.concept.title;
-            if (fDomain && state.concept) fDomain.textContent = state.concept.domain || 'General';
+            if (state.concept) {
+                if (fHeroTitle) fHeroTitle.textContent = state.concept.title;
+                if (fHeroDomain) fHeroDomain.textContent = state.concept.domain || 'General';
+                if (fNormalTitle) fNormalTitle.textContent = state.concept.title;
+                if (fNormalDomain) fNormalDomain.textContent = state.concept.domain || 'General';
+                if (fReason) {
+                    if (state.concept.summary) {
+                        fReason.textContent = state.concept.summary;
+                        fReason.hidden = false;
+                    } else {
+                        fReason.hidden = true;
+                    }
+                }
+                if (fModel) fModel.innerHTML = renderMarkdown(state.concept.intuitive_model || '');
+            }
             if (fPrompt) fPrompt.textContent = state.prompt || '';
-            if (fModel && state.concept) fModel.innerHTML = renderMarkdown(state.concept.intuitive_model || '');
 
             document.body.setAttribute('data-vector-theme', state.concept?.source_mode || state.activeVector || 'adjacent');
             document.body.setAttribute('data-focus-active', '');
@@ -1132,7 +1147,7 @@
         }
     }
 
-    // ─── Focus Hero: Scroll-Driven Cinematic Shrink Effect ───
+    // ─── Focus Hero: Scroll-Driven Cinematic Shrink & Morph Effect ───
     let _focusScrollCleanup = null;
 
     function initFocusHeroScroll() {
@@ -1143,16 +1158,16 @@
         }
 
         const mainEl = $('#main');
-        const stickyEl = $('#focus-hero-sticky');
+        const heroStage = $('#focus-hero-stage');
         const ambientBlur = $('#ambient-focus-blur');
         const scrollCue = $('#focus-scroll-cue');
         const cockpit = $('.focus-cockpit');
 
-        if (!mainEl || !stickyEl) return;
+        if (!mainEl || !heroStage) return;
 
         // Scroll thresholds in px
-        const PIN_SCROLL_DISTANCE = 380; // Pure pinned scroll travel to scale title down
-        const BLUR_THRESHOLD = 120;      // Background blur clears rapidly within 120px
+        const MORPH_SCROLL_DISTANCE = 360; // Pure scroll travel where Hero morphs into Normal Header
+        const BLUR_THRESHOLD = 120;        // Background blur clears rapidly within 120px
 
         let ticking = false;
         let lastProgress = -1;
@@ -1163,46 +1178,58 @@
 
         function updateHeroOnScroll() {
             const scrollTop = mainEl.scrollTop;
-            const progress = Math.min(Math.max(scrollTop / PIN_SCROLL_DISTANCE, 0), 1);
+            const progress = Math.min(Math.max(scrollTop / MORPH_SCROLL_DISTANCE, 0), 1);
 
             if (Math.abs(progress - lastProgress) < 0.002) return;
             lastProgress = progress;
 
-            // Ease out deceleration for title shrink
+            // Ease out deceleration curve
             const eased = 1 - Math.pow(1 - progress, 2.2);
 
-            // 1. Massive Title Font Size (Red Box): from 9.5vw -> 2.4rem
-            const titleStartVw = 9.5;
-            const titleEndRem = 2.4;
+            // 1. Massive Title Font Size (Red Box): from 9.0vw -> 2.3rem
+            const titleStartVw = 9.0;
+            const titleEndRem = 2.3;
             const titleSizeVw = lerp(titleStartVw, 0, eased);
             const titleSizeRem = lerp(0, titleEndRem, eased);
             const titleSize = `calc(${titleSizeRem}rem + ${titleSizeVw}vw)`;
 
-            // 2. Category Font Size (Green Box): from 2.4vw -> 0.85rem
-            const domainStartVw = 2.4;
-            const domainEndRem = 0.85;
+            // 2. Category Font Size (Green Box): from 2.6vw -> 0.82rem
+            const domainStartVw = 2.6;
+            const domainEndRem = 0.82;
             const domainSizeVw = lerp(domainStartVw, 0, eased);
             const domainSizeRem = lerp(0, domainEndRem, eased);
             const domainSize = `calc(${domainSizeRem}rem + ${domainSizeVw}vw)`;
 
-            // 3. Category wrap padding & vertical docking
-            const titleWrapPtRem = lerp(3.2, 1.4, eased);
-            const padTopVh = lerp(0, 4, eased);
-            const padTopRem = lerp(0, 1.5, eased);
-            const padTop = `calc(${padTopRem}rem + ${padTopVh}vh)`;
+            // 3. Hero vertical translation & category padding
+            const heroTy = -eased * 150;
+            const heroPtRem = lerp(3.5, 1.2, eased);
 
-            // 4. Scroll cue opacity (fades out in first 60px)
+            // 4. Crossfade between Hero Overlay and Normal Header
+            const heroOpacity = progress >= 0.98 ? 0 : (progress > 0.8 ? lerp(1, 0, (progress - 0.8) / 0.18) : 1);
+            const normalHeaderOpacity = progress < 0.7 ? 0 : lerp(0, 1, (progress - 0.7) / 0.3);
+
+            // 5. Scroll cue opacity (fades out fast in first 60px)
             const cueOpacity = Math.max(1 - progress * 5, 0);
 
             if (cockpit) {
                 cockpit.style.setProperty('--hero-title-size', titleSize);
                 cockpit.style.setProperty('--hero-domain-size', domainSize);
-                cockpit.style.setProperty('--title-wrap-pt', `${titleWrapPtRem}rem`);
-                cockpit.style.setProperty('--hero-pad-top', padTop);
+                cockpit.style.setProperty('--hero-title-pt', `${heroPtRem}rem`);
+                cockpit.style.setProperty('--hero-stage-ty', `${heroTy}px`);
+                cockpit.style.setProperty('--hero-stage-opacity', heroOpacity);
                 cockpit.style.setProperty('--hero-cue-opacity', cueOpacity);
+                cockpit.style.setProperty('--normal-header-opacity', normalHeaderOpacity);
             }
 
-            // 5. Rapid Background Blur Dissolve (strictly underneath all text)
+            if (heroStage) {
+                if (progress >= 0.99) {
+                    heroStage.setAttribute('data-hidden', '');
+                } else {
+                    heroStage.removeAttribute('data-hidden');
+                }
+            }
+
+            // 6. Rapid Background Blur Dissolve (strictly underneath all text)
             const blurProgress = Math.min(Math.max(scrollTop / BLUR_THRESHOLD, 0), 1);
             const blurEased = 1 - Math.pow(1 - blurProgress, 2);
             const blurPx = lerp(30, 0, blurEased);
@@ -1220,7 +1247,6 @@
                 }
             }
 
-            // Hide scroll cue when faded
             if (scrollCue) {
                 if (cueOpacity <= 0.01) {
                     scrollCue.setAttribute('data-hidden', '');
@@ -1251,9 +1277,11 @@
             if (cockpit) {
                 cockpit.style.removeProperty('--hero-title-size');
                 cockpit.style.removeProperty('--hero-domain-size');
-                cockpit.style.removeProperty('--title-wrap-pt');
-                cockpit.style.removeProperty('--hero-pad-top');
+                cockpit.style.removeProperty('--hero-title-pt');
+                cockpit.style.removeProperty('--hero-stage-ty');
+                cockpit.style.removeProperty('--hero-stage-opacity');
                 cockpit.style.removeProperty('--hero-cue-opacity');
+                cockpit.style.removeProperty('--normal-header-opacity');
             }
             if (ambientBlur) {
                 ambientBlur.removeAttribute('data-collapsed');
@@ -1261,6 +1289,7 @@
                 ambientBlur.style.removeProperty('--hero-blur');
                 ambientBlur.style.removeProperty('--hero-overlay-opacity');
             }
+            if (heroStage) heroStage.removeAttribute('data-hidden');
             if (scrollCue) scrollCue.removeAttribute('data-hidden');
         };
     }

@@ -16,7 +16,7 @@
 
     <link rel="icon" type="image/png" href="assets/favicon.png">
     <link rel="apple-touch-icon" href="assets/favicon.png">
-    <link rel="stylesheet" href="style.css?v=3.4.0">
+    <link rel="stylesheet" href="style.css?v=3.5.0">
 </head>
 
 <body>
@@ -730,23 +730,31 @@
                     <div class="dashboard-stage dashboard-stage--focus" id="dashboard-stage-focus" hidden>
                         <div class="focus-cockpit">
 
-                            <!-- Sticky Scroll Pin Hero Section -->
-                            <div class="focus-hero-scroll-track" id="focus-hero-scroll-track">
-                                <div class="focus-hero-sticky" id="focus-hero-sticky">
-                                    <div class="focus-hero-content">
-                                        <div class="focus-hero-title-wrap">
-                                            <span class="focus-domain-tag" id="focus-concept-domain"></span>
-                                            <h1 class="focus-hero__title" id="focus-concept-title"></h1>
-                                        </div>
+                            <!-- Fixed Fullscreen Morphing Hero Stage -->
+                            <div class="focus-hero-stage" id="focus-hero-stage">
+                                <div class="focus-hero-inner">
+                                    <div class="focus-hero-title-wrap">
+                                        <span class="focus-domain-tag" id="focus-concept-domain"></span>
+                                        <h1 class="focus-hero__title" id="focus-concept-title"></h1>
+                                    </div>
 
-                                        <div class="focus-scroll-cue" id="focus-scroll-cue">
-                                            <span class="scroll-cue-mouse" aria-hidden="true"></span>
-                                            <span class="scroll-cue-text" data-i18n="focus_card.scroll_to_read">Przewiń, aby przeczytać</span>
-                                            <span class="scroll-cue-arrow" aria-hidden="true">↓</span>
-                                        </div>
+                                    <div class="focus-scroll-cue" id="focus-scroll-cue">
+                                        <span class="scroll-cue-mouse" aria-hidden="true"></span>
+                                        <span class="scroll-cue-text" data-i18n="focus_card.scroll_to_read">Przewiń, aby przeczytać</span>
+                                        <span class="scroll-cue-arrow" aria-hidden="true">↓</span>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Normal Page Flow with Scroll Transition Spacer -->
+                            <div class="focus-scroll-spacer" id="focus-scroll-spacer"></div>
+
+                            <!-- Normal Reading Header (Destination State) -->
+                            <header class="focus-normal-header" id="focus-normal-header">
+                                <span class="focus-normal-domain" id="focus-normal-domain"></span>
+                                <h1 class="focus-normal-title" id="focus-normal-title"></h1>
+                                <p class="focus-bridge-subtitle" id="focus-concept-reason"></p>
+                            </header>
 
                             <!-- Borderless Fluid Markdown Document -->
                             <article class="focus-article" id="focus-concept-model"></article>
@@ -997,7 +1005,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=3.4.0"></script>
+    <script src="app.js?v=3.5.0"></script>
 </body>
 
 </html>
