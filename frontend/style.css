@@ -668,6 +668,21 @@ body[data-focus-active] .ambient-focus-blur {
     display: none !important;
 }
 
+body[data-focus-active] .dashboard-container {
+    margin: 0;
+    padding: 0;
+    justify-content: flex-start;
+    display: block;
+    width: 100%;
+}
+
+body[data-focus-active] .dashboard-stage--focus {
+    width: 100%;
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
 /* --- Stage 1: Discovery Split Hero (Expansive Layout, Fluid Transitions & Grounded Actions) --- */
 .discovery-split-hero {
     display: grid;
@@ -1027,31 +1042,43 @@ body[data-focus-active] .ambient-focus-blur {
 
 /* --- Stage 2: Focus & Learning Mode (Pure Editorial Cockpit) --- */
 .focus-cockpit {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
+    display: block;
     width: 100%;
     max-width: 860px;
     margin: 0 auto;
-    gap: 0;
-    text-align: left;
     position: relative;
-    z-index: 15;
 }
 
-/* ─── Hero Header (Fullscreen on load, Morphs to compact on scroll) ─── */
-.focus-hero-header {
+/* ─── Pinned Scroll Track (450px of sticky scroll travel) ─── */
+.focus-scroll-track {
     width: 100%;
-    min-height: var(--hero-min-h, calc(100vh - 100px));
+    height: calc(100vh - 50px + 450px);
+    position: relative;
+    display: block;
+}
+
+/* Sticky Hero Box — LOCKED in the viewport for the entire 450px of scroll travel */
+.focus-sticky-hero {
+    position: sticky;
+    top: 0;
+    height: calc(100vh - 50px);
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    padding-top: var(--hero-pad-top, 0);
-    padding-bottom: var(--hero-pad-bottom, 1rem);
     box-sizing: border-box;
+    padding-top: var(--hero-pad-top, 0);
+    padding-bottom: 2rem;
+    z-index: 10;
+}
+
+.focus-hero-inner {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     position: relative;
-    transition: none;
 }
 
 /* Title wrapper — container with relative positioning for glued category */
@@ -1138,14 +1165,15 @@ body[data-focus-active] .ambient-focus-blur {
     }
 }
 
-/* Grey associative bridge */
-.focus-bridge-subtitle {
-    font-size: 1.05rem;
-    line-height: 1.65;
-    color: #888888;
-    margin: 0.5rem 0 1.25rem 0;
-    text-align: left;
-    font-weight: 400;
+/* Article Content Wrapper */
+.focus-article-wrap {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    position: relative;
+    z-index: 5;
+    padding-top: 1rem;
 }
 
 /* Borderless Fluid Markdown Document */

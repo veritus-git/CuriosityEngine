@@ -1064,21 +1064,12 @@
 
             const fTitle = $('#focus-concept-title');
             const fDomain = $('#focus-concept-domain');
-            const fReason = $('#focus-concept-reason');
             const fPrompt = $('#prompt-card-content');
             const fModel = $('#focus-concept-model');
 
             if (state.concept) {
                 if (fTitle) fTitle.textContent = state.concept.title;
                 if (fDomain) fDomain.textContent = state.concept.domain || 'General';
-                if (fReason) {
-                    if (state.concept.summary) {
-                        fReason.textContent = state.concept.summary;
-                        fReason.hidden = false;
-                    } else {
-                        fReason.hidden = true;
-                    }
-                }
                 if (fModel) fModel.innerHTML = renderMarkdown(state.concept.intuitive_model || '');
             }
             if (fPrompt) fPrompt.textContent = state.prompt || '';
@@ -1154,14 +1145,14 @@
         }
 
         const mainEl = $('#main');
-        const heroHeader = $('#focus-hero-header');
+        const stickyHero = $('#focus-sticky-hero');
         const ambientBlur = $('#ambient-focus-blur');
         const scrollCue = $('#focus-scroll-cue');
         const cockpit = $('.focus-cockpit');
 
-        if (!mainEl || !heroHeader) return;
+        if (!mainEl || !stickyHero) return;
 
-        const SHRINK_DISTANCE = 320; // 320px of scroll travel to morph from Fullscreen Hero -> Compact Header
+        const PIN_TRAVEL = 450; // px of pure pinned scroll travel
 
         let ticking = false;
         let lastProgress = -1;
@@ -1172,7 +1163,7 @@
 
         function updateHeroOnScroll() {
             const scrollTop = mainEl.scrollTop;
-            const progress = Math.min(Math.max(scrollTop / SHRINK_DISTANCE, 0), 1);
+            const progress = Math.min(Math.max(scrollTop / PIN_TRAVEL, 0), 1);
 
             if (Math.abs(progress - lastProgress) < 0.002) return;
             lastProgress = progress;
@@ -1194,32 +1185,26 @@
             const domainSizeRem = lerp(0, domainEndRem, eased);
             const domainSize = `calc(${domainSizeRem}rem + ${domainSizeVw}vw)`;
 
-            // 3. Title wrapper top padding: 3.5rem -> 1.2rem
+            // 3. Category padding: 3.5rem -> 1.2rem
             const titlePtRem = lerp(3.5, 1.2, eased);
 
-            // 4. Hero header min-height: (100vh - 100px) -> auto (0px)
-            const minHeightVh = lerp(100, 0, eased);
-            const minHeightOffset = lerp(100, 0, eased);
-            const minHeight = progress >= 0.99 ? 'auto' : `calc(${minHeightVh}vh - ${minHeightOffset}px)`;
+            // 4. Hero vertical docking in sticky box: moves from center towards top
+            const padTopVh = lerp(0, 4, eased);
+            const padTopRem = lerp(0, 1.0, eased);
+            const padTop = `calc(${padTopRem}rem + ${padTopVh}vh)`;
 
-            // 5. Hero header padding: from centering (0) -> compact (0.5rem)
-            const padTopRem = lerp(0, 1.2, eased);
-            const padBotRem = lerp(1.0, 0.2, eased);
-
-            // 6. Scroll cue opacity (fades out in first 60px)
+            // 5. Scroll cue opacity (fades out in first 60px)
             const cueOpacity = Math.max(1 - progress * 5, 0);
 
             if (cockpit) {
                 cockpit.style.setProperty('--hero-title-size', titleSize);
                 cockpit.style.setProperty('--hero-domain-size', domainSize);
                 cockpit.style.setProperty('--hero-title-pt', `${titlePtRem}rem`);
-                cockpit.style.setProperty('--hero-min-h', minHeight);
-                cockpit.style.setProperty('--hero-pad-top', `${padTopRem}rem`);
-                cockpit.style.setProperty('--hero-pad-bottom', `${padBotRem}rem`);
+                cockpit.style.setProperty('--hero-pad-top', padTop);
                 cockpit.style.setProperty('--hero-cue-opacity', cueOpacity);
             }
 
-            // 7. Rapid Background Blur Dissolve (strictly underneath all text)
+            // 6. Rapid Background Blur Dissolve (strictly underneath all text)
             const blurProgress = Math.min(Math.max(scrollTop / 120, 0), 1);
             const blurEased = 1 - Math.pow(1 - blurProgress, 2);
             const blurPx = lerp(30, 0, blurEased);
@@ -1268,9 +1253,7 @@
                 cockpit.style.removeProperty('--hero-title-size');
                 cockpit.style.removeProperty('--hero-domain-size');
                 cockpit.style.removeProperty('--hero-title-pt');
-                cockpit.style.removeProperty('--hero-min-h');
                 cockpit.style.removeProperty('--hero-pad-top');
-                cockpit.style.removeProperty('--hero-pad-bottom');
                 cockpit.style.removeProperty('--hero-cue-opacity');
             }
             if (ambientBlur) {
