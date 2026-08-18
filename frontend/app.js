@@ -1143,16 +1143,16 @@
         }
 
         const mainEl = $('#main');
-        const heroHeader = $('#focus-hero-header');
+        const stickyEl = $('#focus-hero-sticky');
         const ambientBlur = $('#ambient-focus-blur');
         const scrollCue = $('#focus-scroll-cue');
         const cockpit = $('.focus-cockpit');
 
-        if (!mainEl || !heroHeader) return;
+        if (!mainEl || !stickyEl) return;
 
         // Scroll thresholds in px
-        const SHRINK_THRESHOLD = 260; // Title shrinks to compact within 260px
-        const BLUR_THRESHOLD = 110;   // Background blur clears rapidly within 110px
+        const PIN_SCROLL_DISTANCE = 380; // Pure pinned scroll travel to scale title down
+        const BLUR_THRESHOLD = 120;      // Background blur clears rapidly within 120px
 
         let ticking = false;
         let lastProgress = -1;
@@ -1163,45 +1163,46 @@
 
         function updateHeroOnScroll() {
             const scrollTop = mainEl.scrollTop;
-            const progress = Math.min(Math.max(scrollTop / SHRINK_THRESHOLD, 0), 1);
+            const progress = Math.min(Math.max(scrollTop / PIN_SCROLL_DISTANCE, 0), 1);
 
             if (Math.abs(progress - lastProgress) < 0.002) return;
             lastProgress = progress;
 
-            // Ease out deceleration for title
-            const eased = 1 - Math.pow(1 - progress, 2);
+            // Ease out deceleration for title shrink
+            const eased = 1 - Math.pow(1 - progress, 2.2);
 
-            // Interpolate title font-size: from 7.5vw -> 2.2rem
-            const titleSizeVw = lerp(7.5, 0, eased);
-            const titleSizeRem = lerp(0, 2.2, eased);
+            // 1. Massive Title Font Size (Red Box): from 9.5vw -> 2.4rem
+            const titleStartVw = 9.5;
+            const titleEndRem = 2.4;
+            const titleSizeVw = lerp(titleStartVw, 0, eased);
+            const titleSizeRem = lerp(0, titleEndRem, eased);
             const titleSize = `calc(${titleSizeRem}rem + ${titleSizeVw}vw)`;
 
-            // Interpolate domain font-size: from 2.2vw -> 0.82rem
-            const domainSizeVw = lerp(2.2, 0, eased);
-            const domainSizeRem = lerp(0, 0.82, eased);
+            // 2. Category Font Size (Green Box): from 2.4vw -> 0.85rem
+            const domainStartVw = 2.4;
+            const domainEndRem = 0.85;
+            const domainSizeVw = lerp(domainStartVw, 0, eased);
+            const domainSizeRem = lerp(0, domainEndRem, eased);
             const domainSize = `calc(${domainSizeRem}rem + ${domainSizeVw}vw)`;
 
-            // Hero vertical padding: shrinks from 24vh -> 1.5rem (top) and 0.5rem (bottom)
-            const padTopVh = lerp(24, 0, eased);
+            // 3. Category wrap padding & vertical docking
+            const titleWrapPtRem = lerp(3.2, 1.4, eased);
+            const padTopVh = lerp(0, 4, eased);
             const padTopRem = lerp(0, 1.5, eased);
             const padTop = `calc(${padTopRem}rem + ${padTopVh}vh)`;
 
-            const padBotVh = lerp(24, 0, eased);
-            const padBotRem = lerp(0, 0.5, eased);
-            const padBot = `calc(${padBotRem}rem + ${padBotVh}vh)`;
-
-            // Scroll cue opacity (fades out in first 50px)
+            // 4. Scroll cue opacity (fades out in first 60px)
             const cueOpacity = Math.max(1 - progress * 5, 0);
 
             if (cockpit) {
                 cockpit.style.setProperty('--hero-title-size', titleSize);
                 cockpit.style.setProperty('--hero-domain-size', domainSize);
+                cockpit.style.setProperty('--title-wrap-pt', `${titleWrapPtRem}rem`);
                 cockpit.style.setProperty('--hero-pad-top', padTop);
-                cockpit.style.setProperty('--hero-pad-bottom', padBot);
                 cockpit.style.setProperty('--hero-cue-opacity', cueOpacity);
             }
 
-            // Rapid Background Blur Dissolve (underneath all text)
+            // 5. Rapid Background Blur Dissolve (strictly underneath all text)
             const blurProgress = Math.min(Math.max(scrollTop / BLUR_THRESHOLD, 0), 1);
             const blurEased = 1 - Math.pow(1 - blurProgress, 2);
             const blurPx = lerp(30, 0, blurEased);
@@ -1213,7 +1214,7 @@
                     ambientBlur.style.opacity = '0';
                 } else {
                     ambientBlur.removeAttribute('data-collapsed');
-                    ambientBlur.style.opacity = `${(1 - blurProgress) * 1}`;
+                    ambientBlur.style.opacity = `${(1 - blurProgress)}`;
                     ambientBlur.style.setProperty('--hero-blur', `${blurPx}px`);
                     ambientBlur.style.setProperty('--hero-overlay-opacity', overlayOpacity);
                 }
@@ -1250,8 +1251,8 @@
             if (cockpit) {
                 cockpit.style.removeProperty('--hero-title-size');
                 cockpit.style.removeProperty('--hero-domain-size');
+                cockpit.style.removeProperty('--title-wrap-pt');
                 cockpit.style.removeProperty('--hero-pad-top');
-                cockpit.style.removeProperty('--hero-pad-bottom');
                 cockpit.style.removeProperty('--hero-cue-opacity');
             }
             if (ambientBlur) {
