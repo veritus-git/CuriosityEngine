@@ -1062,25 +1062,15 @@
             if (stageDiscovery) stageDiscovery.hidden = true;
             if (stageFocus) stageFocus.hidden = false;
 
-            const heroStage = $('#focus-hero-stage');
-            if (heroStage) {
-                heroStage.hidden = false;
-                heroStage.removeAttribute('data-hidden');
-            }
-
-            const fHeroTitle = $('#focus-concept-title');
-            const fHeroDomain = $('#focus-concept-domain');
-            const fNormalTitle = $('#focus-normal-title');
-            const fNormalDomain = $('#focus-normal-domain');
+            const fTitle = $('#focus-concept-title');
+            const fDomain = $('#focus-concept-domain');
             const fReason = $('#focus-concept-reason');
             const fPrompt = $('#prompt-card-content');
             const fModel = $('#focus-concept-model');
 
             if (state.concept) {
-                if (fHeroTitle) fHeroTitle.textContent = state.concept.title;
-                if (fHeroDomain) fHeroDomain.textContent = state.concept.domain || 'General';
-                if (fNormalTitle) fNormalTitle.textContent = state.concept.title;
-                if (fNormalDomain) fNormalDomain.textContent = state.concept.domain || 'General';
+                if (fTitle) fTitle.textContent = state.concept.title;
+                if (fDomain) fDomain.textContent = state.concept.domain || 'General';
                 if (fReason) {
                     if (state.concept.summary) {
                         fReason.textContent = state.concept.summary;
@@ -1103,8 +1093,6 @@
         } else {
             if (stageDiscovery) stageDiscovery.hidden = false;
             if (stageFocus) stageFocus.hidden = true;
-            const heroStage = $('#focus-hero-stage');
-            if (heroStage) heroStage.hidden = true;
             document.body.removeAttribute('data-focus-active');
 
             // Resolve concept for active vector from batch proposals if available
@@ -1166,17 +1154,14 @@
         }
 
         const mainEl = $('#main');
-        const heroStage = $('#focus-hero-stage');
+        const heroHeader = $('#focus-hero-header');
         const ambientBlur = $('#ambient-focus-blur');
         const scrollCue = $('#focus-scroll-cue');
+        const cockpit = $('.focus-cockpit');
 
-        if (!mainEl || !heroStage) return;
+        if (!mainEl || !heroHeader) return;
 
-        heroStage.hidden = false;
-
-        // Scroll thresholds in px
-        const MORPH_SCROLL_DISTANCE = 360; // Pure scroll travel where Hero morphs into Normal Header
-        const BLUR_THRESHOLD = 120;        // Background blur clears rapidly within 120px
+        const SHRINK_DISTANCE = 320; // 320px of scroll travel to morph from Fullscreen Hero -> Compact Header
 
         let ticking = false;
         let lastProgress = -1;
@@ -1187,7 +1172,7 @@
 
         function updateHeroOnScroll() {
             const scrollTop = mainEl.scrollTop;
-            const progress = Math.min(Math.max(scrollTop / MORPH_SCROLL_DISTANCE, 0), 1);
+            const progress = Math.min(Math.max(scrollTop / SHRINK_DISTANCE, 0), 1);
 
             if (Math.abs(progress - lastProgress) < 0.002) return;
             lastProgress = progress;
@@ -1195,50 +1180,47 @@
             // Ease out deceleration curve
             const eased = 1 - Math.pow(1 - progress, 2.2);
 
-            // 1. Massive Title Font Size (Red Box): from 9.0vw -> 2.3rem
-            const titleStartVw = 9.0;
+            // 1. Massive Title Font Size (Red Box): from 8.5vw -> 2.3rem
+            const titleStartVw = 8.5;
             const titleEndRem = 2.3;
             const titleSizeVw = lerp(titleStartVw, 0, eased);
             const titleSizeRem = lerp(0, titleEndRem, eased);
             const titleSize = `calc(${titleSizeRem}rem + ${titleSizeVw}vw)`;
 
-            // 2. Category Font Size (Green Box): from 2.6vw -> 0.82rem
-            const domainStartVw = 2.6;
+            // 2. Category Font Size (Green Box): from 2.4vw -> 0.82rem
+            const domainStartVw = 2.4;
             const domainEndRem = 0.82;
             const domainSizeVw = lerp(domainStartVw, 0, eased);
             const domainSizeRem = lerp(0, domainEndRem, eased);
             const domainSize = `calc(${domainSizeRem}rem + ${domainSizeVw}vw)`;
 
-            // 3. Hero vertical translation & category padding
-            const heroTy = -eased * 150;
-            const heroPtRem = lerp(3.5, 1.2, eased);
+            // 3. Title wrapper top padding: 3.5rem -> 1.2rem
+            const titlePtRem = lerp(3.5, 1.2, eased);
 
-            // 4. Crossfade between Hero Overlay and Normal Header
-            const heroOpacity = progress >= 0.98 ? 0 : (progress > 0.8 ? lerp(1, 0, (progress - 0.8) / 0.18) : 1);
-            const normalHeaderOpacity = progress < 0.7 ? 0 : lerp(0, 1, (progress - 0.7) / 0.3);
+            // 4. Hero header min-height: (100vh - 100px) -> auto (0px)
+            const minHeightVh = lerp(100, 0, eased);
+            const minHeightOffset = lerp(100, 0, eased);
+            const minHeight = progress >= 0.99 ? 'auto' : `calc(${minHeightVh}vh - ${minHeightOffset}px)`;
 
-            // 5. Scroll cue opacity (fades out fast in first 60px)
+            // 5. Hero header padding: from centering (0) -> compact (0.5rem)
+            const padTopRem = lerp(0, 1.2, eased);
+            const padBotRem = lerp(1.0, 0.2, eased);
+
+            // 6. Scroll cue opacity (fades out in first 60px)
             const cueOpacity = Math.max(1 - progress * 5, 0);
 
-            // Set globally on root element so both Hero stage and Cockpit header react synchronously
-            document.documentElement.style.setProperty('--hero-title-size', titleSize);
-            document.documentElement.style.setProperty('--hero-domain-size', domainSize);
-            document.documentElement.style.setProperty('--hero-title-pt', `${heroPtRem}rem`);
-            document.documentElement.style.setProperty('--hero-stage-ty', `${heroTy}px`);
-            document.documentElement.style.setProperty('--hero-stage-opacity', heroOpacity);
-            document.documentElement.style.setProperty('--hero-cue-opacity', cueOpacity);
-            document.documentElement.style.setProperty('--normal-header-opacity', normalHeaderOpacity);
-
-            if (heroStage) {
-                if (progress >= 0.99) {
-                    heroStage.setAttribute('data-hidden', '');
-                } else {
-                    heroStage.removeAttribute('data-hidden');
-                }
+            if (cockpit) {
+                cockpit.style.setProperty('--hero-title-size', titleSize);
+                cockpit.style.setProperty('--hero-domain-size', domainSize);
+                cockpit.style.setProperty('--hero-title-pt', `${titlePtRem}rem`);
+                cockpit.style.setProperty('--hero-min-h', minHeight);
+                cockpit.style.setProperty('--hero-pad-top', `${padTopRem}rem`);
+                cockpit.style.setProperty('--hero-pad-bottom', `${padBotRem}rem`);
+                cockpit.style.setProperty('--hero-cue-opacity', cueOpacity);
             }
 
-            // 6. Rapid Background Blur Dissolve (strictly underneath all text)
-            const blurProgress = Math.min(Math.max(scrollTop / BLUR_THRESHOLD, 0), 1);
+            // 7. Rapid Background Blur Dissolve (strictly underneath all text)
+            const blurProgress = Math.min(Math.max(scrollTop / 120, 0), 1);
             const blurEased = 1 - Math.pow(1 - blurProgress, 2);
             const blurPx = lerp(30, 0, blurEased);
             const overlayOpacity = lerp(0.65, 0, blurEased);
@@ -1282,22 +1264,20 @@
         // Cleanup function
         _focusScrollCleanup = () => {
             mainEl.removeEventListener('scroll', onScroll);
-            document.documentElement.style.removeProperty('--hero-title-size');
-            document.documentElement.style.removeProperty('--hero-domain-size');
-            document.documentElement.style.removeProperty('--hero-title-pt');
-            document.documentElement.style.removeProperty('--hero-stage-ty');
-            document.documentElement.style.removeProperty('--hero-stage-opacity');
-            document.documentElement.style.removeProperty('--hero-cue-opacity');
-            document.documentElement.style.removeProperty('--normal-header-opacity');
+            if (cockpit) {
+                cockpit.style.removeProperty('--hero-title-size');
+                cockpit.style.removeProperty('--hero-domain-size');
+                cockpit.style.removeProperty('--hero-title-pt');
+                cockpit.style.removeProperty('--hero-min-h');
+                cockpit.style.removeProperty('--hero-pad-top');
+                cockpit.style.removeProperty('--hero-pad-bottom');
+                cockpit.style.removeProperty('--hero-cue-opacity');
+            }
             if (ambientBlur) {
                 ambientBlur.removeAttribute('data-collapsed');
                 ambientBlur.style.opacity = '';
                 ambientBlur.style.removeProperty('--hero-blur');
                 ambientBlur.style.removeProperty('--hero-overlay-opacity');
-            }
-            if (heroStage) {
-                heroStage.removeAttribute('data-hidden');
-                heroStage.hidden = true;
             }
             if (scrollCue) scrollCue.removeAttribute('data-hidden');
         };

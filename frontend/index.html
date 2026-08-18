@@ -16,7 +16,7 @@
 
     <link rel="icon" type="image/png" href="assets/favicon.png">
     <link rel="apple-touch-icon" href="assets/favicon.png">
-    <link rel="stylesheet" href="style.css?v=3.6.0">
+    <link rel="stylesheet" href="style.css?v=3.7.0">
 </head>
 
 <body>
@@ -31,22 +31,6 @@
             <div class="ambient-orb ambient-orb--1"></div>
             <div class="ambient-orb ambient-orb--2"></div>
             <div class="ambient-focus-blur" id="ambient-focus-blur"></div>
-        </div>
-
-        <!-- Fixed Viewport Morphing Hero Overlay (Direct child of #app) -->
-        <div class="focus-hero-stage" id="focus-hero-stage" hidden>
-            <div class="focus-hero-inner">
-                <div class="focus-hero-title-wrap">
-                    <span class="focus-domain-tag" id="focus-concept-domain"></span>
-                    <h1 class="focus-hero__title" id="focus-concept-title"></h1>
-                </div>
-
-                <div class="focus-scroll-cue" id="focus-scroll-cue">
-                    <span class="scroll-cue-mouse" aria-hidden="true"></span>
-                    <span class="scroll-cue-text" data-i18n="focus_card.scroll_to_read">Przewiń, aby przeczytać</span>
-                    <span class="scroll-cue-arrow" aria-hidden="true">↓</span>
-                </div>
-            </div>
         </div>
 
         <!-- Top Navigation Bar -->
@@ -746,15 +730,22 @@
                     <div class="dashboard-stage dashboard-stage--focus" id="dashboard-stage-focus" hidden>
                         <div class="focus-cockpit">
 
-                            <!-- Normal Page Flow with Scroll Transition Spacer -->
-                            <div class="focus-scroll-spacer" id="focus-scroll-spacer"></div>
+                            <!-- Cinematic Hero Header that morphs into compact article header on scroll -->
+                            <header class="focus-hero-header" id="focus-hero-header">
+                                <div class="focus-hero-title-wrap">
+                                    <span class="focus-domain-tag" id="focus-concept-domain"></span>
+                                    <h1 class="focus-hero__title" id="focus-concept-title"></h1>
+                                </div>
 
-                            <!-- Normal Reading Header (Destination State) -->
-                            <header class="focus-normal-header" id="focus-normal-header">
-                                <span class="focus-normal-domain" id="focus-normal-domain"></span>
-                                <h1 class="focus-normal-title" id="focus-normal-title"></h1>
-                                <p class="focus-bridge-subtitle" id="focus-concept-reason"></p>
+                                <div class="focus-scroll-cue" id="focus-scroll-cue">
+                                    <span class="scroll-cue-mouse" aria-hidden="true"></span>
+                                    <span class="scroll-cue-text" data-i18n="focus_card.scroll_to_read">Przewiń, aby przeczytać</span>
+                                    <span class="scroll-cue-arrow" aria-hidden="true">↓</span>
+                                </div>
                             </header>
+
+                            <!-- Associative Bridge Subtitle (Fades in smoothly when shrunk) -->
+                            <p class="focus-bridge-subtitle" id="focus-concept-reason"></p>
 
                             <!-- Borderless Fluid Markdown Document -->
                             <article class="focus-article" id="focus-concept-model"></article>
@@ -1005,7 +996,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=3.6.0"></script>
+    <script src="app.js?v=3.7.0"></script>
 </body>
 
 </html>

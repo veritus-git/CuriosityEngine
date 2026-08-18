@@ -1031,48 +1031,27 @@ body[data-focus-active] .ambient-focus-blur {
     flex-direction: column;
     align-items: stretch;
     width: 100%;
-    max-width: 820px;
+    max-width: 860px;
     margin: 0 auto;
     gap: 0;
     text-align: left;
-    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     z-index: 15;
 }
 
-/* ─── Hero Stage (Fixed Over Viewport at start, Morphs on Scroll) ─── */
-.focus-hero-stage {
-    position: fixed;
-    top: 45px;
-    left: 0;
-    right: 0;
-    bottom: 0;
+/* ─── Hero Header (Fullscreen on load, Morphs to compact on scroll) ─── */
+.focus-hero-header {
+    width: 100%;
+    min-height: var(--hero-min-h, calc(100vh - 100px));
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    padding: 0 2rem 3rem 2rem;
-    box-sizing: border-box;
-    pointer-events: none;
-    z-index: 25;
-    opacity: var(--hero-stage-opacity, 1);
-    transform: translateY(var(--hero-stage-ty, 0px));
-    will-change: transform, opacity;
-}
-
-.focus-hero-stage[data-hidden] {
-    display: none !important;
-}
-
-.focus-hero-inner {
-    width: 100%;
-    max-width: 1080px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
     align-items: flex-start;
+    padding-top: var(--hero-pad-top, 0);
+    padding-bottom: var(--hero-pad-bottom, 1rem);
+    box-sizing: border-box;
     position: relative;
-    pointer-events: auto;
+    transition: none;
 }
 
 /* Title wrapper — container with relative positioning for glued category */
@@ -1092,7 +1071,7 @@ body[data-focus-active] .ambient-focus-blur {
     left: 0;
     display: inline-block;
     font-family: var(--font-mono);
-    font-size: var(--hero-domain-size, clamp(1.4rem, 2.8vw, 2.4rem));
+    font-size: var(--hero-domain-size, clamp(1.4rem, 2.6vw, 2.2rem));
     font-weight: 850;
     text-transform: uppercase;
     letter-spacing: 0.18em;
@@ -1110,14 +1089,15 @@ body[data-focus-active] .ambient-focus-blur {
     pointer-events: none;
     line-height: 1;
     z-index: 2;
+    transform-origin: top left;
 }
 
 /* Massive Title in Hero (Red Box) */
 .focus-hero__title {
-    font-size: var(--hero-title-size, clamp(3.8rem, 9.5vw, 8.5rem));
+    font-size: var(--hero-title-size, clamp(3.6rem, 9vw, 7.5rem));
     font-weight: 900;
     color: #ffffff;
-    line-height: 0.96;
+    line-height: 0.98;
     letter-spacing: -0.045em;
     text-align: left;
     margin: 0;
@@ -1158,50 +1138,12 @@ body[data-focus-active] .ambient-focus-blur {
     }
 }
 
-/* ─── Normal Page Flow (Destination State) ─── */
-.focus-scroll-spacer {
-    width: 100%;
-    height: calc(100vh - 80px + 360px); /* Guarantees article is below the fold at scrollTop=0 */
-    flex-shrink: 0;
-    pointer-events: none;
-}
-
-.focus-normal-header {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding-top: 1rem;
-    margin-bottom: 1.25rem;
-    opacity: var(--normal-header-opacity, 1);
-}
-
-.focus-normal-domain {
-    display: inline-block;
-    font-family: var(--font-mono);
-    font-size: 0.82rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--vector-accent-light, #818cf8);
-    margin-bottom: 0.5rem;
-}
-
-.focus-normal-title {
-    font-size: 2.3rem;
-    font-weight: 800;
-    color: #ffffff;
-    line-height: 1.15;
-    letter-spacing: -0.03em;
-    margin: 0 0 0.8rem 0;
-    text-align: left;
-}
-
+/* Grey associative bridge */
 .focus-bridge-subtitle {
     font-size: 1.05rem;
     line-height: 1.65;
     color: #888888;
-    margin: 0;
+    margin: 0.5rem 0 1.25rem 0;
     text-align: left;
     font-weight: 400;
 }
