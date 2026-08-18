@@ -1161,7 +1161,7 @@ body[data-focus-active] .ambient-focus-blur {
 /* ─── Normal Page Flow (Destination State) ─── */
 .focus-scroll-spacer {
     width: 100%;
-    height: 360px; /* Pure scroll travel to morph from Hero to Normal page */
+    height: calc(100vh - 80px + 360px); /* Guarantees article is below the fold at scrollTop=0 */
     flex-shrink: 0;
     pointer-events: none;
 }

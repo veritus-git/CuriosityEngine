@@ -1062,6 +1062,12 @@
             if (stageDiscovery) stageDiscovery.hidden = true;
             if (stageFocus) stageFocus.hidden = false;
 
+            const heroStage = $('#focus-hero-stage');
+            if (heroStage) {
+                heroStage.hidden = false;
+                heroStage.removeAttribute('data-hidden');
+            }
+
             const fHeroTitle = $('#focus-concept-title');
             const fHeroDomain = $('#focus-concept-domain');
             const fNormalTitle = $('#focus-normal-title');
@@ -1097,6 +1103,8 @@
         } else {
             if (stageDiscovery) stageDiscovery.hidden = false;
             if (stageFocus) stageFocus.hidden = true;
+            const heroStage = $('#focus-hero-stage');
+            if (heroStage) heroStage.hidden = true;
             document.body.removeAttribute('data-focus-active');
 
             // Resolve concept for active vector from batch proposals if available
@@ -1161,9 +1169,10 @@
         const heroStage = $('#focus-hero-stage');
         const ambientBlur = $('#ambient-focus-blur');
         const scrollCue = $('#focus-scroll-cue');
-        const cockpit = $('.focus-cockpit');
 
         if (!mainEl || !heroStage) return;
+
+        heroStage.hidden = false;
 
         // Scroll thresholds in px
         const MORPH_SCROLL_DISTANCE = 360; // Pure scroll travel where Hero morphs into Normal Header
@@ -1211,15 +1220,14 @@
             // 5. Scroll cue opacity (fades out fast in first 60px)
             const cueOpacity = Math.max(1 - progress * 5, 0);
 
-            if (cockpit) {
-                cockpit.style.setProperty('--hero-title-size', titleSize);
-                cockpit.style.setProperty('--hero-domain-size', domainSize);
-                cockpit.style.setProperty('--hero-title-pt', `${heroPtRem}rem`);
-                cockpit.style.setProperty('--hero-stage-ty', `${heroTy}px`);
-                cockpit.style.setProperty('--hero-stage-opacity', heroOpacity);
-                cockpit.style.setProperty('--hero-cue-opacity', cueOpacity);
-                cockpit.style.setProperty('--normal-header-opacity', normalHeaderOpacity);
-            }
+            // Set globally on root element so both Hero stage and Cockpit header react synchronously
+            document.documentElement.style.setProperty('--hero-title-size', titleSize);
+            document.documentElement.style.setProperty('--hero-domain-size', domainSize);
+            document.documentElement.style.setProperty('--hero-title-pt', `${heroPtRem}rem`);
+            document.documentElement.style.setProperty('--hero-stage-ty', `${heroTy}px`);
+            document.documentElement.style.setProperty('--hero-stage-opacity', heroOpacity);
+            document.documentElement.style.setProperty('--hero-cue-opacity', cueOpacity);
+            document.documentElement.style.setProperty('--normal-header-opacity', normalHeaderOpacity);
 
             if (heroStage) {
                 if (progress >= 0.99) {
@@ -1274,22 +1282,23 @@
         // Cleanup function
         _focusScrollCleanup = () => {
             mainEl.removeEventListener('scroll', onScroll);
-            if (cockpit) {
-                cockpit.style.removeProperty('--hero-title-size');
-                cockpit.style.removeProperty('--hero-domain-size');
-                cockpit.style.removeProperty('--hero-title-pt');
-                cockpit.style.removeProperty('--hero-stage-ty');
-                cockpit.style.removeProperty('--hero-stage-opacity');
-                cockpit.style.removeProperty('--hero-cue-opacity');
-                cockpit.style.removeProperty('--normal-header-opacity');
-            }
+            document.documentElement.style.removeProperty('--hero-title-size');
+            document.documentElement.style.removeProperty('--hero-domain-size');
+            document.documentElement.style.removeProperty('--hero-title-pt');
+            document.documentElement.style.removeProperty('--hero-stage-ty');
+            document.documentElement.style.removeProperty('--hero-stage-opacity');
+            document.documentElement.style.removeProperty('--hero-cue-opacity');
+            document.documentElement.style.removeProperty('--normal-header-opacity');
             if (ambientBlur) {
                 ambientBlur.removeAttribute('data-collapsed');
                 ambientBlur.style.opacity = '';
                 ambientBlur.style.removeProperty('--hero-blur');
                 ambientBlur.style.removeProperty('--hero-overlay-opacity');
             }
-            if (heroStage) heroStage.removeAttribute('data-hidden');
+            if (heroStage) {
+                heroStage.removeAttribute('data-hidden');
+                heroStage.hidden = true;
+            }
             if (scrollCue) scrollCue.removeAttribute('data-hidden');
         };
     }
