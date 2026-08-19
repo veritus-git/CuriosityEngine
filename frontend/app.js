@@ -1152,7 +1152,7 @@
 
         if (!mainEl || !stickyHero) return;
 
-        const PIN_TRAVEL = 450; // px of pure pinned scroll travel
+        const PIN_TRAVEL = 280; // px of pure pinned scroll travel
 
         let ticking = false;
         let lastProgress = -1;
@@ -1171,15 +1171,15 @@
             // Ease out deceleration curve
             const eased = 1 - Math.pow(1 - progress, 2.2);
 
-            // 1. Massive Title Font Size: from 5.0vw -> 1.35rem
-            const titleStartVw = 5.0;
+            // 1. Massive Title Font Size: from 4.8vw -> 1.35rem
+            const titleStartVw = 4.8;
             const titleEndRem = 1.35;
             const titleSizeVw = lerp(titleStartVw, 0, eased);
             const titleSizeRem = lerp(0, titleEndRem, eased);
             const titleSize = `calc(${titleSizeRem}rem + ${titleSizeVw}vw)`;
 
-            // 2. Category Font Size & Margins: from 1.4vw -> 0.75rem (Always vibrant and crisp)
-            const domainStartVw = 1.4;
+            // 2. Category Font Size & Margins: from 1.35vw -> 0.75rem (Always vibrant and crisp)
+            const domainStartVw = 1.35;
             const domainEndRem = 0.75;
             const domainSizeVw = lerp(domainStartVw, 0, eased);
             const domainSizeRem = lerp(0, domainEndRem, eased);
@@ -1195,21 +1195,16 @@
 
             // 4. Exact HTML Document Center Offset: -25px at top -> 0px when docked
             const centerOffset = `${lerp(-25, 0, eased)}px`;
-            const padTop = `${lerp(0, 0.35, eased)}rem`;
 
             // 5. Sandwich Background Mask Opacity: 0 at start -> 1 as soon as scroll begins
-            const maskOpacity = Math.min(Math.max((progress - 0.02) / 0.35, 0), 1);
+            const maskOpacity = Math.min(Math.max((progress - 0.02) / 0.3, 0), 1);
 
             // 6. Smooth width scaling (starts at 75vw, ends at 860px)
             const maxWStart = window.innerWidth * 0.75;
             const maxWEnd = 860; // cockpit max width
             const currentMaxW = lerp(maxWStart, maxWEnd, eased);
 
-            // 7. Article pull-up (slides content up smoothly to meet the title)
-            const maxPull = window.innerHeight - 130;
-            const pullUpPx = lerp(0, maxPull, eased);
-
-            // 8. Scroll cue opacity (fades out rapidly on first scroll)
+            // 7. Scroll cue opacity (fades out rapidly on first scroll)
             const cueOpacity = Math.max(1 - progress * 4, 0);
 
             if (cockpit) {
@@ -1219,14 +1214,12 @@
                 cockpit.style.setProperty('--hero-domain-opacity', domainOpacity);
                 cockpit.style.setProperty('--hero-h', heroH);
                 cockpit.style.setProperty('--hero-center-offset', centerOffset);
-                cockpit.style.setProperty('--hero-pad-top', padTop);
                 cockpit.style.setProperty('--hero-mask-opacity', maskOpacity);
                 cockpit.style.setProperty('--hero-inner-w', `${currentMaxW}px`);
-                cockpit.style.setProperty('--article-pull', `-${pullUpPx}px`);
                 cockpit.style.setProperty('--hero-cue-opacity', cueOpacity);
             }
 
-            // 9. Ambient Background Blur Dissolve
+            // 8. Ambient Background Blur Dissolve
             const blurProgress = Math.min(Math.max(scrollTop / 120, 0), 1);
             const blurEased = 1 - Math.pow(1 - blurProgress, 2);
             const blurPx = lerp(30, 0, blurEased);
@@ -1278,10 +1271,8 @@
                 cockpit.style.removeProperty('--hero-domain-opacity');
                 cockpit.style.removeProperty('--hero-h');
                 cockpit.style.removeProperty('--hero-center-offset');
-                cockpit.style.removeProperty('--hero-pad-top');
                 cockpit.style.removeProperty('--hero-mask-opacity');
                 cockpit.style.removeProperty('--hero-inner-w');
-                cockpit.style.removeProperty('--article-pull');
                 cockpit.style.removeProperty('--hero-cue-opacity');
             }
             if (ambientBlur) {

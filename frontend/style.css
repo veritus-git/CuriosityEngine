@@ -1049,15 +1049,7 @@ body[data-focus-active] .dashboard-stage--focus {
     position: relative;
 }
 
-/* ─── Pinned Scroll Track (450px of sticky scroll travel) ─── */
-.focus-scroll-track {
-    width: 100%;
-    height: calc(100vh - 50px + 450px);
-    position: relative;
-    display: block;
-}
-
-/* Sticky Hero Box — LOCKED in the viewport for the entire 450px of scroll travel */
+/* Sticky Hero Box — LOCKED in the viewport throughout the focus view */
 .focus-sticky-hero {
     position: sticky;
     top: 0;
@@ -1070,29 +1062,28 @@ body[data-focus-active] .dashboard-stage--focus {
     height: var(--hero-h, calc(100vh - 50px));
     z-index: 20;
     background: transparent;
+    pointer-events: none;
 }
 
 /* The Sandwich Mask — Occludes all scrolling content underneath the docked title */
 .focus-sticky-mask {
     position: absolute;
-    top: 0;
+    top: -20px;
     left: 50%;
     transform: translateX(-50%);
     width: 100vw;
-    height: calc(100% + 2.5rem);
+    height: calc(100% + 20px);
     pointer-events: none;
     z-index: 5;
     opacity: var(--hero-mask-opacity, 0);
     background: linear-gradient(
         to bottom,
         var(--bg-deep) 0%,
-        var(--bg-deep) calc(100% - 2.5rem),
+        var(--bg-deep) calc(100% - 1.8rem),
         transparent 100%
     );
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    mask-image: linear-gradient(to bottom, black calc(100% - 2.5rem), transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 2.5rem), transparent 100%);
 }
 
 .focus-hero-inner {
@@ -1119,7 +1110,7 @@ body[data-focus-active] .dashboard-stage--focus {
     transform: translateY(var(--hero-center-offset, -25px));
     will-change: transform;
     z-index: 15;
-    padding-top: var(--hero-pad-top, 0rem);
+    pointer-events: auto;
 }
 
 /* Category Tag in Hero — Crisp, fully legible, positioned cleanly above title */
@@ -1207,11 +1198,8 @@ body[data-focus-active] .dashboard-stage--focus {
     gap: 1.25rem;
     position: relative;
     z-index: 2;
-    padding-top: 1rem;
-    padding-bottom: 40vh;
-    /* Ensures enough scroll space for the morphing animation even with short text */
-    transform: translateY(var(--article-pull, 0px));
-    will-change: transform;
+    padding-top: 2rem;
+    padding-bottom: 25vh;
 }
 
 /* Borderless Fluid Markdown Document */
