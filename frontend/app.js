@@ -680,11 +680,17 @@
         // Reset any inline accent hue override
         document.documentElement.style.removeProperty('--hue-primary');
 
-        // Dynamic vector theme accents are strictly isolated to DASHBOARD
-        if (viewName === 'DASHBOARD') {
-            document.body.setAttribute('data-vector-theme', state.concept?.source_mode || state.activeVector || 'adjacent');
-        } else {
+        // Maintain vector theme for all authenticated views
+        if (viewName === 'LANDING' || viewName === 'ONBOARDING' || viewName === 'COLD_START') {
             document.body.removeAttribute('data-vector-theme');
+        } else {
+            // Only update it if we are explicitly rendering the dashboard
+            if (viewName === 'DASHBOARD') {
+                document.body.setAttribute('data-vector-theme', state.concept?.source_mode || state.activeVector || 'adjacent');
+            }
+        }
+        
+        if (viewName !== 'DASHBOARD') {
             document.body.removeAttribute('data-focus-active');
             const stickyHero = document.getElementById('focus-sticky-hero');
             if (stickyHero) stickyHero.hidden = true;

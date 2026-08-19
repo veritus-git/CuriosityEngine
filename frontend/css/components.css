@@ -6,10 +6,11 @@
     padding: 0.5rem 1.5rem;
     border-bottom: 1px solid var(--border-subtle);
     backdrop-filter: blur(16px);
-    background: rgba(12, 12, 20, 0.6);
+    background: var(--bg-topbar);
     position: sticky;
     top: 0;
     z-index: 50;
+    transition: background-color 0.8s ease;
 }
 
 .topbar__left {
@@ -156,7 +157,7 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    background: linear-gradient(135deg, var(--vector-accent-hover), var(--vector-accent));
     border: 2px solid rgba(255, 255, 255, 0.2);
     color: #ffffff;
     font-family: var(--font-sans);
@@ -166,14 +167,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 10px rgba(99, 102, 241, 0.35);
-    transition: transform var(--duration-fast), box-shadow var(--duration-fast), border-color var(--duration-fast);
+    box-shadow: 0 2px 10px var(--vector-accent-glow);
+    transition: transform var(--duration-fast), box-shadow var(--duration-fast), border-color var(--duration-fast), background 1s ease;
 }
 
 .user-avatar-btn:hover {
     transform: scale(1.06);
-    border-color: #818cf8;
-    box-shadow: 0 0 16px rgba(99, 102, 241, 0.6);
+    border-color: var(--vector-accent-light);
+    box-shadow: 0 0 16px var(--vector-accent-glow);
 }
 
 .user-dropdown-menu {

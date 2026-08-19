@@ -26,8 +26,8 @@
 
 /* Sandwich mask removed */
 body[data-focus-active] .main {
-    mask-image: linear-gradient(to bottom, transparent 0%, transparent 60px, black 600px);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 60px, black 110px);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 60px);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 60px);
 }
 
 .focus-hero-inner {
@@ -61,7 +61,7 @@ body[data-focus-active] .main {
     font-size: var(--hero-domain-size, clamp(1.05rem, 1.8vw, 1.35rem));
     font-weight: 800;
     font-family: var(--font-mono);
-    background: linear-gradient(135deg, var(--vector-accent), var(--vector-accent-light), #fff, var(--vector-accent));
+    background: linear-gradient(135deg, var(--vector-accent), var(--vector-accent-light), color-mix(in srgb, var(--vector-accent-light) 50%, white 50%), var(--vector-accent));
     background-size: 200% 200%;
     animation: shimmerGradient 6s ease-in-out infinite;
     -webkit-background-clip: text;
