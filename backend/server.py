@@ -592,8 +592,17 @@ async def add_no_cache_header(request: Request, call_next):
         response.headers["Expires"] = "0"
     return response
 
-@app.get("/")
-async def serve_index():
+@app.get("/{full_path:path}")
+async def serve_spa(full_path: str):
+    # If the path looks like a static asset (has an extension), try to serve it or return 404
+    if "." in full_path and not full_path.startswith("api/"):
+        file_path = FRONTEND_DIR / full_path
+        if file_path.exists():
+            return FileResponse(file_path)
+        else:
+            raise HTTPException(status_code=404, detail="File not found")
+            
+    # For all other routes (SPA routing), return index.html
     return FileResponse(
         FRONTEND_DIR / "index.html",
         headers={
@@ -603,7 +612,7 @@ async def serve_index():
         }
     )
 
-app.mount("/", StaticFiles(directory=str(FRONTEND_DIR)), name="frontend")
+app.mount("/assets", StaticFiles(directory=str(FRONTEND_DIR / "assets")), name="assets")
 
 
 if __name__ == "__main__":

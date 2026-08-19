@@ -591,6 +591,16 @@
     }
 
     // ─── Topbar User Profile & Auth State ───
+    const viewRoutes = {
+        'LANDING': '/',
+        'DASHBOARD': '/dashboard',
+        'ONBOARDING': '/onboarding',
+        'COLD_START': '/dashboard', // will handle conditionally
+        'CONSTELLATION': '/constellation',
+        'HISTORY': '/history',
+        'SETTINGS': '/settings'
+    };
+    
     function updateTopbarAuthState(username = null) {
         const token = localStorage.getItem('curiosity_token');
         const authLinks = $('#topbar-auth-links');
@@ -615,14 +625,47 @@
         }
     }
 
+    // ─── SPA Router Initialization ───
+    if (typeof Router !== 'undefined') {
+        window.appRouter = new Router({
+            '/': () => {
+                const token = localStorage.getItem('curiosity_token');
+                return token ? 'DASHBOARD' : 'LANDING';
+            },
+            '/dashboard': 'DASHBOARD',
+            '/onboarding': () => {
+                if (state.coldStartActive && state.profile && state.profile.onboarded) {
+                    return 'COLD_START';
+                }
+                return 'ONBOARDING';
+            },
+            '/constellation': 'CONSTELLATION',
+            '/history': 'HISTORY',
+            '/settings': 'SETTINGS'
+        }, (viewName) => {
+            showView(viewName);
+        });
+    }
+
     // ─── View Routing ───
     function showView(viewName) {
         state.view = viewName;
+        
+        // Sync URL natively
+        let targetPath = viewRoutes[viewName];
+        if (viewName === 'COLD_START') targetPath = '/onboarding'; // specific request
+        
+        if (targetPath && window.location.pathname !== targetPath) {
+            window.history.pushState({}, '', targetPath);
+        }
         const currentViews = getViews();
         Object.entries(currentViews).forEach(([name, el]) => {
             if (!el) return;
             el.hidden = (name !== viewName);
         });
+        
+        // Show the app after initial view is set
+        document.body.setAttribute('data-app-ready', 'true');
 
         const navLinks = $('#topbar-nav-links');
         const floatingBtn = $('#btn-floating-spark');
@@ -642,6 +685,9 @@
             document.body.setAttribute('data-vector-theme', state.concept?.source_mode || state.activeVector || 'adjacent');
         } else {
             document.body.removeAttribute('data-vector-theme');
+            document.body.removeAttribute('data-focus-active');
+            const stickyHero = document.getElementById('focus-sticky-hero');
+            if (stickyHero) stickyHero.hidden = true;
         }
 
         if (viewName === 'LANDING') {
@@ -948,13 +994,13 @@
             state.batchProposals = data.proposals || {};
             state.concept = state.batchProposals[state.activeVector] || Object.values(state.batchProposals)[0] || null;
             state.coldStartActive = false;
-            renderDashboard('discovery');
-            showView('DASHBOARD');
         } catch (err) {
             showToast(err.message || t('errors.server_down'));
         } finally {
             if (rerollBtn) rerollBtn.classList.remove('loading');
             if (heroEl) heroEl.classList.remove('is-loading');
+            renderDashboard('discovery');
+            showView('DASHBOARD');
         }
     }
 
@@ -1061,6 +1107,8 @@
         if (isFocus) {
             if (stageDiscovery) stageDiscovery.hidden = true;
             if (stageFocus) stageFocus.hidden = false;
+            const fHeroMain = $('#focus-sticky-hero');
+            if (fHeroMain) fHeroMain.hidden = false;
 
             const fTitle = $('#focus-concept-title');
             const fDomain = $('#focus-concept-domain');
@@ -1084,6 +1132,8 @@
         } else {
             if (stageDiscovery) stageDiscovery.hidden = false;
             if (stageFocus) stageFocus.hidden = true;
+            const fHeroMain = $('#focus-sticky-hero');
+            if (fHeroMain) fHeroMain.hidden = true;
             document.body.removeAttribute('data-focus-active');
 
             // Resolve concept for active vector from batch proposals if available
@@ -1116,9 +1166,15 @@
             ];
 
             smoothFlipAnimate(trackElements, () => {
-                if (dDomain) dDomain.textContent = state.concept.domain || 'General';
-                if (dTitle) dTitle.textContent = state.concept.title;
-                if (dReason) dReason.textContent = state.concept.summary || '';
+                if (state.concept) {
+                    if (dDomain) dDomain.textContent = state.concept.domain || 'General';
+                    if (dTitle) dTitle.textContent = state.concept.title;
+                    if (dReason) dReason.textContent = state.concept.summary || '';
+                } else {
+                    if (dDomain) dDomain.textContent = 'System';
+                    if (dTitle) dTitle.textContent = 'Błąd Generowania';
+                    if (dReason) dReason.textContent = 'Nie udało się pobrać tematów. Spróbuj wygenerować ponownie za pomocą przycisku na dole ekranu.';
+                }
 
                 // Trigger smooth 60fps fade-in-up emerging from below without blinking
                 [dDomain, dTitle, dReasonBox].forEach(el => {
@@ -1130,7 +1186,7 @@
             });
 
             // Stream Intuicja on the right with organic typewriter
-            runDiscoveryIntuitionTypewriter(dModel, state.concept.intuitive_model || '');
+            runDiscoveryIntuitionTypewriter(dModel, state.concept ? (state.concept.intuitive_model || '') : '');
         }
     }
 
@@ -1152,7 +1208,7 @@
 
         if (!mainEl || !stickyHero) return;
 
-        const PIN_TRAVEL = 280; // px of pure pinned scroll travel
+        const PIN_TRAVEL = 600; // px of pure pinned scroll travel
 
         let ticking = false;
         let lastProgress = -1;
@@ -1187,14 +1243,7 @@
             const domainMargin = `${lerp(0.45, 0.15, eased)}rem`;
             const domainOpacity = lerp(1, 0.95, eased);
 
-            // 3. Hero vertical docking via height shrink (snug 4.2rem docked under topbar)
-            const hVh = lerp(100, 0, eased);
-            const hRem = lerp(0, 4.2, eased);
-            const topbarOffsetPx = lerp(50, 0, eased);
-            const heroH = `calc(${hVh}vh + ${hRem}rem - ${topbarOffsetPx}px)`;
 
-            // 4. Exact HTML Document Center Offset: -25px at top -> 0px when docked
-            const centerOffset = `${lerp(-25, 0, eased)}px`;
 
             // 5. Sandwich Background Mask Opacity: 0 at start -> 1 as soon as scroll begins
             const maskOpacity = Math.min(Math.max((progress - 0.02) / 0.3, 0), 1);
@@ -1204,36 +1253,31 @@
             const maxWEnd = 860; // cockpit max width
             const currentMaxW = lerp(maxWStart, maxWEnd, eased);
 
-            // 7. Scroll cue opacity (fades out rapidly on first scroll)
             const cueOpacity = Math.max(1 - progress * 4, 0);
 
             if (cockpit) {
-                cockpit.style.setProperty('--hero-title-size', titleSize);
-                cockpit.style.setProperty('--hero-domain-size', domainSize);
-                cockpit.style.setProperty('--hero-domain-margin', domainMargin);
-                cockpit.style.setProperty('--hero-domain-opacity', domainOpacity);
-                cockpit.style.setProperty('--hero-h', heroH);
-                cockpit.style.setProperty('--hero-center-offset', centerOffset);
                 cockpit.style.setProperty('--hero-mask-opacity', maskOpacity);
                 cockpit.style.setProperty('--hero-inner-w', `${currentMaxW}px`);
-                cockpit.style.setProperty('--hero-cue-opacity', cueOpacity);
+                cockpit.style.setProperty('--hero-progress', eased);
             }
 
-            // 8. Ambient Background Blur Dissolve
-            const blurProgress = Math.min(Math.max(scrollTop / 120, 0), 1);
-            const blurEased = 1 - Math.pow(1 - blurProgress, 2);
-            const blurPx = lerp(30, 0, blurEased);
-            const overlayOpacity = lerp(0.65, 0, blurEased);
-
-            if (ambientBlur) {
-                if (blurProgress >= 0.98) {
-                    ambientBlur.setAttribute('data-collapsed', '');
-                    ambientBlur.style.opacity = '0';
-                } else {
-                    ambientBlur.removeAttribute('data-collapsed');
-                    ambientBlur.style.opacity = `${(1 - blurProgress)}`;
-                    ambientBlur.style.setProperty('--hero-blur', `${blurPx}px`);
-                    ambientBlur.style.setProperty('--hero-overlay-opacity', overlayOpacity);
+            if (stickyHero) {
+                stickyHero.style.setProperty('--hero-cue-opacity', cueOpacity);
+                stickyHero.style.setProperty('--hero-progress', eased);
+                const titleEl = stickyHero.querySelector('.focus-hero__title');
+                const domainEl = stickyHero.querySelector('.focus-domain-tag');
+                
+                if (titleEl) {
+                    const startPx = (window.innerWidth * 4.8) / 100;
+                    const endPx = 1.8 * 16;
+                    titleEl.style.fontSize = `${lerp(startPx, endPx, eased)}px`;
+                }
+                if (domainEl) {
+                    const startDomainPx = (window.innerWidth * 1.2) / 100;
+                    const endDomainPx = 0.85 * 16;
+                    domainEl.style.fontSize = `${lerp(startDomainPx, endDomainPx, eased)}px`;
+                    domainEl.style.opacity = domainOpacity;
+                    domainEl.style.marginBottom = `${lerp(-1.0, -0.3, eased)}rem`;
                 }
             }
 
@@ -1265,21 +1309,18 @@
         _focusScrollCleanup = () => {
             mainEl.removeEventListener('scroll', onScroll);
             if (cockpit) {
-                cockpit.style.removeProperty('--hero-title-size');
-                cockpit.style.removeProperty('--hero-domain-size');
-                cockpit.style.removeProperty('--hero-domain-margin');
-                cockpit.style.removeProperty('--hero-domain-opacity');
-                cockpit.style.removeProperty('--hero-h');
-                cockpit.style.removeProperty('--hero-center-offset');
                 cockpit.style.removeProperty('--hero-mask-opacity');
                 cockpit.style.removeProperty('--hero-inner-w');
-                cockpit.style.removeProperty('--hero-cue-opacity');
             }
-            if (ambientBlur) {
-                ambientBlur.removeAttribute('data-collapsed');
-                ambientBlur.style.opacity = '';
-                ambientBlur.style.removeProperty('--hero-blur');
-                ambientBlur.style.removeProperty('--hero-overlay-opacity');
+            if (stickyHero) {
+                stickyHero.style.removeProperty('--hero-cue-opacity');
+                const titleEl = stickyHero.querySelector('.focus-hero__title');
+                const domainEl = stickyHero.querySelector('.focus-domain-tag');
+                if (titleEl) titleEl.style.fontSize = '';
+                if (domainEl) {
+                    domainEl.style.fontSize = '';
+                    domainEl.style.opacity = '';
+                }
             }
             if (scrollCue) scrollCue.removeAttribute('data-hidden');
         };
@@ -1465,6 +1506,7 @@
 
     // ─── Main Application Initialization ───
     async function init() {
+        document.body.setAttribute('data-app-ready', 'true');
         // Initial instantaneous translation from bundled dictionary
         applyTranslations();
         updateGreetingAndDates();
@@ -1531,9 +1573,9 @@
         } catch (err) {
             if (err.message === 'Unauthorized') {
                 showView('LANDING');
-                return;
+            } else {
+                showView('LANDING');
             }
-            showView('LANDING');
         }
     }
 

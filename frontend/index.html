@@ -17,9 +17,15 @@
         href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
 
-    <link rel="icon" type="image/png" href="assets/favicon.png">
-    <link rel="apple-touch-icon" href="assets/favicon.png">
-    <link rel="stylesheet" href="style.css?v=3.15.0">
+    <link rel="icon" type="image/png" href="/assets/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/favicon.png">
+    <link rel="stylesheet" href="/css/base.css?v=3">
+    <link rel="stylesheet" href="/css/components.css?v=3">
+    <link rel="stylesheet" href="/css/landing.css?v=3">
+    <link rel="stylesheet" href="/css/auth.css?v=3">
+    <link rel="stylesheet" href="/css/onboarding.css?v=3">
+    <link rel="stylesheet" href="/css/dashboard.css?v=3">
+    <link rel="stylesheet" href="/css/focus.css?v=7">
 </head>
 
 <body>
@@ -33,14 +39,13 @@
         <div class="ambient-bg" aria-hidden="true">
             <div class="ambient-orb ambient-orb--1"></div>
             <div class="ambient-orb ambient-orb--2"></div>
-            <div class="ambient-focus-blur" id="ambient-focus-blur"></div>
         </div>
 
         <!-- Top Navigation Bar -->
         <header class="topbar" id="topbar">
             <div class="topbar__left">
                 <a href="#" class="brand" id="nav-brand">
-                    <img src="assets/logo.png" alt="CuriosityEngine" class="brand__logo-img">
+                    <img src="/assets/logo.png" alt="CuriosityEngine" class="brand__logo-img">
                     <span class="brand__name" data-i18n="nav.brand">CuriosityEngine</span>
                 </a>
                 <span class="topbar__date" id="topbar-date"></span>
@@ -95,6 +100,22 @@
                 </select>
             </nav>
         </header>
+
+        <!-- Focus Hero Overlay (Fixed outside of scroll container) -->
+        <div class="focus-sticky-hero" id="focus-sticky-hero" hidden>
+            <div class="focus-hero-inner">
+                <div class="focus-hero-title-wrap">
+                    <span class="focus-domain-tag" id="focus-concept-domain"></span>
+                    <h1 class="focus-hero__title" id="focus-concept-title"></h1>
+                </div>
+
+                <div class="focus-scroll-cue" id="focus-scroll-cue">
+                    <span class="scroll-cue-mouse" aria-hidden="true"></span>
+                    <span class="scroll-cue-text" data-i18n="focus_card.scroll_to_read">Przewiń, aby przeczytać</span>
+                    <span class="scroll-cue-arrow" aria-hidden="true">↓</span>
+                </div>
+            </div>
+        </div>
 
         <!-- Main Workspace -->
         <main class="main" id="main">
@@ -159,7 +180,7 @@
                     <button type="button" class="modal-close auth-modal-close" id="btn-close-auth-modal"
                         aria-label="Close">&times;</button>
                     <div class="auth-hero">
-                        <img src="assets/logo.png" alt="CuriosityEngine" class="auth-hero-img">
+                        <img src="/assets/logo.png" alt="CuriosityEngine" class="auth-hero-img">
                         <h2 class="auth-title" id="auth-card-title" data-i18n="auth.login_title"></h2>
                         <p class="auth-subtitle" id="auth-card-subtitle" data-i18n="auth.login_subtitle"></p>
                     </div>
@@ -596,7 +617,7 @@
                             <!-- Populated dynamically via JS -->
                         </div>
                         <div class="spark-grid-loader" id="cold-start-cards-loader" hidden aria-live="polite">
-                            <img src="assets/logo.png" alt="Loading" class="loading-logo-spin" width="50" height="50"
+                            <img src="/assets/logo.png" alt="Loading" class="loading-logo-spin" width="50" height="50"
                                 style="width: 50px; height: 50px; max-width: 50px; max-height: 50px;">
                         </div>
                     </div>
@@ -733,24 +754,7 @@
                     <div class="dashboard-stage dashboard-stage--focus" id="dashboard-stage-focus" hidden>
                         <div class="focus-cockpit">
 
-                            <!-- Sticky Hero: Sticks at top for the entire article duration -->
-                            <div class="focus-sticky-hero" id="focus-sticky-hero">
-                                <div class="focus-sticky-mask" id="focus-sticky-mask" aria-hidden="true"></div>
-                                <div class="focus-hero-inner">
-                                    <div class="focus-hero-title-wrap">
-                                        <span class="focus-domain-tag" id="focus-concept-domain"></span>
-                                        <h1 class="focus-hero__title" id="focus-concept-title"></h1>
-                                    </div>
-
-                                    <div class="focus-scroll-cue" id="focus-scroll-cue">
-                                        <span class="scroll-cue-mouse" aria-hidden="true"></span>
-                                        <span class="scroll-cue-text" data-i18n="focus_card.scroll_to_read">Przewiń, aby przeczytać</span>
-                                        <span class="scroll-cue-arrow" aria-hidden="true">↓</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Destination Article Content (Scrolls under the sticky hero & sandwich mask) -->
+                            <!-- Destination Article Content (Scrolls cleanly) -->
                             <div class="focus-article-wrap">
                                 <!-- Borderless Fluid Markdown Document -->
                                 <article class="focus-article" id="focus-concept-model"></article>
@@ -988,7 +992,7 @@
         <!-- Global Zen Loading Overlay -->
         <div class="loading-overlay" id="loading-overlay" hidden aria-live="polite">
             <div class="loading-content">
-                <img src="assets/logo.png" alt="Loading" class="loading-logo-spin" width="52" height="52"
+                <img src="/assets/logo.png" alt="Loading" class="loading-logo-spin" width="52" height="52"
                     style="width: 52px; height: 52px; max-width: 52px; max-height: 52px;">
                 <p class="loading-text" id="loading-text" data-i18n="loading.generating"></p>
             </div>
@@ -999,9 +1003,9 @@
             <span class="toast__icon">✓</span>
             <p class="toast__text" id="toast-text"></p>
         </div>
-    </div>
-
-    <script src="app.js?v=3.15.0"></script>
+        <!-- Application Scripts -->
+    <script src="/js/router.js?v=3"></script>
+    <script src="/app.js?v=10"></script>
 </body>
 
 </html>

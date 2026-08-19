@@ -1,0 +1,128 @@
+/* --- Auth Modal Layout --- */
+.auth-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 4, 10, 0.78);
+    backdrop-filter: blur(12px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-md);
+    animation: fadeIn var(--duration-fast) var(--ease-out);
+}
+
+.auth-modal-backdrop[hidden] {
+    display: none !important;
+}
+
+.auth-card {
+    background: #0f0f1d;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-xl);
+    padding: 3rem 2.5rem;
+    max-width: 440px;
+    width: 100%;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(99, 102, 241, 0.15);
+    text-align: center;
+    position: relative;
+    animation: scaleUpModal 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes scaleUpModal {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.auth-modal-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: transparent;
+    border: none;
+    font-size: 1.4rem;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    line-height: 1;
+}
+
+.auth-modal-close:hover {
+    color: #ffffff;
+}
+
+.auth-hero {
+    margin-bottom: 1.75rem;
+}
+
+.auth-hero-img {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    margin-bottom: 0.5rem;
+    filter: drop-shadow(0 0 16px rgba(99, 102, 241, 0.5));
+}
+
+.auth-title {
+    font-size: 1.45rem;
+    font-weight: 700;
+    margin-top: 0.35rem;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+}
+
+.auth-subtitle {
+    font-size: 0.88rem;
+    color: #cbd5e1;
+    margin-top: 0.25rem;
+    line-height: 1.45;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    text-align: left;
+}
+
+.auth-actions {
+    margin-top: 0.5rem;
+}
+
+.auth-switch-box {
+    margin-top: 0.75rem;
+    text-align: center;
+}
+
+.btn-link {
+    background: transparent;
+    border: none;
+    color: #818cf8;
+    font-family: var(--font-sans);
+    font-size: 0.86rem;
+    cursor: pointer;
+    transition: color var(--duration-fast);
+}
+
+.btn-link:hover {
+    color: #38bdf8;
+    text-decoration: underline;
+}
+
+.form-error {
+    color: #f87171;
+    font-size: 0.85rem;
+    margin-top: var(--space-xs);
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.75rem;
+    text-align: center;
+}
+

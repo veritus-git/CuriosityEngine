@@ -1,0 +1,1168 @@
+/* --- Onboarding Slide Wizard Layout --- */
+.view--onboarding {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    min-height: calc(100vh - 80px);
+    height: 100%;
+    width: 100%;
+    flex: 1;
+    padding: 0;
+    position: relative;
+}
+
+.onboarding-container {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    position: relative;
+}
+
+.wizard-card {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.wizard-slide {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+}
+
+.wizard-slide[hidden] {
+    display: none !important;
+}
+
+/* Fluid Wizard Slide Transition Engine */
+.wizard-slide.slide-enter-forward {
+    animation: wizardSlideEnterForward 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.wizard-slide.slide-enter-backward {
+    animation: wizardSlideEnterBackward 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.wizard-slide.slide-exit-forward {
+    animation: wizardSlideExitForward 0.28s cubic-bezier(0.4, 0, 0.2, 1) both;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.wizard-slide.slide-exit-backward {
+    animation: wizardSlideExitBackward 0.28s cubic-bezier(0.4, 0, 0.2, 1) both;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+@keyframes wizardSlideEnterForward {
+    0% {
+        opacity: 0;
+        transform: translateY(22px) scale(0.985);
+        filter: blur(4px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes wizardSlideEnterBackward {
+    0% {
+        opacity: 0;
+        transform: translateY(-22px) scale(0.985);
+        filter: blur(4px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes wizardSlideExitForward {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-18px) scale(0.985);
+        filter: blur(4px);
+    }
+}
+
+@keyframes wizardSlideExitBackward {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(18px) scale(0.985);
+        filter: blur(4px);
+    }
+}
+
+/* Slide Content: Perfect Window-Relative Optical Centering */
+.wizard-slide__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: auto 0;
+    padding: 2.7rem 0 2.5rem 0;
+    /* Optical center compensation for topbar */
+    box-sizing: border-box;
+}
+
+.wizard-slide__content--wizard-slide-2 {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: auto 0;
+    padding: 1rem 0 2.5rem 0;
+    /* Optical center compensation for topbar */
+    box-sizing: border-box;
+}
+
+.slide-header {
+    text-align: center;
+    margin-bottom: 1.85rem;
+    width: 100%;
+}
+
+.slide-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.45rem;
+}
+
+.slide-subtitle {
+    font-size: 0.95rem;
+    color: #cbd5e1;
+    line-height: 1.5;
+    max-width: 580px;
+    margin: 0 auto;
+}
+
+/* Staggered Element Micro-Animations */
+.wizard-slide.slide-enter-forward .slide-header,
+.wizard-slide.slide-enter-backward .slide-header {
+    animation: wizardHeaderFadeIn 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.wizard-slide.slide-enter-forward .slide-content-spacious,
+.wizard-slide.slide-enter-forward .chips-column,
+.wizard-slide.slide-enter-forward .level-cards-vertical,
+.wizard-slide.slide-enter-backward .slide-content-spacious,
+.wizard-slide.slide-enter-backward .chips-column,
+.wizard-slide.slide-enter-backward .level-cards-vertical {
+    animation: wizardBodyFadeIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) 0.04s both;
+}
+
+@keyframes wizardHeaderFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes wizardBodyFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Step 0: Language & Personalization / Gender Selection */
+.step0-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    width: 100%;
+    text-align: left;
+}
+
+.step0-label {
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-tertiary);
+}
+
+.step0-lang-pills {
+    display: flex;
+    gap: 0.85rem;
+    width: 100%;
+}
+
+.lang-pill {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.4rem;
+    background: #10101d;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: var(--radius-lg);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #cbd5e1;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+}
+
+.lang-pill:hover {
+    background: #17172e;
+    color: #ffffff;
+    border-color: rgba(99, 102, 241, 0.4);
+}
+
+.lang-pill.active {
+    background: #181834;
+    border-color: #6366f1;
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(99, 102, 241, 0.35);
+}
+
+.step0-gender-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.gender-pill {
+    display: flex;
+    align-items: center;
+    padding: 0.85rem 1.15rem;
+    background: #10101d;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: var(--radius-lg);
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #cbd5e1;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+    text-align: left;
+}
+
+.gender-pill:hover {
+    background: #17172e;
+    color: #ffffff;
+    border-color: rgba(99, 102, 241, 0.4);
+}
+
+.gender-pill.active {
+    background: #181834;
+    border-color: #6366f1;
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(99, 102, 241, 0.35);
+}
+
+.step0-custom-input-wrap {
+    width: 100%;
+    margin-top: 0.35rem;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.step0-disclaimer {
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+    text-align: center;
+    line-height: 1.45;
+    margin-top: 0.5rem;
+}
+
+/* Step 1: Centered 1-item-per-row pills with stacked chaotic vector watermark texture */
+.chips-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.chip-row {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 42px;
+    padding: 0.65rem 1.4rem;
+    font-family: var(--font-sans);
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: #cbd5e1;
+    background: #0d0d1b;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    cursor: pointer;
+    user-select: none;
+    transition: background var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out), color var(--duration-fast), border-color var(--duration-fast), box-shadow var(--duration-fast);
+    text-align: center;
+}
+
+/* Background stacked vector watermark texture (Visible ONLY on selection with expressive out-of-bounds card-toss spin physics) */
+.chip-row__bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1;
+}
+
+.chip-row.active .chip-row__bg {
+    opacity: 1;
+}
+
+.chip-bg-icon {
+    position: absolute;
+    stroke: #818cf8;
+    fill: none;
+    stroke-width: 1.35;
+    opacity: 0;
+    transition: opacity 0.18s var(--ease-out), transform 0.2s var(--ease-out);
+}
+
+.chip-bg-icon.pos-1 {
+    transform: translate(-95px, -65px) scale(0.2) rotate(calc(var(--icon-rot, 0deg) - 180deg));
+}
+
+.chip-bg-icon.pos-2 {
+    transform: translate(-85px, 75px) scale(0.2) rotate(calc(var(--icon-rot, 0deg) + 190deg));
+}
+
+.chip-bg-icon.pos-3 {
+    transform: translate(90px, -65px) scale(0.2) rotate(calc(var(--icon-rot, 0deg) + 175deg));
+}
+
+.chip-bg-icon.pos-4 {
+    transform: translate(100px, 75px) scale(0.2) rotate(calc(var(--icon-rot, 0deg) - 195deg));
+}
+
+/* Active State: Expressive whip-in from far outside pill borders with full spin & spring bounce */
+.chip-row.active .chip-bg-icon {
+    opacity: 0.22;
+    transform: translate(0, 0) scale(var(--icon-scale, 1)) rotate(var(--icon-rot, 0deg));
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.42s cubic-bezier(0.22, 1.25, 0.36, 1);
+}
+
+.chip-row.active .chip-bg-icon.pos-1 {
+    transition-delay: 0.05s;
+}
+
+.chip-row.active .chip-bg-icon.pos-3 {
+    transition-delay: 0.10s;
+}
+
+.chip-row.active .chip-bg-icon.pos-2 {
+    transition-delay: 0.15s;
+}
+
+.chip-row.active .chip-bg-icon.pos-4 {
+    transition-delay: 0.20s;
+}
+
+/* ─── Per-Domain Random Coordinates, Sizes & Rotations on Flanks (Center Clear) ─── */
+/* 1. Matematyka */
+[data-domain="math"] .chip-bg-icon.pos-1 {
+    left: 2%;
+    top: -20%;
+    width: 44px;
+    height: 44px;
+    --icon-rot: -22deg;
+    --icon-scale: 0.95;
+}
+
+[data-domain="math"] .chip-bg-icon.pos-2 {
+    left: 15%;
+    bottom: -30%;
+    width: 38px;
+    height: 38px;
+    --icon-rot: 16deg;
+    --icon-scale: 1.1;
+}
+
+[data-domain="math"] .chip-bg-icon.pos-3 {
+    right: 16%;
+    top: -16%;
+    width: 40px;
+    height: 40px;
+    --icon-rot: -10deg;
+    --icon-scale: 0.9;
+}
+
+[data-domain="math"] .chip-bg-icon.pos-4 {
+    right: 1%;
+    bottom: -24%;
+    width: 46px;
+    height: 46px;
+    --icon-rot: 26deg;
+    --icon-scale: 1.05;
+}
+
+/* 2. Informatyka */
+[data-domain="cs"] .chip-bg-icon.pos-1 {
+    left: 5%;
+    bottom: -26%;
+    width: 42px;
+    height: 42px;
+    --icon-rot: 19deg;
+    --icon-scale: 1.05;
+}
+
+[data-domain="cs"] .chip-bg-icon.pos-2 {
+    left: 19%;
+    top: -32%;
+    width: 36px;
+    height: 36px;
+    --icon-rot: -28deg;
+    --icon-scale: 0.9;
+}
+
+[data-domain="cs"] .chip-bg-icon.pos-3 {
+    right: 2%;
+    top: -18%;
+    width: 44px;
+    height: 44px;
+    --icon-rot: -35deg;
+    --icon-scale: 1.1;
+}
+
+[data-domain="cs"] .chip-bg-icon.pos-4 {
+    right: 17%;
+    bottom: -22%;
+    width: 38px;
+    height: 38px;
+    --icon-rot: 14deg;
+    --icon-scale: 0.95;
+}
+
+/* 3. Fizyka */
+[data-domain="physics"] .chip-bg-icon.pos-1 {
+    left: 1%;
+    top: -12%;
+    width: 46px;
+    height: 46px;
+    --icon-rot: -32deg;
+    --icon-scale: 1.15;
+}
+
+[data-domain="physics"] .chip-bg-icon.pos-2 {
+    left: 13%;
+    bottom: -36%;
+    width: 36px;
+    height: 36px;
+    --icon-rot: 28deg;
+    --icon-scale: 0.85;
+}
+
+[data-domain="physics"] .chip-bg-icon.pos-3 {
+    right: 20%;
+    bottom: -19%;
+    width: 40px;
+    height: 40px;
+    --icon-rot: -18deg;
+    --icon-scale: 0.9;
+}
+
+[data-domain="physics"] .chip-bg-icon.pos-4 {
+    right: 3%;
+    top: -28%;
+    width: 44px;
+    height: 44px;
+    --icon-rot: 24deg;
+    --icon-scale: 1.1;
+}
+
+/* 4. Biologia */
+[data-domain="biology"] .chip-bg-icon.pos-1 {
+    left: 4%;
+    top: -29%;
+    width: 40px;
+    height: 40px;
+    --icon-rot: 25deg;
+    --icon-scale: 0.95;
+}
+
+[data-domain="biology"] .chip-bg-icon.pos-2 {
+    left: 17%;
+    bottom: -22%;
+    width: 42px;
+    height: 42px;
+    --icon-rot: -14deg;
+    --icon-scale: 1.05;
+}
+
+[data-domain="biology"] .chip-bg-icon.pos-3 {
+    right: 15%;
+    top: -25%;
+    width: 38px;
+    height: 38px;
+    --icon-rot: 30deg;
+    --icon-scale: 1.0;
+}
+
+[data-domain="biology"] .chip-bg-icon.pos-4 {
+    right: 2%;
+    bottom: -32%;
+    width: 44px;
+    height: 44px;
+    --icon-rot: -22deg;
+    --icon-scale: 0.85;
+}
+
+/* 5. Inżynieria */
+[data-domain="engineering"] .chip-bg-icon.pos-1 {
+    left: 3%;
+    bottom: -33%;
+    width: 44px;
+    height: 44px;
+    --icon-rot: -18deg;
+    --icon-scale: 1.1;
+}
+
+[data-domain="engineering"] .chip-bg-icon.pos-2 {
+    left: 16%;
+    top: -17%;
+    width: 36px;
+    height: 36px;
+    --icon-rot: 34deg;
+    --icon-scale: 0.85;
+}
+
+[data-domain="engineering"] .chip-bg-icon.pos-3 {
+    right: 18%;
+    bottom: -26%;
+    width: 42px;
+    height: 42px;
+    --icon-rot: -26deg;
+    --icon-scale: 1.05;
+}
+
+[data-domain="engineering"] .chip-bg-icon.pos-4 {
+    right: 1%;
+    top: -22%;
+    width: 40px;
+    height: 40px;
+    --icon-rot: 12deg;
+    --icon-scale: 0.95;
+}
+
+/* 6. Psychologia */
+[data-domain="psychology"] .chip-bg-icon.pos-1 {
+    left: 5%;
+    top: -20%;
+    width: 42px;
+    height: 42px;
+    --icon-rot: -15deg;
+    --icon-scale: 1.05;
+}
+
+[data-domain="psychology"] .chip-bg-icon.pos-2 {
+    left: 18%;
+    bottom: -29%;
+    width: 38px;
+    height: 38px;
+    --icon-rot: 22deg;
+    --icon-scale: 0.9;
+}
+
+[data-domain="psychology"] .chip-bg-icon.pos-3 {
+    right: 19%;
+    top: -31%;
+    width: 36px;
+    height: 36px;
+    --icon-rot: -32deg;
+    --icon-scale: 0.95;
+}
+
+[data-domain="psychology"] .chip-bg-icon.pos-4 {
+    right: 3%;
+    bottom: -18%;
+    width: 46px;
+    height: 46px;
+    --icon-rot: 18deg;
+    --icon-scale: 1.1;
+}
+
+/* 7. Filozofia */
+[data-domain="philosophy"] .chip-bg-icon.pos-1 {
+    left: 1%;
+    top: -25%;
+    width: 38px;
+    height: 38px;
+    --icon-rot: 20deg;
+    --icon-scale: 0.9;
+}
+
+[data-domain="philosophy"] .chip-bg-icon.pos-2 {
+    left: 14%;
+    bottom: -19%;
+    width: 44px;
+    height: 44px;
+    --icon-rot: -25deg;
+    --icon-scale: 1.1;
+}
+
+[data-domain="philosophy"] .chip-bg-icon.pos-3 {
+    right: 16%;
+    bottom: -33%;
+    width: 36px;
+    height: 36px;
+    --icon-rot: 15deg;
+    --icon-scale: 0.85;
+}
+
+[data-domain="philosophy"] .chip-bg-icon.pos-4 {
+    right: 2%;
+    top: -16%;
+    width: 42px;
+    height: 42px;
+    --icon-rot: -28deg;
+    --icon-scale: 1.05;
+}
+
+/* 8. Ekonomia */
+[data-domain="economics"] .chip-bg-icon.pos-1 {
+    left: 6%;
+    bottom: -31%;
+    width: 40px;
+    height: 40px;
+    --icon-rot: -30deg;
+    --icon-scale: 1.0;
+}
+
+[data-domain="economics"] .chip-bg-icon.pos-2 {
+    left: 20%;
+    top: -23%;
+    width: 38px;
+    height: 38px;
+    --icon-rot: 16deg;
+    --icon-scale: 0.95;
+}
+
+[data-domain="economics"] .chip-bg-icon.pos-3 {
+    right: 14%;
+    top: -18%;
+    width: 44px;
+    height: 44px;
+    --icon-rot: -12deg;
+    --icon-scale: 1.1;
+}
+
+[data-domain="economics"] .chip-bg-icon.pos-4 {
+    right: 4%;
+    bottom: -27%;
+    width: 36px;
+    height: 36px;
+    --icon-rot: 35deg;
+    --icon-scale: 0.85;
+}
+
+/* 9. Historia */
+[data-domain="history"] .chip-bg-icon.pos-1 {
+    left: 2%;
+    top: -18%;
+    width: 44px;
+    height: 44px;
+    --icon-rot: 14deg;
+    --icon-scale: 1.1;
+}
+
+[data-domain="history"] .chip-bg-icon.pos-2 {
+    left: 15%;
+    bottom: -35%;
+    width: 36px;
+    height: 36px;
+    --icon-rot: -20deg;
+    --icon-scale: 0.85;
+}
+
+[data-domain="history"] .chip-bg-icon.pos-3 {
+    right: 21%;
+    bottom: -21%;
+    width: 38px;
+    height: 38px;
+    --icon-rot: 28deg;
+    --icon-scale: 0.95;
+}
+
+[data-domain="history"] .chip-bg-icon.pos-4 {
+    right: 1%;
+    top: -29%;
+    width: 42px;
+    height: 42px;
+    --icon-rot: -16deg;
+    --icon-scale: 1.05;
+}
+
+/* 10. Sztuka */
+[data-domain="art"] .chip-bg-icon.pos-1 {
+    left: 4%;
+    bottom: -23%;
+    width: 38px;
+    height: 38px;
+    --icon-rot: 32deg;
+    --icon-scale: 0.95;
+}
+
+[data-domain="art"] .chip-bg-icon.pos-2 {
+    left: 17%;
+    top: -29%;
+    width: 44px;
+    height: 44px;
+    --icon-rot: -18deg;
+    --icon-scale: 1.1;
+}
+
+[data-domain="art"] .chip-bg-icon.pos-3 {
+    right: 17%;
+    top: -33%;
+    width: 36px;
+    height: 36px;
+    --icon-rot: 22deg;
+    --icon-scale: 0.85;
+}
+
+[data-domain="art"] .chip-bg-icon.pos-4 {
+    right: 3%;
+    bottom: -19%;
+    width: 42px;
+    height: 42px;
+    --icon-rot: -25deg;
+    --icon-scale: 1.05;
+}
+
+/* Default fallback for custom chips */
+.chip-bg-icon.pos-1 {
+    left: 3%;
+    top: -20%;
+    width: 42px;
+    height: 42px;
+    --icon-rot: -18deg;
+    --icon-scale: 1.0;
+}
+
+.chip-bg-icon.pos-2 {
+    left: 17%;
+    bottom: -26%;
+    width: 38px;
+    height: 38px;
+    --icon-rot: 20deg;
+    --icon-scale: 0.95;
+}
+
+.chip-bg-icon.pos-3 {
+    right: 18%;
+    top: -22%;
+    width: 40px;
+    height: 40px;
+    --icon-rot: -14deg;
+    --icon-scale: 0.9;
+}
+
+.chip-bg-icon.pos-4 {
+    right: 2%;
+    bottom: -20%;
+    width: 44px;
+    height: 44px;
+    --icon-rot: 24deg;
+    --icon-scale: 1.05;
+}
+
+.chip-row__content {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    pointer-events: none;
+}
+
+.chip-row__icon {
+    width: 17px;
+    height: 17px;
+    stroke: currentColor;
+    flex-shrink: 0;
+    transition: transform var(--duration-fast) var(--ease-out), color var(--duration-fast);
+}
+
+/* Hover: subtle brightening & slight lift */
+.chip-row:hover {
+    color: #ffffff;
+    background: #15152a;
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.chip-row:hover .chip-row__icon {
+    transform: scale(1.1);
+    color: #ffffff;
+}
+
+/* Active (Selected): Neon glow & border */
+.chip-row.active {
+    color: #ffffff;
+    background: rgba(99, 102, 241, 0.22);
+    border-color: #6366f1;
+    box-shadow: 0 0 16px rgba(99, 102, 241, 0.35);
+}
+
+.chip-row.active .chip-row__icon {
+    color: #a5b4fc;
+}
+
+.chip-row__label {
+    letter-spacing: 0.01em;
+}
+
+/* Custom Tag Input & Absolute Zero-Shift Error Wrapper */
+.custom-chip-builder-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    margin: 1.25rem auto 0 auto;
+}
+
+.custom-chip-builder {
+    display: flex;
+    gap: 0.65rem;
+    width: 100%;
+}
+
+.input--compact {
+    padding: 0.65rem 1rem;
+    font-size: 0.85rem;
+}
+
+.btn--compact {
+    padding: 0.65rem 1.2rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.onboarding-inline-error {
+    position: absolute;
+    top: calc(100% + 0.45rem);
+    left: 0;
+    right: 0;
+    color: #f87171;
+    font-size: 0.86rem;
+    font-weight: 500;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.2s var(--ease-out), transform 0.2s var(--ease-out);
+}
+
+.onboarding-inline-error.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Step 2: Vertical 3-Column Grounding Cards (REBRANDED PREMIUM DESIGN) */
+.level-cards-vertical {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.3rem;
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
+}
+
+.level-card-v {
+    background: #0d0d1b;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: var(--radius-xl);
+    padding: 1.75rem 1.4rem 1.6rem 1.4rem;
+    cursor: pointer;
+    transition: all var(--duration-normal) cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: space-between;
+    position: relative;
+    min-height: 380px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.level-card-v:hover {
+    background: #14142a;
+    border-color: rgba(99, 102, 241, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(99, 102, 241, 0.15);
+}
+
+.level-card-v.active {
+    background: #141430;
+    border-color: #6366f1;
+    box-shadow: 0 0 28px rgba(99, 102, 241, 0.4), 0 16px 40px rgba(0, 0, 0, 0.6);
+}
+
+.level-card-v__top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.level-bolts {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.8rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.bolt-svg {
+    width: 18px;
+    height: 18px;
+    transition: all var(--duration-fast) var(--ease-out);
+}
+
+.bolt-svg.filled {
+    fill: #38bdf8;
+    filter: drop-shadow(0 0 6px #38bdf8);
+}
+
+.bolt-svg.empty {
+    fill: transparent;
+    stroke: rgba(255, 255, 255, 0.18);
+    stroke-width: 1.6;
+}
+
+.level-card-v.active .bolt-svg.filled {
+    fill: #818cf8;
+    filter: drop-shadow(0 0 8px #818cf8);
+}
+
+.level-card-v__tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #818cf8;
+    background: rgba(99, 102, 241, 0.12);
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+}
+
+.level-card-v__body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    justify-content: center;
+    width: 100%;
+    padding: 0 0.2rem;
+}
+
+.level-card-v__title {
+    font-size: 1.18rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.6rem;
+    line-height: 1.25;
+}
+
+.level-card-v__desc {
+    font-size: 0.88rem;
+    color: #cbd5e1;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.level-card-v__footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 1.2rem;
+}
+
+.level-card-v__check {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--duration-fast) var(--ease-out);
+}
+
+.level-card-v.active .level-card-v__check {
+    border-color: #6366f1;
+    background: #6366f1;
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+}
+
+.level-card-v.active .level-card-v__check::after {
+    content: '✓';
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+/* Step 3: Spacious & Clean Textarea */
+.slide-content-spacious {
+    width: 100%;
+    max-width: 580px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.35rem;
+}
+
+.textarea--spacious-clean {
+    min-height: 220px;
+    width: 100%;
+    padding: 1.3rem 1.4rem;
+    font-size: 1rem;
+    line-height: 1.65;
+    resize: vertical;
+    border-radius: var(--radius-xl);
+}
+
+.step3-hint {
+    font-size: 0.84rem;
+    color: var(--text-tertiary);
+    text-align: center;
+    margin-top: 0.4rem;
+}
+
+/* Wizard Actions Bar (Pinned at Bottom Left & Right Corners with 3rem Inset) */
+.wizard-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    max-width: 100%;
+    margin-top: auto;
+    padding: 1rem 3rem 3rem 3rem;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.wizard-actions--step0 {
+    justify-content: flex-end;
+}
+
+.wizard-actions__right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-left: auto;
+}
+
+.wizard-actions .btn {
+    height: 44px;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    font-size: 0.92rem;
+    font-weight: 600;
+    padding: 0 1.5rem;
+    border-radius: var(--radius-md);
+}
+
+.wizard-actions .btn--ghost {
+    font-weight: 500;
+    padding: 0 1.2rem;
+    color: var(--text-secondary);
+    background: transparent;
+}
+
+.wizard-actions .btn--ghost:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.wizard-actions .btn--primary {
+    flex-shrink: 0;
+}
+
