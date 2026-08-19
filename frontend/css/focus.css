@@ -10,7 +10,7 @@
 /* Sticky Hero Box — FIXED docked height */
 .focus-sticky-hero {
     position: absolute;
-    top: calc(45vh - (45vh - 70px) * var(--hero-progress, 0));
+    top: calc(45vh - (45vh - 55px) * var(--hero-progress, 0));
     left: 0;
     width: 100%;
     display: flex;
@@ -26,8 +26,8 @@
 
 /* Sandwich mask removed */
 body[data-focus-active] .main {
-    mask-image: linear-gradient(to bottom, transparent 0%, transparent 140px, black 250px);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 140px, black 250px);
+    mask-image: linear-gradient(to bottom, transparent 0%, transparent 60px, black 600px);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 60px, black 110px);
 }
 
 .focus-hero-inner {
@@ -46,12 +46,11 @@ body[data-focus-active] .main {
 /* Title wrapper — unified block of category + title centered to entire viewport */
 .focus-hero-title-wrap {
     position: relative;
-    width: max-content;
-    max-width: 90vw;
+    width: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     text-align: center;
     z-index: 15;
     pointer-events: none;
@@ -77,16 +76,7 @@ body[data-focus-active] .main {
     z-index: 16;
 }
 
-.focus-domain-tag::after {
-    content: '';
-    display: block;
-    width: 3rem;
-    height: 2px;
-    background: var(--vector-accent-light);
-    margin-top: 0.4rem;
-    border-radius: 2px;
-    opacity: 0.8;
-}
+
 
 /* Massive Title in Hero */
 .focus-hero__title {
@@ -141,9 +131,17 @@ body[data-focus-active] .main {
 }
 
 @keyframes shimmerGradient {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 /* Article Content Wrapper */
@@ -671,4 +669,3 @@ body[data-focus-active] .main {
 .toast__icon {
     color: var(--success);
 }
-

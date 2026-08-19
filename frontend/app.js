@@ -1244,7 +1244,7 @@
             const domainSizeRem = lerp(0, domainEndRem, eased);
             const domainSize = `calc(${domainSizeRem}rem + ${domainSizeVw}vw)`;
             const domainMargin = `${lerp(0.45, 0.15, eased)}rem`;
-            const domainOpacity = lerp(1, 0.95, eased);
+            const domainOpacity = Math.max(1 - progress * 3, 0);
 
 
 
@@ -1264,7 +1264,11 @@
                 cockpit.style.setProperty('--hero-progress', eased);
             }
 
+            // Fade out entire hero to provide clean reading space
+            const heroOpacity = Math.max(1 - progress * 1.5, 0);
+            
             if (stickyHero) {
+                stickyHero.style.opacity = heroOpacity;
                 stickyHero.style.setProperty('--hero-cue-opacity', cueOpacity);
                 stickyHero.style.setProperty('--hero-progress', eased);
                 const titleEl = stickyHero.querySelector('.focus-hero__title');
@@ -1289,6 +1293,32 @@
                     scrollCue.setAttribute('data-hidden', '');
                 } else {
                     scrollCue.removeAttribute('data-hidden');
+                }
+            }
+
+            // Move title to topbar when fully scrolled
+            const topbarDate = $('#topbar-date');
+            if (topbarDate) {
+                if (progress > 0.8 && state.concept && state.concept.status === 'active') {
+                    if (topbarDate.textContent !== state.concept.title) {
+                        topbarDate.style.opacity = '0';
+                        setTimeout(() => {
+                            topbarDate.textContent = state.concept.title;
+                            topbarDate.style.color = 'var(--vector-accent)';
+                            topbarDate.style.fontWeight = '700';
+                            topbarDate.style.opacity = '1';
+                        }, 150);
+                    }
+                } else {
+                    if (topbarDate.style.color === 'var(--vector-accent)') {
+                        topbarDate.style.opacity = '0';
+                        setTimeout(() => {
+                            updateGreetingAndDates();
+                            topbarDate.style.color = '';
+                            topbarDate.style.fontWeight = '';
+                            topbarDate.style.opacity = '1';
+                        }, 150);
+                    }
                 }
             }
         }

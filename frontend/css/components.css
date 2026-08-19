@@ -47,6 +47,7 @@
     color: var(--text-tertiary);
     border-left: 1px solid var(--border);
     padding-left: var(--space-md);
+    transition: opacity 0.15s ease, color 0.15s ease;
 }
 
 .topbar__nav {
