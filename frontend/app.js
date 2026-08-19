@@ -1117,7 +1117,10 @@
 
             if (state.concept) {
                 if (fTitle) fTitle.textContent = state.concept.title;
-                if (fDomain) fDomain.textContent = state.concept.domain || 'General';
+                if (fDomain) {
+                    const catText = state.concept.domain || 'General';
+                    fDomain.textContent = catText.charAt(0).toUpperCase() + catText.slice(1).toLowerCase();
+                }
                 if (fModel) fModel.innerHTML = renderMarkdown(state.concept.intuitive_model || '');
             }
             if (fPrompt) fPrompt.textContent = state.prompt || '';
@@ -1277,7 +1280,7 @@
                     const endDomainPx = 0.85 * 16;
                     domainEl.style.fontSize = `${lerp(startDomainPx, endDomainPx, eased)}px`;
                     domainEl.style.opacity = domainOpacity;
-                    domainEl.style.marginBottom = `${lerp(-1.0, -0.3, eased)}rem`;
+                    domainEl.style.marginBottom = `${lerp(0.2, 0, eased)}rem`;
                 }
             }
 

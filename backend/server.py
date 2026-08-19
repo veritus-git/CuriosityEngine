@@ -266,10 +266,12 @@ async def select_starter_concept(req: SelectStarterTopicRequest, username: str =
             domain=req.domain,
             summary=req.summary
         )
-        prompt = await generate_dynamic_learning_prompt(concept["id"])
+        # Generate rich intro and prompt, updating the DB
+        pkg = await generate_active_session_package(concept["id"])
+        
         return {
-            "concept": concept,
-            "prompt": prompt,
+            "concept": pkg.get("concept") or get_concept(concept["id"]),
+            "prompt": pkg.get("prompt", ""),
             "state": "CONCEPT_ACTIVE"
         }
     except Exception as e:

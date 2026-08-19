@@ -10,7 +10,7 @@
 /* Sticky Hero Box — FIXED docked height */
 .focus-sticky-hero {
     position: absolute;
-    top: calc(45vh - (45vh - 120px) * var(--hero-progress, 0));
+    top: calc(45vh - (45vh - 70px) * var(--hero-progress, 0));
     left: 0;
     width: 100%;
     display: flex;
@@ -24,25 +24,10 @@
     transform: translateY(calc(-50% + 50% * var(--hero-progress, 0)));
 }
 
-/* The Sandwich Mask — Occludes all scrolling content underneath the docked title */
-.focus-sticky-mask {
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100vw;
-    height: calc(100% + 20px);
-    pointer-events: none;
-    z-index: 5;
-    opacity: var(--hero-mask-opacity, 0);
-    background: linear-gradient(
-        to bottom,
-        var(--bg-deep) 0%,
-        var(--bg-deep) calc(100% - 1.8rem),
-        transparent 100%
-    );
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+/* Sandwich mask removed */
+body[data-focus-active] .main {
+    mask-image: linear-gradient(to bottom, transparent 0%, transparent 140px, black 250px);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 140px, black 250px);
 }
 
 .focus-hero-inner {
@@ -61,13 +46,15 @@
 /* Title wrapper — unified block of category + title centered to entire viewport */
 .focus-hero-title-wrap {
     position: relative;
-    width: 100%;
+    width: max-content;
+    max-width: 90vw;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     text-align: center;
     z-index: 15;
-    pointer-events: auto;
+    pointer-events: none;
 }
 
 /* Category Tag in Hero — Crisp, fully legible, positioned cleanly above title */
@@ -75,17 +62,30 @@
     font-size: var(--hero-domain-size, clamp(1.05rem, 1.8vw, 1.35rem));
     font-weight: 800;
     font-family: var(--font-mono);
-    background: linear-gradient(135deg, var(--vector-accent), var(--vector-accent-light), #fff);
+    background: linear-gradient(135deg, var(--vector-accent), var(--vector-accent-light), #fff, var(--vector-accent));
+    background-size: 200% 200%;
+    animation: shimmerGradient 6s ease-in-out infinite;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-transform: uppercase;
+    text-transform: none;
     letter-spacing: 0.14em;
     opacity: var(--hero-domain-opacity, 1);
-    margin-bottom: -0.35em;
+    margin-bottom: 0.2em;
     white-space: nowrap;
     position: relative;
     z-index: 16;
+}
+
+.focus-domain-tag::after {
+    content: '';
+    display: block;
+    width: 3rem;
+    height: 2px;
+    background: var(--vector-accent-light);
+    margin-top: 0.4rem;
+    border-radius: 2px;
+    opacity: 0.8;
 }
 
 /* Massive Title in Hero */
@@ -107,7 +107,7 @@
     align-items: center;
     gap: 0.55rem;
     position: relative;
-    margin-top: 2rem;
+    margin-top: 1.2rem;
     font-size: 0.75rem;
     color: var(--text-tertiary);
     font-weight: 500;
@@ -138,6 +138,12 @@
         transform: translateY(6px);
         opacity: 1;
     }
+}
+
+@keyframes shimmerGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 /* Article Content Wrapper */
